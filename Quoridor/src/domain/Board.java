@@ -3,27 +3,53 @@ package src.domain;
 import java.awt.*;
 
 public class Board {
-
-    public static int size;
+    public int size;
     private Field[][] board;
-    private Color color;
+    private int turns;
 
-    public Board(int size, Color color, String player1Name, String player2Name) {
+    public Board(int size, String player1Color, String player2Color) {
         this.size = size;
-        this.color = color;
-        board = new Field[size][size];
+        board = new Field[2 * size - 1][2 * size - 1];
+        turns = 0;
+        board[getBoardLimit() - 1][getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() + 1] = new Peon(getBoardLimit() - 1, getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() + 1, this);
+        board[0][getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() + 1] = new Peon(0, getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() + 1, this);
     }
 
-    public boolean hasBarrier(int row, int column){
-        if(board[row][column] != null){
+    public Peon getPeon1InitialMoment(){
+        return turns == 0 ? (Peon)board[getBoardLimit() - 1][getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() + 1] : null;
+    }
+    public Peon getPeon2InitialMoment(){
+        return turns == 0 ? (Peon)board[0][getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() + 1] : null;
+    }
+
+    public int getBoardLimit() {
+        return board.length;
+    }
+
+    public boolean hasBarrier(int row, int column) {
+        if (board[row][column] != null) {
             return board[row][column].hasBarrier();
         }
         return false;
     }
-    public boolean hasSquare(int row, int column){
-        if(board[row][column] != null){
+
+    public boolean hasSquare(int row, int column) {
+        if (board[row][column] != null) {
             return board[row][column].hasSquare();
         }
         return false;
+    }
+
+    public boolean hasPeon(int row, int column) {
+        if (board[row][column] != null) {
+            return board[row][column].hasPeon();
+        }
+        return false;
+    }
+
+    public void addBarrier(int row, int column) throws QuoridorException {
+        if(board[row][column]!=null){
+
+        }
     }
 }

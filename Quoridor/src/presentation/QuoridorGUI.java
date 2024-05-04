@@ -1,14 +1,12 @@
 package src.presentation;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 public class QuoridorGUI extends  JFrame{
+
     Dimension screenSize;
     private Dimension buttonSize = new Dimension(250,60);
     private final QuoridorGUI gui = this;
@@ -38,6 +36,9 @@ public class QuoridorGUI extends  JFrame{
     private JTextField numberNormalB, numberTemporal, numberLarga, numberAliadas;
     private JButton applyCustoms;
     // Game window
+    private JButton[][] cells;
+    private JPanel[][] horizontalBarriers;
+    private JPanel[][] verticalBarriers;
     private JLabel turns;
     private JPanel gamePanel;
     private JPanel boardPanel;
@@ -501,7 +502,123 @@ public class QuoridorGUI extends  JFrame{
     }
     public void prepareStartGameWindowElements(){
         gamePanel = new JPanel();
+        gamePanel.setLayout(new BorderLayout());
+
+        JPanel optionsGame = new JPanel();
+        JPanel title = new JPanel();
+        JLabel titleLabel = new JLabel("Quoridor");
+        titleLabel.setFont(new Font("Consolas", Font.BOLD, 50));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        title.add(titleLabel);
+        gamePanel.add(title, BorderLayout.NORTH);
+        gamePanel.add(createBoard(), BorderLayout.CENTER);
     }
+    private JPanel createBoard() {
+        boardPanel = new JPanel(null);
+        int tamBoard = screenSize.height * 4 / 5;
+        int CELL_SIZE = 50;
+        int BAR_WIDTH = 5;
+        int numero = 16;
+        cells = new JButton[numero][numero];
+        horizontalBarriers = new JPanel[numero - 1][numero];
+        verticalBarriers = new JPanel[numero][numero - 1];
+
+        for (int i = 0; i < numero; i++) {
+            for (int j = 0; j < numero; j++) {
+                cells[i][j] = new JButton();
+                int cellX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
+                int cellY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
+                int cell = (int) (CELL_SIZE);
+                cells[i][j].setBounds(cellX, cellY, cell, cell);
+                boardPanel.add(cells[i][j]);
+                if (j < numero - 1) {
+                    verticalBarriers[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, CELL_SIZE);
+                    int barrierX = (int) ((j + 1) * CELL_SIZE + j * BAR_WIDTH);
+                    int barrierY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
+                    verticalBarriers[i][j].setBounds(barrierX, barrierY, BAR_WIDTH, CELL_SIZE);
+                    verticalBarriers[i][j].addMouseListener(createBarrierMouseListener(verticalBarriers[i][j], i, j));
+                    boardPanel.add(verticalBarriers[i][j]);
+                }
+            }
+            if (i < numero - 1) {
+                for (int j = 0; j < numero; j++) {
+                    horizontalBarriers[i][j] = createBarrier(Color.GRAY, CELL_SIZE, BAR_WIDTH);
+                    int barrierX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
+                    int barrierY = (int) ((i + 1) * CELL_SIZE + i * BAR_WIDTH);
+                    horizontalBarriers[i][j].setBounds(barrierX, barrierY, CELL_SIZE, BAR_WIDTH);
+                    horizontalBarriers[i][j].addMouseListener(createBarrierMouseListener(horizontalBarriers[i][j], i, j));
+                    boardPanel.add(horizontalBarriers[i][j]);
+                    if (j < numero - 1) {
+                        JPanel emptyPanel = new JPanel();
+                        emptyPanel.setBackground(boardPanel.getBackground());
+                        int emptyX = (int) ((j + 1) * CELL_SIZE + j * BAR_WIDTH);
+                        int emptyY = (int) ((i + 1) * CELL_SIZE + i * BAR_WIDTH);
+                        int emptyWidth = (int) (BAR_WIDTH);
+                        int emptyHeight = (int) (BAR_WIDTH);
+                        emptyPanel.setBounds(emptyX, emptyY, emptyWidth, emptyHeight);
+                        boardPanel.add(emptyPanel);
+                    }
+                }
+            }
+        }
+        boardPanel.setPreferredSize(new Dimension(tamBoard, tamBoard));
+        return boardPanel;
+    }
+
+    private JPanel createBarrier(Color color, int width, int height) {
+        JPanel barrierPanel = new JPanel();
+        barrierPanel.setBackground(color);
+        barrierPanel.setPreferredSize(new Dimension(width, height));
+        return barrierPanel;
+    }
+    private MouseAdapter createBarrierMouseListener(JPanel barrier, int row, int col) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                barrier.setBackground(Color.BLUE); // Cambiar a tu color deseado
+                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
+                if (e.getComponent() == verticalBarriers[row][col] && row != verticalBarriers.length - 1) {
+                    verticalBarriers[row + 1][col].setBackground(Color.RED);
+                }
+                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
+                else if (e.getComponent() == verticalBarriers[row][col] && row == verticalBarriers.length - 1 ) {
+                    verticalBarriers[row - 1][col].setBackground(Color.BLUE);
+                }
+                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
+                else if (e.getComponent() == horizontalBarriers[row][col] && col < horizontalBarriers[row].length - 1) {
+                    horizontalBarriers[row][col + 1].setBackground(Color.BLUE);
+                }
+                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
+                else if (e.getComponent() == horizontalBarriers[row][col] && col > 0) {
+                    horizontalBarriers[row][col - 1].setBackground(Color.BLUE);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                barrier.setBackground(Color.GRAY); // Cambiar al color original
+                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
+                if (e.getComponent() == verticalBarriers[row][col] &&  row != verticalBarriers.length - 1) {
+                    verticalBarriers[row + 1][col].setBackground(Color.GRAY);
+                }
+                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
+                if (e.getComponent() == verticalBarriers[row][col] && row == verticalBarriers.length - 1 ) {
+                    verticalBarriers[row - 1][col].setBackground(Color.GRAY);
+                }
+                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
+                if (e.getComponent() == horizontalBarriers[row][col] && col < horizontalBarriers[row].length - 1) {
+                    horizontalBarriers[row][col + 1].setBackground(Color.GRAY);
+                }
+                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
+                if (e.getComponent() == horizontalBarriers[row][col] && col > 0) {
+                    horizontalBarriers[row][col - 1].setBackground(Color.GRAY);
+                }
+            }
+        };
+    }
+
+
+
     public void prepareStartGameWindowActions(){
 
     }
@@ -517,7 +634,6 @@ public class QuoridorGUI extends  JFrame{
         customPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
-
         // Título
         JLabel titleLabel = new JLabel("CUSTOMIZES");
         titleLabel.setFont(new Font("Consolas", Font.BOLD, 60));
@@ -526,7 +642,6 @@ public class QuoridorGUI extends  JFrame{
         gbc.gridy = 0;
         gbc.gridwidth = 3; // Ocupar tres columnas
         customPanel.add(titleLabel, gbc);
-
         // Panel para el tamaño del tablero
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
@@ -537,20 +652,17 @@ public class QuoridorGUI extends  JFrame{
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         panel.add(labelBoardSize);
-
         JTextField boardSizeField = new JTextField();
         boardSizeField.setPreferredSize(buttonSize);
         boardSizeField.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(boardSizeField);
         customPanel.add(panel, gbc);
-
         // Panel para las opciones de personalización
         JPanel options = new JPanel(new GridBagLayout());
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1; // Ocupar dos columnas
         customPanel.add(options, gbc);
-
         gbc.anchor = GridBagConstraints.WEST; // Alinear a la izquierda
         String[] labels = {"Normal:", "Normal:", "Temporal:", "Teletransportadora:", "Larga:", "Regresar:", "Aliada:", "Turno Doble:"};
         for (int i = 1; i <= 7; i+=2) {
@@ -597,7 +709,6 @@ public class QuoridorGUI extends  JFrame{
             options.add(textField2, gbc);// Agrega el campo de texto con GridBagConstraints
             custumValuesSquares.add(textField2);
         }
-
         // Botón
         applyCustoms = createButton("APPLY", buttonSize);
         gbc.gridx = 0; // Columna 0

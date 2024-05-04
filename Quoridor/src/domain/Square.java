@@ -1,10 +1,12 @@
 package src.domain;
 
 public abstract class Square extends Field{
-    protected abstract void applySpecialAction();
 
     @Override
-    protected boolean hasBarrier() {
-        return false;
-    }
+    protected boolean hasBarrier() {return false;}
+
+    @Override
+    protected boolean hasPeon() {return false;}
+
+    protected abstract void applySpecialAction();
 }

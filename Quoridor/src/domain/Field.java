@@ -12,8 +12,9 @@ public abstract class Field {
         this.color = color;
     }
 
-    protected abstract String getTipy();
+    protected abstract String getType();
     protected abstract boolean hasBarrier();
     protected abstract boolean hasSquare();
+    protected abstract boolean hasPeon();
 
 }
