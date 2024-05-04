@@ -1,4 +1,5 @@
 package src.domain;
 
-public class Barrier {
+public abstract class Barrier extends Field{
+    protected boolean orientarion;
 }
