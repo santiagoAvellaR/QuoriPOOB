@@ -49,29 +49,36 @@ public class Peon extends Field{
         int direction = goesUp ? -1 : 1;
         if (row == 0 && goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
         if (row == board.getBoardLimit()-1 && !goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
+        int oldRow = row;
         if (board.hasPeon(row+(2*direction), column)){
             if (row <= 2 && goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             if (row >= board.getBoardLimit()-2 && !goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             if (board.hasBarrier(row+(3*direction), column)){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             // validar que donde salta tenga casilla especial
             row += 4*direction;
+            board.movePeon(oldRow, column, row, column);
         }
         else {//validar que donde salta tenga casilla especial
-            row += 2*direction;}
+            row += 2*direction;
+            board.movePeon(oldRow, column, row, column);
+        }
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
         if (column == 0 && goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
         if (column == board.getBoardLimit()-1 && !goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
+        int oldColumn = column;
         if (board.hasPeon(row, column+(2*direction))){
             if (column <= 2 && goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             if (column >= board.getBoardLimit()-2 && !goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             if (board.hasBarrier(row, column+(3*direction))){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             // validar que donde salta tenga casilla especial
             column += 4*direction;
+            board.movePeon(oldColumn, column, row, column);
         }
         else {//validar que donde salta tenga casilla especial
             column += 2*direction;
+            board.movePeon(oldColumn, column, row, column);
         }
     }
     public void move(char direction) throws QuoridorException{

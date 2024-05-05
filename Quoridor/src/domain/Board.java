@@ -7,7 +7,7 @@ public class Board {
     private Field[][] board;
     private int turns;
 
-    public Board(int size, String player1Color, String player2Color) {
+    public Board(int size, Color player1Color, Color player2Color) {
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         turns = 0;
@@ -21,7 +21,9 @@ public class Board {
     public Peon getPeon2InitialMoment(){
         return turns == 0 ? (Peon)board[0][getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() + 1] : null;
     }
-
+    public int getTurns(){
+        return turns;
+    }
     public int getBoardLimit() {
         return board.length;
     }
@@ -47,9 +49,13 @@ public class Board {
         return false;
     }
 
+    public void movePeon(int oldRow, int oldColumn, int newRow, int newColumn) {
+        board[newRow][newColumn] = board[oldRow][oldColumn];
+        board[oldRow][oldColumn] = null;
+    }
+
     public void addBarrier(int row, int column) throws QuoridorException {
         if(board[row][column]!=null){
-
         }
     }
 }

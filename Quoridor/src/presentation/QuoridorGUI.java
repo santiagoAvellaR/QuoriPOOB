@@ -27,16 +27,18 @@ public class QuoridorGUI extends  JFrame{
     private JTextField namePlayer2;
     //Ajustes
     private JPanel settingsPanel;
-    private JButton colorBoard, colorP1, colorP2, colorB1, colorB2, applySettings;
+    private JButton colorBoard, colorP1, colorP2, applySettings;
+    private Color colorBoardSelected = Color.WHITE;
+    private Color colorP1Selected = Color.WHITE;
+    private Color colorP2Selected = Color.WHITE;
     // Customize window;
     private JPanel customPanel;
-    private  JTextField boardSize;
+    private  JTextField boardSize ;
     private ArrayList<JTextField> custumValuesBarriers;
     private ArrayList<JTextField> custumValuesSquares;
-    private JTextField numberNormalB, numberTemporal, numberLarga, numberAliadas;
     private JButton applyCustoms;
     // Game window
-    private JButton[][] cells;
+    private JPanel[][] cells;
     private JPanel[][] horizontalBarriers;
     private JPanel[][] verticalBarriers;
     private JLabel turns;
@@ -408,13 +410,10 @@ public class QuoridorGUI extends  JFrame{
         colorBoard = createButton("COLOR BOARD", buttonSize);
         colorP1 = createButton("COLOR P1", buttonSize);
         colorP2 = createButton("COLOR P2", buttonSize);
-        colorB1 = createButton("COLOR B1", buttonSize);
-        colorB2 = createButton("COLOR B2", buttonSize);
         buttons.add(colorBoard);
         buttons.add(colorP1);
         buttons.add(colorP2);
-        buttons.add(colorB1);
-        buttons.add(colorB2);
+
         settingsPanel.add(buttons, buttonConstraints);
         // Restricciones para el botón de aplicar
         GridBagConstraints applyConstraints = new GridBagConstraints();
@@ -428,77 +427,60 @@ public class QuoridorGUI extends  JFrame{
     }
 
 
-
     public void prepareSettingsWindowActions(){
         colorBoard.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", Color.WHITE);
-                if (newColor == null){
-                    JOptionPane.showMessageDialog(gui, "Color no valida, vuelva a seleccionar");
+                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorBoardSelected);
+                if (newColor != null) {
+                    colorBoardSelected = newColor;
                 }
-                else {
-                    String newColorString = Integer.toString(newColor.getRGB());
+                else{
+                    JOptionPane.showMessageDialog(null, "Debes elegir un color");
                 }
             }
         });
         colorP1.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", Color.WHITE);
-                if (newColor == null){
-                    JOptionPane.showMessageDialog(gui, "Color no valida, vuelva a seleccionar");
+                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorP1Selected);
+                if (newColor != null) {
+                    colorP1Selected = newColor;
                 }
-                else {
-                    String newColorString = Integer.toString(newColor.getRGB());
+                else{
+                    JOptionPane.showMessageDialog(null, "Debes elegir un color");
                 }
-            }
-        });
-        colorP2.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", Color.WHITE);
-                if (newColor == null){
-                    JOptionPane.showMessageDialog(gui, "Color no valida, vuelva a seleccionar");
-                }
-                else {
-                    String newColorString = Integer.toString(newColor.getRGB());
-                }
-            }
-        });
-        colorB1.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", Color.WHITE);
-                if (newColor == null){
-                    JOptionPane.showMessageDialog(gui, "Color no valida, vuelva a seleccionar");
-                }
-                else {
-                    String newColorString = Integer.toString(newColor.getRGB());
-                }
-            }
-        });
-        colorB2.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", Color.WHITE);
-                if (newColor == null){
-                    JOptionPane.showMessageDialog(gui, "Color no valida, vuelva a seleccionar");
-                }
-                else {
-                    String newColorString = Integer.toString(newColor.getRGB());
-                }
-            }
-        });
-        applySettings.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setContentPane(newGameOp);
-                revalidate();
-                repaint();
             }
         });
 
+
+        colorP2.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorP2Selected);
+                if (newColor != null) {
+                    colorP2Selected = newColor;
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Debes elegir un color");
+                }
+            }
+        });
+
+        applySettings.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (!colorBoardSelected.equals(colorP1Selected) && !colorBoardSelected.equals(colorP2Selected) && !colorP1Selected.equals(colorP2Selected)) {
+                    setContentPane(newGameOp);
+                    revalidate();
+                    repaint();
+                } else {
+
+                    JOptionPane.showMessageDialog(gui, "Por favor, selecciona colores diferentes para cada opción.");
+                }
+            }
+        });
     }
     public void prepareStartGameWindowElements(){
         gamePanel = new JPanel();
@@ -518,25 +500,29 @@ public class QuoridorGUI extends  JFrame{
         int tamBoard = screenSize.height * 4 / 5;
         int CELL_SIZE = 50;
         int BAR_WIDTH = 5;
-        int numero = 16;
-        cells = new JButton[numero][numero];
+        int numero =Integer.parseInt(boardSize.getText().trim());
+
+        cells = new JPanel[numero][numero];
         horizontalBarriers = new JPanel[numero - 1][numero];
         verticalBarriers = new JPanel[numero][numero - 1];
 
         for (int i = 0; i < numero; i++) {
             for (int j = 0; j < numero; j++) {
-                cells[i][j] = new JButton();
+                cells[i][j] = new JPanel();
                 int cellX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
                 int cellY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
                 int cell = (int) (CELL_SIZE);
                 cells[i][j].setBounds(cellX, cellY, cell, cell);
                 boardPanel.add(cells[i][j]);
-                if (j < numero - 1) {
+                if (j < numero - 1 ) { // Evitar la última fila de barreras verticales
                     verticalBarriers[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, CELL_SIZE);
                     int barrierX = (int) ((j + 1) * CELL_SIZE + j * BAR_WIDTH);
                     int barrierY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
                     verticalBarriers[i][j].setBounds(barrierX, barrierY, BAR_WIDTH, CELL_SIZE);
-                    verticalBarriers[i][j].addMouseListener(createBarrierMouseListener(verticalBarriers[i][j], i, j));
+                    // Evitar añadir MouseListener a las barreras verticales de la última fila
+                    if (i < verticalBarriers.length - 1) {
+                        verticalBarriers[i][j].addMouseListener(createBarrierMouseListener(verticalBarriers[i][j], i, j));
+                    }
                     boardPanel.add(verticalBarriers[i][j]);
                 }
             }
@@ -546,7 +532,10 @@ public class QuoridorGUI extends  JFrame{
                     int barrierX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
                     int barrierY = (int) ((i + 1) * CELL_SIZE + i * BAR_WIDTH);
                     horizontalBarriers[i][j].setBounds(barrierX, barrierY, CELL_SIZE, BAR_WIDTH);
-                    horizontalBarriers[i][j].addMouseListener(createBarrierMouseListener(horizontalBarriers[i][j], i, j));
+                    // Evitar añadir MouseListener a las barreras horizontales de la última columna
+                    if (j < horizontalBarriers[i].length - 1) {
+                        horizontalBarriers[i][j].addMouseListener(createBarrierMouseListener(horizontalBarriers[i][j], i, j));
+                    }
                     boardPanel.add(horizontalBarriers[i][j]);
                     if (j < numero - 1) {
                         JPanel emptyPanel = new JPanel();
@@ -576,46 +565,32 @@ public class QuoridorGUI extends  JFrame{
             @Override
             public void mouseEntered(MouseEvent e) {
                 barrier.setBackground(Color.BLUE); // Cambiar a tu color deseado
-                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
-                if (e.getComponent() == verticalBarriers[row][col] && row != verticalBarriers.length - 1) {
-                    verticalBarriers[row + 1][col].setBackground(Color.RED);
+                if (e.getComponent() == verticalBarriers[row][col]  && row != verticalBarriers.length -1) {
+                    verticalBarriers[row + 1][col].setBackground(Color.BLUE);
                 }
-                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
-                else if (e.getComponent() == verticalBarriers[row][col] && row == verticalBarriers.length - 1 ) {
-                    verticalBarriers[row - 1][col].setBackground(Color.BLUE);
-                }
-                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
-                else if (e.getComponent() == horizontalBarriers[row][col] && col < horizontalBarriers[row].length - 1) {
+
+                // Verificar si la barrera es horizontal y no es la última columna de barreras horizontales
+                else if (e.getComponent() == horizontalBarriers[row][col] && col != horizontalBarriers[row].length - 1) {
                     horizontalBarriers[row][col + 1].setBackground(Color.BLUE);
                 }
-                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
-                else if (e.getComponent() == horizontalBarriers[row][col] && col > 0) {
-                    horizontalBarriers[row][col - 1].setBackground(Color.BLUE);
-                }
+
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 barrier.setBackground(Color.GRAY); // Cambiar al color original
-                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
-                if (e.getComponent() == verticalBarriers[row][col] &&  row != verticalBarriers.length - 1) {
+                // Verificar si la barrera es vertical y no es la última fila de barreras verticales
+                if (e.getComponent() == verticalBarriers[row][col]  && row != verticalBarriers.length-1) {
                     verticalBarriers[row + 1][col].setBackground(Color.GRAY);
                 }
-                // Verificar si la barrera es vertical y está dentro de los límites de la matriz
-                if (e.getComponent() == verticalBarriers[row][col] && row == verticalBarriers.length - 1 ) {
-                    verticalBarriers[row - 1][col].setBackground(Color.GRAY);
-                }
-                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
-                if (e.getComponent() == horizontalBarriers[row][col] && col < horizontalBarriers[row].length - 1) {
+                // Verificar si la barrera es horizontal y no es la última columna de barreras horizontales
+                else if (e.getComponent() == horizontalBarriers[row][col] && col != horizontalBarriers[row].length - 1) {
                     horizontalBarriers[row][col + 1].setBackground(Color.GRAY);
-                }
-                // Verificar si la barrera es horizontal y está dentro de los límites de la matriz
-                if (e.getComponent() == horizontalBarriers[row][col] && col > 0) {
-                    horizontalBarriers[row][col - 1].setBackground(Color.GRAY);
                 }
             }
         };
     }
+
 
 
 
@@ -652,10 +627,10 @@ public class QuoridorGUI extends  JFrame{
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         panel.add(labelBoardSize);
-        JTextField boardSizeField = new JTextField();
-        boardSizeField.setPreferredSize(buttonSize);
-        boardSizeField.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(boardSizeField);
+        boardSize = new JTextField();
+        boardSize.setPreferredSize(buttonSize);
+        boardSize.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(boardSize);
         customPanel.add(panel, gbc);
         // Panel para las opciones de personalización
         JPanel options = new JPanel(new GridBagLayout());
@@ -723,10 +698,38 @@ public class QuoridorGUI extends  JFrame{
         applyCustoms.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                setContentPane(newGameOp);
-                revalidate();
-                repaint();
+                if(!boardSize.getText().equals("")) {
+                    int tamBoard = Integer.parseInt(boardSize.getText().trim());
+                    int count = 0;
+                    int total = 0;
+                    boolean lleno = true;
+                    for (JTextField textField : custumValuesBarriers) {
+                        if(!boardSize.getText().equals("")) {
+                            if (count % 2 == 0) {
+                                int numbarrera = Integer.parseInt(textField.getText().trim());
+                                total += numbarrera;
+                            }
+                        }
+                        else{
+                            lleno = false;
+                        }
+                        count += 1;
+                    }
+                    if (total > tamBoard) {
+                        JOptionPane.showMessageDialog(null, "El numero de barreras es invalido");
+                    } else {
+                        if(lleno) {
+                            setContentPane(newGameOp);
+                            revalidate();
+                            repaint();
+                        }
+                        else{
+                            JOptionPane.showMessageDialog(null, "Todo los campos deben ser llenados");
+                        }
+                    }
+                }
             }
+
         });
     }
 
