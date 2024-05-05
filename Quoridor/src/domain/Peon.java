@@ -7,12 +7,14 @@ public class Peon extends Field{
     private int row;
     private int column;
     private final Board board;
+    private ArrayList<String> tracker;
 
     public Peon(int row, int column, Board board, Color color) {
         super(color);
         this.row = row;
         this.column = column;
         this.board = board;
+        tracker = new ArrayList<String>();
     }
     public int getRow() {
         return row;
@@ -28,7 +30,7 @@ public class Peon extends Field{
     public boolean equals(Object obj) {
         if (obj instanceof Peon) {
             Peon p = (Peon) obj;
-            return row == p.row && column == p.column && color.equals(p.color);
+            return row == p.row && column == p.column && color.equals(p.getColor());
         }
         return false;
     }
@@ -42,91 +44,127 @@ public class Peon extends Field{
     @Override
     public boolean hasPeon(){return true;}
 
-    public void moveVertical(Color playerColor, boolean goesUp) throws QuoridorException {
+    public void moveVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        if (row == 0 && goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-        if (row == board.getBoardLimit()-1 && !goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-        int oldRow = row;
-        if (board.hasPeon(row+(2*direction), column)){
-            if (row <= 2 && goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-            if (row >= board.getBoardLimit()-2 && !goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-            if (board.hasBarrier(row+(3*direction), column)){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-            // validar que donde salta tenga casilla especial
-            row += 4*direction;
-            board.movePeon(playerColor, oldRow, column, row, column);
-        }
-        else {//validar que donde salta tenga casilla especial
-            row += 2*direction;
-            board.movePeon(playerColor, oldRow, column, row, column);
-        }
+        board.movePeon(row, column, row + direction*2, column);
+        row += direction*2;
+        tracker.add(goesUp ? "d" : "u");
     }
-    public void moveHorizontal(Color playerColor, boolean goesLeft) throws QuoridorException {
+    public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        if (column == 0 && goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-        if (column == board.getBoardLimit()-1 && !goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-        int oldColumn = column;
-        if (board.hasPeon(row, column+(2*direction))){
-            if (column <= 2 && goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-            if (column >= board.getBoardLimit()-2 && !goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-            if (board.hasBarrier(row, column+(3*direction))){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
-            // validar que donde salta tenga casilla especial
-            column += 4*direction;
-            try{
-                board.movePeon(playerColor, oldColumn, column, row, column);
-            }
-            catch(QuoridorException e) {
-                if (e.getMessage().equals(QuoridorException.PLAYER_NOT_TURN)) {
-                    column += 4 * direction * -1;
-                    throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);
-                }
-            }
+        try{
+            board.movePeon(row, column, row, column + direction*2);
+            column += direction*2;
         }
-        else {//validar que donde salta tenga casilla especial
-            column += 2*direction;
-            try{
-                board.movePeon(playerColor, oldColumn, column, row, column);
-            }
-            catch(QuoridorException e) {
-                if (e.getMessage().equals(QuoridorException.PLAYER_NOT_TURN)) {
-                    column += 2 * direction * -1;
-                    throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);
-                }
+        catch(QuoridorException e){
+            if (e.getMessage().equals(QuoridorException.PLAYER_NOT_TURN)){
+                column -= direction*2;
+                throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);
             }
         }
     }
 
-    public void move(Color playerColor, char direction) throws QuoridorException{
-        if (direction == 'u'){
-            moveVertical(playerColor, true);
+    public void move(String direction) throws QuoridorException{
+        if (direction.equals("u")){
+            moveVertical(true);
         }
-        else if (direction == 'd'){
-            moveVertical(playerColor, false);
+        else if (direction.equals("d")){
+            moveVertical(false);
         }
-        else if (direction == 'l'){
-            moveHorizontal(playerColor, true);
+        else if (direction.equals("l")){
+            moveHorizontal(true);
         }
-        else if (direction == 'r'){
-            moveHorizontal(playerColor, false);
+        else if (direction.equals("r")){
+            moveHorizontal(false);
         }
     }
 
-    public ArrayList<Character> getValidMovements() throws QuoridorException{
-        ArrayList<Character> validMovements = new ArrayList<Character>();
-        // validate up
-        if (validateUp()){validMovements.add('u');}
+    public ArrayList<String> getValidMovements(){
+        ArrayList<String> validMovements = new ArrayList<String>();
+        validMovements = validateVertical(validMovements, true);
+        validMovements = validateVertical(validMovements, false);
+        validMovements = validateHorizontal(validMovements, true);
+        validMovements = validateHorizontal(validMovements, false);
         return validMovements;
     }
 
-    public boolean validateUp(){
-        // verificar barrera
-        boolean hasBarrier = false;
-        if (board.getField(row-1, column) != null){
-            Barrier barrier = (Barrier) board.getField(row-1, column);
-            if (!barrier.isAllied(color)){
-                hasBarrier = true;
+    public ArrayList<String> validateVertical(ArrayList<String> validMovementsCalculated, boolean goesUp){
+        ArrayList<String> validVericalMovements = validMovementsCalculated;
+        if (row == 0 && goesUp) {return validVericalMovements;}
+        if (row == board.getBoardLimit()-1 && !goesUp) {return validVericalMovements;}
+        int direction = goesUp ? -1 : 1;
+        // verificar salto Simple
+        if (board.getField(row + direction, column) != null) {
+            Barrier barrier = (Barrier) board.getField(row + direction, column);
+            if (!barrier.isAllied(color)) {
+                return validVericalMovements;
             }
         }
-        boolean hasPeon = false;
-        return !hasBarrier && !hasPeon;
+        if (board.getField(row + 2*direction, column) != null) {
+            Field field = board.getField(row + 2*direction, column);
+            if (!field.hasPeon()){
+                String directionString = goesUp ? "u" : "d";
+                validVericalMovements.add(directionString);
+                return validVericalMovements;
+            }
+        }
+        if (row <= 2 && goesUp){return validVericalMovements;}
+        if (row >= board.getBoardLimit()-2 && !goesUp){return validVericalMovements;}
+        // verificar salto Doble
+        if (board.getField(row + 3*direction, column) != null) {
+            Barrier barrier = (Barrier) board.getField(row + 3*direction, column);
+            if (!barrier.isAllied(color)) {
+                return validVericalMovements;
+            }
+        }
+        if (board.getField(row + 4*direction, column) != null) {
+            Field field = board.getField(row + 4 * direction, column);
+            if (!field.hasPeon()) {
+                String directionCharacter = goesUp ? "ju" : "jd";
+                validVericalMovements.add(directionCharacter);
+                return validVericalMovements;
+            }
+        }
+        return validVericalMovements;
+    }
+
+    public ArrayList<String> validateHorizontal(ArrayList<String> validMovementsCalculated, boolean goesLeft){
+        ArrayList<String> validHorizontalMovements = validMovementsCalculated;
+        if (column == 0 && goesLeft) {return validHorizontalMovements;}
+        if (column == board.getBoardLimit()-1 && !goesLeft) {return validHorizontalMovements;}
+        int direction = goesLeft ? -1 : 1;
+        // verificar salto Simple
+        if (board.getField(row, column + direction) != null) {
+            Barrier barrier = (Barrier) board.getField(row, column + direction);
+            if (!barrier.isAllied(color)) {
+                return validHorizontalMovements;
+            }
+        }
+        if (board.getField(row, column + 2*direction) != null) {
+            Field field = board.getField(row, column + 2*direction);
+            if (!field.hasPeon()){
+                String directionString = goesLeft ? "u" : "d";
+                validHorizontalMovements.add(directionString);
+                return validHorizontalMovements;
+            }
+        }
+        if (column <= 2 && goesLeft){return validHorizontalMovements;}
+        if (column >= board.getBoardLimit()-2 && !goesLeft){return validHorizontalMovements;}
+        // verificar salto Doble
+        if (board.getField(row, column + 3*direction) != null) {
+            Barrier barrier = (Barrier) board.getField(row, column + 3*direction);
+            if (!barrier.isAllied(color)) {
+                return validHorizontalMovements;
+            }
+        }
+        if (board.getField(row, column + 4*direction) != null) {
+            Field field = board.getField(row, column + 4 * direction);
+            if (!field.hasPeon()) {
+                String directionCharacter = goesLeft ? "ju" : "jd";
+                validHorizontalMovements.add(directionCharacter);
+                return validHorizontalMovements;
+            }
+        }
+        return validHorizontalMovements;
     }
 }

@@ -10,8 +10,4 @@ public class Machine extends Player{
         this.machineMode = machineMode;
     }
 
-    @Override
-    public void addBarrier() {
-
-    }
 }

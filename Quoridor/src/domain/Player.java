@@ -1,12 +1,13 @@
 package src.domain;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public abstract class Player {
-    private Peon peon;
-    private int remainingBridges;
-    private String name;
-    private Color color;
+    protected Peon peon;
+    protected int remainingBridges;
+    protected String name;
+    protected Color color;
 
     public Player(Peon peon, String name, int remainingBridges, Color color) {
         this.peon = peon;
@@ -19,8 +20,8 @@ public abstract class Player {
         return color;
     }
 
-    public abstract void addBarrier();
-    public final void movePeon(Color color, char direction) throws QuoridorException {
-        peon.move(color, direction);
+    public final void movePeon(Color color, String direction) throws QuoridorException {
+        peon.move(direction);
     }
+
 }
