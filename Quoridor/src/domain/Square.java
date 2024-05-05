@@ -1,12 +1,18 @@
 package src.domain;
 
+import java.awt.*;
+
 public abstract class Square extends Field{
 
-    @Override
-    protected boolean hasBarrier() {return false;}
+    public Square(Color color){
+        super(color);
+    }
 
     @Override
-    protected boolean hasPeon() {return false;}
+    public boolean hasBarrier() {return false;}
+
+    @Override
+    public boolean hasPeon() {return false;}
 
     protected abstract void applySpecialAction();
 }

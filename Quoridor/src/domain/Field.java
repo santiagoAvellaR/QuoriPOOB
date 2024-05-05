@@ -5,6 +5,10 @@ import java.awt.*;
 public abstract class Field {
     protected Color color;
 
+    public Field(Color color) {
+        this.color = color;
+    }
+
     protected Color getColor(){
         return color;
     }
@@ -12,9 +16,9 @@ public abstract class Field {
         this.color = color;
     }
 
-    protected abstract String getType();
-    protected abstract boolean hasBarrier();
-    protected abstract boolean hasSquare();
-    protected abstract boolean hasPeon();
+    public abstract String getType();
+    public abstract boolean hasBarrier();
+    public abstract boolean hasSquare();
+    public abstract boolean hasPeon();
 
 }

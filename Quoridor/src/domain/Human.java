@@ -8,11 +8,6 @@ public class Human extends Player{
     }
 
     @Override
-    public void movePeon(int row, int col) {
-
-    }
-
-    @Override
     public void addBarrier() {
 
     }

@@ -20,5 +20,7 @@ public abstract class Player {
     }
 
     public abstract void addBarrier();
-    public abstract void movePeon(int row, int col);
+    public final void movePeon(Color color, char direction) throws QuoridorException {
+        peon.move(color, direction);
+    }
 }

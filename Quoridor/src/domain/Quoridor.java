@@ -28,4 +28,13 @@ public class Quoridor {
     public int getTurns(){
         return board.getTurns();
     }
+
+    public void movePeon(Color playerColor, char direction) throws QuoridorException {
+        Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
+        selectedPlayer.movePeon(playerColor, direction);
+    }
+
+    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, int length) throws QuoridorException {
+    }
+
 }

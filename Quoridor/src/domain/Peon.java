@@ -1,16 +1,15 @@
 package src.domain;
 
 import java.awt.*;
-import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 
 public class Peon extends Field{
     private int row;
     private int column;
-    private Color color;
     private final Board board;
 
-    public Peon(int row, int column, Board board) {
+    public Peon(int row, int column, Board board, Color color) {
+        super(color);
         this.row = row;
         this.column = column;
         this.board = board;
@@ -21,9 +20,7 @@ public class Peon extends Field{
     public int getColumn() {
         return column;
     }
-    public Color getColor() {
-        return color;
-    }
+
     public void setColor(Color color) {
         this.color = color;
     }
@@ -45,7 +42,7 @@ public class Peon extends Field{
     @Override
     public boolean hasPeon(){return true;}
 
-    public void moveVertical(boolean goesUp) throws QuoridorException {
+    public void moveVertical(Color playerColor, boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
         if (row == 0 && goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
         if (row == board.getBoardLimit()-1 && !goesUp){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
@@ -56,14 +53,14 @@ public class Peon extends Field{
             if (board.hasBarrier(row+(3*direction), column)){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             // validar que donde salta tenga casilla especial
             row += 4*direction;
-            board.movePeon(oldRow, column, row, column);
+            board.movePeon(playerColor, oldRow, column, row, column);
         }
         else {//validar que donde salta tenga casilla especial
             row += 2*direction;
-            board.movePeon(oldRow, column, row, column);
+            board.movePeon(playerColor, oldRow, column, row, column);
         }
     }
-    public void moveHorizontal(boolean goesLeft) throws QuoridorException {
+    public void moveHorizontal(Color playerColor, boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
         if (column == 0 && goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
         if (column == board.getBoardLimit()-1 && !goesLeft){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
@@ -74,30 +71,62 @@ public class Peon extends Field{
             if (board.hasBarrier(row, column+(3*direction))){throw new QuoridorException(QuoridorException.INVALID_MOVEMENT);}
             // validar que donde salta tenga casilla especial
             column += 4*direction;
-            board.movePeon(oldColumn, column, row, column);
+            try{
+                board.movePeon(playerColor, oldColumn, column, row, column);
+            }
+            catch(QuoridorException e) {
+                if (e.getMessage().equals(QuoridorException.PLAYER_NOT_TURN)) {
+                    column += 4 * direction * -1;
+                    throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);
+                }
+            }
         }
         else {//validar que donde salta tenga casilla especial
             column += 2*direction;
-            board.movePeon(oldColumn, column, row, column);
-        }
-    }
-    public void move(char direction) throws QuoridorException{
-        if (direction == 'u'){
-            moveVertical(true);
-        }
-        else if (direction == 'd'){
-            moveVertical(false);
-        }
-        else if (direction == 'l'){
-            moveHorizontal(true);
-        }
-        else if (direction == 'r'){
-            moveHorizontal(false);
+            try{
+                board.movePeon(playerColor, oldColumn, column, row, column);
+            }
+            catch(QuoridorException e) {
+                if (e.getMessage().equals(QuoridorException.PLAYER_NOT_TURN)) {
+                    column += 2 * direction * -1;
+                    throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);
+                }
+            }
         }
     }
 
-    public ArrayList<Character> getValidMovements(Board board) throws QuoridorException{
+    public void move(Color playerColor, char direction) throws QuoridorException{
+        if (direction == 'u'){
+            moveVertical(playerColor, true);
+        }
+        else if (direction == 'd'){
+            moveVertical(playerColor, false);
+        }
+        else if (direction == 'l'){
+            moveHorizontal(playerColor, true);
+        }
+        else if (direction == 'r'){
+            moveHorizontal(playerColor, false);
+        }
+    }
+
+    public ArrayList<Character> getValidMovements() throws QuoridorException{
         ArrayList<Character> validMovements = new ArrayList<Character>();
+        // validate up
+        if (validateUp()){validMovements.add('u');}
         return validMovements;
+    }
+
+    public boolean validateUp(){
+        // verificar barrera
+        boolean hasBarrier = false;
+        if (board.getField(row-1, column) != null){
+            Barrier barrier = (Barrier) board.getField(row-1, column);
+            if (!barrier.isAllied(color)){
+                hasBarrier = true;
+            }
+        }
+        boolean hasPeon = false;
+        return !hasBarrier && !hasPeon;
     }
 }

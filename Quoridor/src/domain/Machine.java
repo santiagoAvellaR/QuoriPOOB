@@ -14,9 +14,4 @@ public class Machine extends Player{
     public void addBarrier() {
 
     }
-
-    @Override
-    public void movePeon(int row, int col) {
-
-    }
 }
