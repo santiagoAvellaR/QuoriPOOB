@@ -10,4 +10,7 @@ public class Machine extends Player{
         this.machineMode = machineMode;
     }
 
+    public void makeMovement(){
+
+    }
 }

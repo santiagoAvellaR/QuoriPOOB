@@ -62,5 +62,23 @@ public class Board {
         if(board[row][column]!=null){
             throw new QuoridorException(QuoridorException.BARRIER_ALREADY_CREATED);
         }
+        Barrier barrier = null;
+        if (type == 'n'){
+            barrier = new Normal(playerColor, horizontal);
+        }
+        else if (type == 'l') {
+            barrier = new Long(playerColor, horizontal);
+        }
+        else if (type == 'a') {
+            barrier = new Allied(playerColor, horizontal);
+        }
+        else if (type == 't') {
+            barrier = new Temporary(playerColor, horizontal);
+        }
+        if (horizontal) {
+            for (int j = 0; j < length; j++) {
+                board[row][column + j] = barrier;
+            }
+        }
     }
 }
