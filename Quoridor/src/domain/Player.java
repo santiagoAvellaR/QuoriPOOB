@@ -1,7 +1,6 @@
 package src.domain;
 
 import java.awt.Color;
-import java.util.ArrayList;
 
 public abstract class Player {
     protected String name;
@@ -22,9 +21,8 @@ public abstract class Player {
         this.alliedBarriers = alliedBarriers;
     }
 
-    public Color getColor() {
-        return color;
-    }
+    public Color getColor() {return color;}
+    public Peon getPeon() {return peon;}
 
     public final void movePeon(String direction) throws QuoridorException {
         peon.move(direction);

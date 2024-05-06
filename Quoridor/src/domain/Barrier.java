@@ -12,9 +12,8 @@ public abstract class Barrier extends Field{
         this.length = length;
     }
 
-    public int getLength() {
-        return length;
-    }
+    public int getLength() {return length;}
+    public boolean isHorizontal() {return horizontal;}
 
     public boolean isAllied(Color color){return false;}
 

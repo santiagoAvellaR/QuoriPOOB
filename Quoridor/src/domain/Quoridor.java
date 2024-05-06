@@ -2,7 +2,6 @@ package src.domain;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Timer;
 
 public class Quoridor {
     public static int turns;
@@ -17,7 +16,7 @@ public class Quoridor {
                     String teleporterSquares, String rewindSquares, String skipTurnSquares,
                     String playerOneName, Color playerOneColor,
                     String playerTwoName, Color playerTwoColor,
-                    String gameMode, int gameTime,
+                    String gameMode, String gameTime,
                     boolean vsMachine, String machineMode) throws QuoridorException {
         turns = 0;
         this.vsMachine = vsMachine;
@@ -59,6 +58,7 @@ public class Quoridor {
         if (totalBarriers > sizeInt + 1){
             throw new QuoridorException(QuoridorException.MAXIMUN_NUMBER_BARRIERS_EXCEEDED);
         }
+        normalBarriersInt = totalBarriers == 0 ? sizeInt +1 : normalBarriersInt;
         Peon peon1 = board.getPeon1InitialMoment();
         Peon peon2 = board.getPeon2InitialMoment();
         player1 = new Human(peon1, playerOneName, playerOneColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);
@@ -104,7 +104,7 @@ public class Quoridor {
         }
     }
 
-    public static boolean areSimilarColors(Color color1, Color color2) {
+    public boolean areSimilarColors(Color color1, Color color2) {
         int redDiff = color1.getRed() - color2.getRed();
         int greenDiff = color1.getGreen() - color2.getGreen();
         int blueDiff = color1.getBlue() - color2.getBlue();
@@ -112,5 +112,15 @@ public class Quoridor {
         double distance = Math.sqrt(redDiff * redDiff + greenDiff * greenDiff + blueDiff * blueDiff);
         return distance <= 30;
     }
+
+    public void actualizeEachTurn() throws QuoridorException {
+        board.actualizeTemporaries();
+    }
+
+    // TEST FUNCTIONS
+    public Peon getPeon1(){return player1.getPeon();}
+    public Peon getPeon2(){return player2.getPeon();}
+    public Field[][] getBoard(){return board.getBoard();}
+    public String getTypeOfField(int row, int column){return board.getTypeField(row, column);}
 
 }

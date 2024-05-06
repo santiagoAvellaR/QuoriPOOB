@@ -272,7 +272,7 @@ public class QuoridorGUI extends  JFrame{
             public void actionPerformed(ActionEvent e) {
                 try {
                     quoridor = new Quoridor(
-                            (String)(boardSize.getText().trim()),
+                            (String)(boardSize.getText().isEmpty() ? "9" :boardSize.getText()),
                             customs.containsKey("Normal B:") && !customs.get("Normal B:").getText().isEmpty() ? customs.get("Normal B:").getText().trim() : "0",
                             customs.containsKey("Temporal:") && !customs.get("Temporal:").getText().isEmpty() ? customs.get("Temporal:").getText().trim() : "0",
                             customs.containsKey("Larga:") && !customs.get("Larga:").getText().isEmpty() ? customs.get("Larga:").getText().trim() : "0",
@@ -282,10 +282,10 @@ public class QuoridorGUI extends  JFrame{
                             customs.containsKey("Turno Doble:") && !customs.get("Turno Doble:").getText().isEmpty() ? customs.get("Turno Doble:").getText().trim() : "0",
                             (String)(namePlayer.getText().trim()),
                             colorP1Selected == Color.WHITE ? Color.CYAN : colorP1Selected,
-                            (String)(namePlayer2.getText().trim()),
+                            (String)(namePlayer2 != null ? namePlayer2.getText().trim() : ""),
                             colorP2Selected == Color.WHITE ? Color.RED : colorP2Selected,
                             (String)difficulty.getSelectedItem(),
-                            0,
+                            "0",
                             (nPlayers.getSelectedItem().equals("1 PLAYERS")),
                             (String)modes.getSelectedItem());
                     prepareStartGameWindowElements();
@@ -495,7 +495,7 @@ public class QuoridorGUI extends  JFrame{
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         title.add(titleLabel);
         gamePanel.add(title, BorderLayout.NORTH);
-        gamePanel.add(createBoard(), BorderLayout.CENTER);
+        gamePanel.add(createBoard(colorBoardSelected), BorderLayout.CENTER);
         String players = (String) nPlayers.getSelectedItem();
         System.out.println(players);
         if(players.equals("1 PLAYER")){
@@ -693,16 +693,10 @@ public class QuoridorGUI extends  JFrame{
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
     }
-    private JPanel createBoard() {
+    private JPanel createBoard(Color board) {
         boardPanel = new JPanel(null);
         int tamBoard = screenSize.height * 4 / 5;
-        int numero;
-        if (boardSize.getText().isEmpty()) {
-            numero = 9;
-        }
-        else {
-            numero = Integer.parseInt(boardSize.getText().trim());
-        }
+        int numero = boardSize.getText().isEmpty() ? 9 : Integer.parseInt(boardSize.getText().trim());
         int CELL_SIZE = (int)((float)(tamBoard*0.75)/numero);
         int BAR_WIDTH = (int)((float)(tamBoard*0.25)/numero);
         cells = new JPanel[numero][numero];
@@ -715,6 +709,7 @@ public class QuoridorGUI extends  JFrame{
                 int cellY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
                 int cell = (int) (CELL_SIZE);
                 cells[i][j].setBounds(cellX, cellY, cell, cell);
+                cells[i][j].setBackground(board);
                 boardPanel.add(cells[i][j]);
                 if (j < numero - 1 ) { // Evitar la última fila de barreras verticales
                     verticalBarriers[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, CELL_SIZE);

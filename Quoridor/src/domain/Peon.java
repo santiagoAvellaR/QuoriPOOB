@@ -30,7 +30,7 @@ public class Peon extends Field{
     public boolean equals(Object obj) {
         if (obj instanceof Peon) {
             Peon p = (Peon) obj;
-            return row == p.row && column == p.column && color.equals(p.getColor());
+            return (((row == p.row) && (column == p.column)) && color.equals(p.getColor()));
         }
         return false;
     }
@@ -52,16 +52,9 @@ public class Peon extends Field{
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        try{
-            board.movePeon(row, column, row, column + direction*2);
-            column += direction*2;
-        }
-        catch(QuoridorException e){
-            if (e.getMessage().equals(QuoridorException.PLAYER_NOT_TURN)){
-                column -= direction*2;
-                throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);
-            }
-        }
+        board.movePeon(row, column, row, column + direction*2);
+        column += direction*2;
+        tracker.add(goesLeft ? "l" : "r");
     }
 
     public void move(String direction) throws QuoridorException{
@@ -100,13 +93,10 @@ public class Peon extends Field{
                 return validVericalMovements;
             }
         }
-        if (board.getField(row + 2*direction, column) != null) {
-            Field field = board.getField(row + 2*direction, column);
-            if (!field.hasPeon()){
-                String directionString = goesUp ? "u" : "d";
-                validVericalMovements.add(directionString);
-                return validVericalMovements;
-            }
+        if (!board.hasPeon(row + 2*direction, column)){
+            String directionString = goesUp ? "u" : "d";
+            validVericalMovements.add(directionString);
+            return validVericalMovements;
         }
         if (row <= 2 && goesUp){return validVericalMovements;}
         if (row >= board.getBoardLimit()-2 && !goesUp){return validVericalMovements;}
@@ -117,13 +107,10 @@ public class Peon extends Field{
                 return validVericalMovements;
             }
         }
-        if (board.getField(row + 4*direction, column) != null) {
-            Field field = board.getField(row + 4 * direction, column);
-            if (!field.hasPeon()) {
-                String directionCharacter = goesUp ? "ju" : "jd";
-                validVericalMovements.add(directionCharacter);
-                return validVericalMovements;
-            }
+        if (board.hasPeon(row + 4*direction, column)) {
+            String directionCharacter = goesUp ? "ju" : "jd";
+            validVericalMovements.add(directionCharacter);
+            return validVericalMovements;
         }
         return validVericalMovements;
     }
@@ -140,13 +127,10 @@ public class Peon extends Field{
                 return validHorizontalMovements;
             }
         }
-        if (board.getField(row, column + 2*direction) != null) {
-            Field field = board.getField(row, column + 2*direction);
-            if (!field.hasPeon()){
-                String directionString = goesLeft ? "u" : "d";
-                validHorizontalMovements.add(directionString);
-                return validHorizontalMovements;
-            }
+        if (board.hasPeon(row, column + 2*direction)) {
+            String directionString = goesLeft ? "u" : "d";
+            validHorizontalMovements.add(directionString);
+            return validHorizontalMovements;
         }
         if (column <= 2 && goesLeft){return validHorizontalMovements;}
         if (column >= board.getBoardLimit()-2 && !goesLeft){return validHorizontalMovements;}
@@ -157,13 +141,10 @@ public class Peon extends Field{
                 return validHorizontalMovements;
             }
         }
-        if (board.getField(row, column + 4*direction) != null) {
-            Field field = board.getField(row, column + 4 * direction);
-            if (!field.hasPeon()) {
-                String directionCharacter = goesLeft ? "ju" : "jd";
-                validHorizontalMovements.add(directionCharacter);
-                return validHorizontalMovements;
-            }
+        if (board.hasPeon(row, column + 4*direction)) {
+            String directionCharacter = goesLeft ? "ju" : "jd";
+            validHorizontalMovements.add(directionCharacter);
+            return validHorizontalMovements;
         }
         return validHorizontalMovements;
     }

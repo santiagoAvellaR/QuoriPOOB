@@ -4,11 +4,18 @@ import java.awt.*;
 
 public class Temporary extends Barrier{
     private int remainingTime;
+    private int row;
+    private int column;
 
-    public Temporary(Color color, boolean horizontal) {
+    public Temporary(Color color, boolean horizontal, int row, int column) {
         super(color, horizontal, 2);
-        remainingTime = 4;
+        this.row = row;
+        this.column = column;
+        remainingTime = 5;
     }
+
+    public int getRow(){return row;}
+    public int getColumn(){return column;}
 
     @Override
     public String getType() {
