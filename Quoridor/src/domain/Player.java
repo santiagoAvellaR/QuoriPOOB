@@ -1,26 +1,32 @@
 package src.domain;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 
 public abstract class Player {
-    protected Peon peon;
-    protected int remainingBridges;
     protected String name;
     protected Color color;
+    protected Peon peon;
+    protected int normalBarriers;
+    protected int temporaryBarriers;
+    protected int longBarriers;
+    protected int alliedBarriers;
 
-    public Player(Peon peon, String name, int remainingBridges, Color color) {
-        this.peon = peon;
+    public Player(Peon peon, String name, Color color, int normalBarriers, int temporaryBarriers, int longBarriers, int alliedBarriers) {
         this.name = name;
-        this.remainingBridges = remainingBridges;
         this.color = color;
+        this.peon = peon;
+        this.normalBarriers = normalBarriers;
+        this.temporaryBarriers = temporaryBarriers;
+        this.longBarriers = longBarriers;
+        this.alliedBarriers = alliedBarriers;
     }
 
     public Color getColor() {
         return color;
     }
 
-    public final void movePeon(Color color, String direction) throws QuoridorException {
+    public final void movePeon(String direction) throws QuoridorException {
         peon.move(direction);
     }
 

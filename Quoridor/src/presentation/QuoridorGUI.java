@@ -1,4 +1,7 @@
 package src.presentation;
+
+import src.domain.*;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -7,10 +10,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+import src.domain.Quoridor;
 public class QuoridorGUI extends  JFrame{
     Dimension screenSize;
     private Dimension buttonSize = new Dimension(250,60);
     private final QuoridorGUI gui = this;
+    Quoridor quoridor;
     // Menu
     private JMenuItem nuevo, abrir, guardar, cerrar;
     // Principal
@@ -263,11 +270,33 @@ public class QuoridorGUI extends  JFrame{
         startGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                prepareStartGameWindowElements();
-                prepareStartGameWindowActions();
-                setContentPane(gamePanel);
-                revalidate();
-                repaint();
+                try {
+                    quoridor = new Quoridor(
+                            (String)(boardSize.getText().trim()),
+                            customs.containsKey("Normal B:") && !customs.get("Normal B:").getText().isEmpty() ? customs.get("Normal B:").getText().trim() : "0",
+                            customs.containsKey("Temporal:") && !customs.get("Temporal:").getText().isEmpty() ? customs.get("Temporal:").getText().trim() : "0",
+                            customs.containsKey("Larga:") && !customs.get("Larga:").getText().isEmpty() ? customs.get("Larga:").getText().trim() : "0",
+                            customs.containsKey("Aliada:") && !customs.get("Aliada:").getText().isEmpty() ? customs.get("Aliada:").getText().trim() : "0",
+                            customs.containsKey("Teletransportadora:") && !customs.get("Teletransportadora:").getText().isEmpty() ? customs.get("Teletransportadora:").getText().trim() : "0",
+                            customs.containsKey("Regresar:") && !customs.get("Regresar:").getText().isEmpty() ? customs.get("Regresar:").getText().trim() : "0",
+                            customs.containsKey("Turno Doble:") && !customs.get("Turno Doble:").getText().isEmpty() ? customs.get("Turno Doble:").getText().trim() : "0",
+                            (String)(namePlayer.getText().trim()),
+                            colorP1Selected == Color.WHITE ? Color.CYAN : colorP1Selected,
+                            (String)(namePlayer2.getText().trim()),
+                            colorP2Selected == Color.WHITE ? Color.RED : colorP2Selected,
+                            (String)difficulty.getSelectedItem(),
+                            0,
+                            (nPlayers.getSelectedItem().equals("1 PLAYERS")),
+                            (String)modes.getSelectedItem());
+                    prepareStartGameWindowElements();
+                    prepareStartGameWindowActions();
+                    setContentPane(gamePanel);
+                    revalidate();
+                    repaint();
+                }
+                catch (QuoridorException ex) {
+                    JOptionPane.showMessageDialog(gui, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         customize.addActionListener(new ActionListener() {

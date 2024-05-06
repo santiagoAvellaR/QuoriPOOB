@@ -9,12 +9,18 @@ public class Board {
     private int midColumn;
     ArrayList<Temporary> temporaries;
 
-    public Board(int size, Color player1Color, Color player2Color) {
+    public Board(int size, Color player1Color, Color player2Color, int teletransporterSquares, int rewindSquares, int skipTurnSquares) {
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         midColumn = getBoardLimit() % 2 == 0 ? getBoardLimit() / 2 : getBoardLimit() / 2 + 1;
         board[getBoardLimit() - 1][midColumn] = new Peon(getBoardLimit() - 1, midColumn, this, player1Color);
         board[0][midColumn] = new Peon(0, midColumn, this, player2Color);
+        temporaries = new ArrayList<>();
+        fieldTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
+    }
+
+    private void fieldTheBoard(int teletransporterSquares, int rewindSquares, int skipTurnSquares){
+
     }
 
     public Peon getPeon1InitialMoment(){
@@ -62,6 +68,15 @@ public class Board {
         if(board[row][column]!=null){
             throw new QuoridorException(QuoridorException.BARRIER_ALREADY_CREATED);
         }
+        Barrier barrier = createBarrierGivenTheType(playerColor, horizontal, type);
+        if (horizontal) {
+            for (int j = 0; j < length; j++) {
+                board[row][column + j] = barrier;
+            }
+        }
+    }
+
+    private Barrier createBarrierGivenTheType(Color playerColor, boolean horizontal, char type) throws QuoridorException {
         Barrier barrier = null;
         if (type == 'n'){
             barrier = new Normal(playerColor, horizontal);
@@ -75,10 +90,12 @@ public class Board {
         else if (type == 't') {
             barrier = new Temporary(playerColor, horizontal);
         }
-        if (horizontal) {
-            for (int j = 0; j < length; j++) {
-                board[row][column + j] = barrier;
-            }
+        else {
+            throw new QuoridorException(QuoridorException.INVELID_BARRIER_TYPE);
         }
+        if (barrier != null) {
+            return barrier;
+        }
+        return null;
     }
 }
