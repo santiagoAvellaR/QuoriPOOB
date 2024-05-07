@@ -7,34 +7,34 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 import src.domain.Quoridor;
 public class QuoridorGUI extends  JFrame{
-    Dimension screenSize;
-    private Dimension buttonSize = new Dimension(250,60);
+    private Dimension screenSize;
+    private final Dimension buttonSize = new Dimension(250,60);
+    private final Font gameFont30 = new Font("Consolas", Font.BOLD, 30);
+    private final Font gameFont20 = new Font("Consolas", Font.BOLD, 20);
     private final QuoridorGUI gui = this;
+    private Integer turns;
     Quoridor quoridor;
     // Menu
     private JMenuItem nuevo, abrir, guardar, cerrar;
     // Principal
     private JPanel mainPanel;
     private JButton newGameButton;
-    private JButton exitGame;
-    private JButton loadGame;
+    private JButton exitGameButton;
+    private JButton loadGameButton;
     // Juego
     private JPanel newGameOp;
     private JComboBox nPlayers, modes, difficulty;
-    private JButton startGame, settings, customize;
+    private JButton startGameButton, settingsButton, customizeButton;
     private JPanel infPlayer, startOp;
     private JTextField namePlayer;
     private JTextField namePlayer2;
     //Ajustes
     private JPanel settingsPanel;
-    private JButton colorBoard, colorP1, colorP2, applySettings;
+    private JButton colorBoard, colorP1, colorP2, applySettingsButton;
     private Color colorBoardSelected = Color.WHITE;
     private Color colorP1Selected = Color.WHITE;
     private Color colorP2Selected = Color.WHITE;
@@ -42,14 +42,15 @@ public class QuoridorGUI extends  JFrame{
     private JPanel customPanel;
     private  JTextField boardSize ;
     private HashMap<String, JTextField> customs;
-    private JButton applyCustoms;
+    private JButton applyCustomsButton;
     // Game window
     private JPanel[][] cells;
     private JPanel[][] horizontalBarriers;
     private JPanel[][] verticalBarriers;
-    private JLabel turns;
+    private JLabel labelTurns;
     private JPanel gamePanel;
     private JPanel boardPanel;
+    private JButton finishButton;
     private JButton homeButton;
     private JButton upButton;
     private JButton downButton;
@@ -57,6 +58,7 @@ public class QuoridorGUI extends  JFrame{
     private JButton rightButton;
     private JButton changeSizeButton;
     private JButton reStartButton;
+
     private QuoridorGUI()  {
         super("Quoridor");
         customs = new HashMap<>();
@@ -157,12 +159,12 @@ public class QuoridorGUI extends  JFrame{
         newGameButton = createButton(" NEW GAME ", buttonSize);
         buttonPanel.add(newGameButton);
         buttonPanel.add(Box.createVerticalStrut(10));
-        exitGame = createButton("   EXIT   ", buttonSize);
-        loadGame = createButton(" LOAD GAME", buttonSize);
-        buttonPanel.add(loadGame);
+        exitGameButton = createButton("   EXIT   ", buttonSize);
+        loadGameButton = createButton(" LOAD GAME", buttonSize);
+        buttonPanel.add(loadGameButton);
         buttonPanel.add(Box.createVerticalGlue());
         buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(exitGame);
+        buttonPanel.add(exitGameButton);
         newGamePanel.add(buttonPanel);
         mainPanel.add(newGamePanel);
         add(mainPanel);
@@ -180,13 +182,13 @@ public class QuoridorGUI extends  JFrame{
 
             }
         });
-        exitGame.addActionListener(new ActionListener() {
+        exitGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cerrar.doClick();
             }
         });
-        loadGame.addActionListener(new ActionListener() {
+        loadGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 guardar.doClick();
@@ -211,30 +213,30 @@ public class QuoridorGUI extends  JFrame{
         nPlayers.addItem("1 PLAYER");
         nPlayers.addItem("2 PLAYERS");
         nPlayers.setPreferredSize(buttonSize);
-        nPlayers.setFont(new Font("Consolas", Font.BOLD, 30));
-        nPlayers.setFont(new Font("Consolas", Font.BOLD, 30));
+        nPlayers.setFont(gameFont30);
+        nPlayers.setFont(gameFont30);
         nPlayers.setAlignmentX(Component.CENTER_ALIGNMENT);
         infPlayer.add(nPlayers);
         newGameOp.add(infPlayer);
         //Inicio y ajustes
-        startGame = createButton("START", buttonSize);
-        settings = createButton("SETTINGS", buttonSize);
-        customize = createButton("CUSTOMIZE", buttonSize);
-        settings.setAlignmentX(Component.CENTER_ALIGNMENT);
-        startGame.setAlignmentX(Component.CENTER_ALIGNMENT);
-        customize.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startGameButton = createButton("START", buttonSize);
+        settingsButton = createButton("SETTINGS", buttonSize);
+        customizeButton = createButton("CUSTOMIZE", buttonSize);
+        settingsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        customizeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         difficulty = new JComboBox<String>();
         difficulty.setPreferredSize(buttonSize);
-        difficulty.setFont(new Font("Consolas", Font.BOLD, 30));
+        difficulty.setFont(gameFont30);
         difficulty.addItem("NORMAL");
         difficulty.addItem("TIME TRIAL");
         difficulty.addItem("TIMED");
         difficulty.setPreferredSize(buttonSize);
-        startOp.add(startGame);
+        startOp.add(startGameButton);
         startOp.add(new Label());
-        startOp.add(settings);
+        startOp.add(settingsButton);
         startOp.add(new Label());
-        startOp.add(customize);
+        startOp.add(customizeButton);
         newGameOp.add(startOp);
     }
     public void prepareNewGameWindowActions(){
@@ -257,7 +259,7 @@ public class QuoridorGUI extends  JFrame{
                 }
             }
         });
-        settings.addActionListener(new ActionListener() {
+        settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 prepareSettingsWindowElements();
@@ -267,7 +269,7 @@ public class QuoridorGUI extends  JFrame{
                 repaint();
             }
         });
-        startGame.addActionListener(new ActionListener() {
+        startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -288,6 +290,7 @@ public class QuoridorGUI extends  JFrame{
                             "0",
                             (nPlayers.getSelectedItem().equals("1 PLAYERS")),
                             (String)modes.getSelectedItem());
+                    turns = quoridor.getTurns();
                     prepareStartGameWindowElements();
                     prepareStartGameWindowActions();
                     setContentPane(gamePanel);
@@ -299,7 +302,7 @@ public class QuoridorGUI extends  JFrame{
                 }
             }
         });
-        customize.addActionListener(new ActionListener() {
+        customizeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 prepareCustomizeWindowElements();
@@ -320,19 +323,19 @@ public class QuoridorGUI extends  JFrame{
         JPanel info = new JPanel();
         info.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         JLabel nameLabel = new JLabel("NAME PLAYER");
-        nameLabel.setFont(new Font("Consolas", Font.BOLD, 30));
+        nameLabel.setFont(gameFont30);
         namePlayer = new JTextField(20);
-        namePlayer.setFont(new Font("Consolas", Font.BOLD, 30));
+        namePlayer.setFont(gameFont30);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         namePlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
         JPanel modos = new JPanel();
         modos.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         JLabel modsmaq = new JLabel("MODES");
         modsmaq.setPreferredSize(buttonSize);
-        modsmaq.setFont(new Font("Consolas", Font.BOLD, 30));
+        modsmaq.setFont(gameFont30);
         modes = new JComboBox<String>();
         modes.setPreferredSize(buttonSize);
-        modes.setFont(new Font("Consolas", Font.BOLD, 30));
+        modes.setFont(gameFont30);
         modes.addItem("AMATEUR");
         modes.addItem("MEDIAN");
         modes.addItem("ADVANCED");
@@ -344,7 +347,7 @@ public class QuoridorGUI extends  JFrame{
         JPanel dificultad = new JPanel();
         dificultad.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         JLabel dificult = new JLabel("DIFFICULTY");
-        dificult.setFont(new Font("Consolas", Font.BOLD, 30));
+        dificult.setFont(gameFont30);
         dificult.setAlignmentX(Component.CENTER_ALIGNMENT);
         difficulty.setAlignmentX(Component.CENTER_ALIGNMENT);
         dificultad.add(dificult);
@@ -367,9 +370,9 @@ public class QuoridorGUI extends  JFrame{
         JPanel player1 = new JPanel();
         player1.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         JLabel nameLabel = new JLabel("NAME PLAYER");
-        nameLabel.setFont(new Font("Consolas", Font.BOLD, 30));
+        nameLabel.setFont(gameFont30);
         namePlayer = new JTextField(20);
-        namePlayer.setFont(new Font("Consolas", Font.BOLD, 30));
+        namePlayer.setFont(gameFont30);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         namePlayer.setAlignmentX(Component.CENTER_ALIGNMENT);
         player1.add(nameLabel);
@@ -377,9 +380,9 @@ public class QuoridorGUI extends  JFrame{
         JPanel player2 = new JPanel();
         player2.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         JLabel nameLabel2 = new JLabel("NAME PLAYER");
-        nameLabel2.setFont(new Font("Consolas", Font.BOLD, 30));
+        nameLabel2.setFont(gameFont30);
         namePlayer2 = new JTextField(20);
-        namePlayer2.setFont(new Font("Consolas", Font.BOLD, 30));
+        namePlayer2.setFont(gameFont30);
         nameLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
         namePlayer2.setAlignmentX(Component.CENTER_ALIGNMENT);
         player2.add(nameLabel2);
@@ -387,7 +390,7 @@ public class QuoridorGUI extends  JFrame{
         JPanel dificultad = new JPanel();
         dificultad.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         JLabel dificult = new JLabel("DIFFICULTY");
-        dificult.setFont(new Font("Consolas", Font.BOLD, 30));
+        dificult.setFont(gameFont30);
         dificult.setAlignmentX(Component.CENTER_ALIGNMENT);
         difficulty.setAlignmentX(Component.CENTER_ALIGNMENT);
         dificultad.add(dificult);
@@ -417,12 +420,21 @@ public class QuoridorGUI extends  JFrame{
         buttonConstraints.gridy = 1;
         buttonConstraints.anchor = GridBagConstraints.CENTER;
         buttonConstraints.insets = new Insets(10, 0, 10, 0);
-        JPanel buttons = new JPanel(new GridLayout(0, 1, 0, 10));
-        colorBoard = createButton("COLOR BOARD", buttonSize);
-        colorP1 = createButton("COLOR P1", buttonSize);
-        colorP2 = createButton("COLOR P2", buttonSize);
+        JPanel buttons = new JPanel(new GridLayout(0, 2, 0, 10));
+        colorBoard = createButton("", buttonSize);
+        JLabel colorB = new JLabel("COLOR BOARD ");
+        colorB.setFont(gameFont30);
+        colorP1 = createButton("", buttonSize);
+        JLabel colorPe1 = new JLabel("COLOR P1 ");
+        colorPe1.setFont(gameFont30);
+        colorP2 = createButton("", buttonSize);
+        JLabel colorPe2 = new JLabel("COLOR P2 ");
+        colorPe2.setFont(gameFont30);
+        buttons.add(colorB);
         buttons.add(colorBoard);
+        buttons.add(colorPe1);
         buttons.add(colorP1);
+        buttons.add(colorPe2);
         buttons.add(colorP2);
         settingsPanel.add(buttons, buttonConstraints);
         // Restricciones para el botón de aplicar
@@ -432,8 +444,8 @@ public class QuoridorGUI extends  JFrame{
         applyConstraints.anchor = GridBagConstraints.SOUTHEAST; // Alineación en la esquina inferior derecha
         applyConstraints.insets = new Insets(300, (screenSize.width)-250, 0, 0); // Espacio entre los botones y el borde inferior
 
-        applySettings = createButton("APPLY", buttonSize);
-        settingsPanel.add(applySettings, applyConstraints);
+        applySettingsButton = createButton("APPLY", buttonSize);
+        settingsPanel.add(applySettingsButton, applyConstraints);
     }
     public void prepareSettingsWindowActions(){
         colorBoard.addActionListener(new ActionListener(){
@@ -442,6 +454,7 @@ public class QuoridorGUI extends  JFrame{
                 Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorBoardSelected);
                 if (newColor != null) {
                     colorBoardSelected = newColor;
+                    colorBoard.setBackground(newColor);
                 }
                 else{
                     JOptionPane.showMessageDialog(null, "Debes elegir un color");
@@ -454,6 +467,7 @@ public class QuoridorGUI extends  JFrame{
                 Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorP1Selected);
                 if (newColor != null) {
                     colorP1Selected = newColor;
+                    colorP1.setBackground(newColor);
                 }
                 else{
                     JOptionPane.showMessageDialog(null, "Debes elegir un color");
@@ -466,13 +480,13 @@ public class QuoridorGUI extends  JFrame{
                 Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorP2Selected);
                 if (newColor != null) {
                     colorP2Selected = newColor;
-                }
-                else{
+                    colorP2.setBackground(newColor);
+                } else{
                     JOptionPane.showMessageDialog(null, "Debes elegir un color");
                 }
             }
         });
-        applySettings.addActionListener(new ActionListener(){
+        applySettingsButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!colorBoardSelected.equals(colorP1Selected) && !colorBoardSelected.equals(colorP2Selected) && !colorP1Selected.equals(colorP2Selected)) {
@@ -488,7 +502,6 @@ public class QuoridorGUI extends  JFrame{
     public void prepareStartGameWindowElements(){
         gamePanel = new JPanel();
         gamePanel.setLayout(new BorderLayout());
-        JPanel optionsGame = new JPanel();
         JPanel title = new JPanel();
         JLabel titleLabel = new JLabel("Quoridor");
         titleLabel.setFont(new Font("Consolas", Font.BOLD, 50));
@@ -497,9 +510,7 @@ public class QuoridorGUI extends  JFrame{
         gamePanel.add(title, BorderLayout.NORTH);
         gamePanel.add(createBoard(colorBoardSelected), BorderLayout.CENTER);
         String players = (String) nPlayers.getSelectedItem();
-        System.out.println(players);
         if(players.equals("1 PLAYER")){
-
             JPanel infoPlayerPanel = infoPlayerGame();
             infoPlayerPanel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoPlayerPanel, BorderLayout.EAST);
@@ -516,6 +527,15 @@ public class QuoridorGUI extends  JFrame{
             infoPlayer2Panel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoPlayer2Panel, BorderLayout.WEST);
         }
+        JPanel options = new JPanel(new BorderLayout());
+        labelTurns = new JLabel("Turno :");
+        labelTurns.setFont(gameFont20);
+        finishButton = createButton("Finish", buttonSize);
+        options.add(new Label(), BorderLayout.WEST);
+        options.add(labelTurns, BorderLayout.CENTER);
+        options.add(finishButton, BorderLayout.EAST);
+        options.add(new Label(), BorderLayout.SOUTH);
+        gamePanel.add(options, BorderLayout.SOUTH);
     }
 
     private JPanel infoPlayerGame(){
@@ -523,13 +543,12 @@ public class QuoridorGUI extends  JFrame{
         JPanel inf = new JPanel(new GridLayout(5,1));
         JPanel infnombre = new JPanel(new FlowLayout());
         JLabel jnombre = new JLabel("Nombre P1:");
-        jnombre.setFont(new Font("Consolas", Font.BOLD, 20));
+        jnombre.setFont(gameFont20);
         JLabel nombre = new JLabel();
-        if(!namePlayer.getText().isEmpty())
-        {
+        if(!namePlayer.getText().isEmpty()) {
             nombre = new JLabel(namePlayer.getText());
         }
-        nombre.setFont(new Font("Consolas", Font.BOLD, 20));
+        nombre.setFont(gameFont20);
         infnombre.add(jnombre);
         infnombre.add(nombre);
         inf.add(infnombre);
@@ -549,7 +568,7 @@ public class QuoridorGUI extends  JFrame{
                 String llave = key[i];
                 String textField = customs.get(llave).getText();
                 JLabel barrera = new JLabel(llave);
-                barrera.setFont(new Font("Consolas", Font.BOLD, 20));
+                barrera.setFont(gameFont20);
                 barrera.setHorizontalAlignment(SwingConstants.CENTER);
                 JLabel cantb;
                 if (!textField.equals("")) {
@@ -557,18 +576,18 @@ public class QuoridorGUI extends  JFrame{
                 } else {
                     cantb = new JLabel("0");
                 }
-                cantb.setFont(new Font("Consolas", Font.BOLD, 20));
+                cantb.setFont(gameFont20);
                 cantb.setHorizontalAlignment(SwingConstants.CENTER);
                 barrerasdis.add(barrera);
                 barrerasdis.add(cantb);
             }
         }else{
             JLabel barrera = new JLabel("Normales");
-            barrera.setFont(new Font("Consolas", Font.BOLD, 20));
+            barrera.setFont(gameFont20);
             barrera.setHorizontalAlignment(SwingConstants.CENTER);
             String cant = "10";
             JLabel cantb = new JLabel(cant);
-            cantb.setFont(new Font("Consolas", Font.BOLD, 20));
+            cantb.setFont(gameFont20);
             cantb.setHorizontalAlignment(SwingConstants.CENTER);
             barrerasdis.add(barrera);
             barrerasdis.add(cantb);
@@ -578,12 +597,13 @@ public class QuoridorGUI extends  JFrame{
         return inf;
 
     }
+
     private JPanel infoMachine(){
         int tampanel = (int)(screenSize.height * 0.5);
         JPanel inf = new JPanel(new GridLayout(5,1));
         JPanel infnombre = new JPanel(new FlowLayout());
         JLabel jnombre = new JLabel("Maquina:");
-        jnombre.setFont(new Font("Consolas", Font.BOLD, 20));
+        jnombre.setFont(gameFont20);
         infnombre.add(jnombre);
         JPanel colorP2 = new JPanel();
         if(!colorP2Selected.equals(Color.WHITE)){
@@ -599,10 +619,9 @@ public class QuoridorGUI extends  JFrame{
         String[] key =  {"Normal B:",  "Temporal:",  "Larga:", "Aliada:"};
         if(!(customs.get(key[0]) == null)) {
             for (int i = 0; i < 4; i++) {
-                String llave = key[i];
-                String textField = customs.get(llave).getText();
-                JLabel barrera = new JLabel(llave);
-                barrera.setFont(new Font("Consolas", Font.BOLD, 20));
+                String textField = customs.get(key[i]).getText();
+                JLabel barrera = new JLabel(key[i]);
+                barrera.setFont(gameFont20);
                 barrera.setHorizontalAlignment(SwingConstants.CENTER);
                 JLabel cantb;
                 if (!textField.equals("")) {
@@ -610,20 +629,19 @@ public class QuoridorGUI extends  JFrame{
                 } else {
                     cantb = new JLabel("0");
                 }
-                cantb.setFont(new Font("Consolas", Font.BOLD, 20));
+                cantb.setFont(gameFont20);
                 cantb.setHorizontalAlignment(SwingConstants.CENTER);
                 barrerasdis.add(barrera);
                 barrerasdis.add(cantb);
             }
-
         }
         else{
             JLabel barrera = new JLabel("Normales");
-            barrera.setFont(new Font("Consolas", Font.BOLD, 20));
+            barrera.setFont(gameFont20);
             barrera.setHorizontalAlignment(SwingConstants.CENTER);
             String cant = "10";
             JLabel cantb = new JLabel(cant);
-            cantb.setFont(new Font("Consolas", Font.BOLD, 20));
+            cantb.setFont(gameFont20);
             cantb.setHorizontalAlignment(SwingConstants.CENTER);
             barrerasdis.add(barrera);
             barrerasdis.add(cantb);
@@ -632,18 +650,18 @@ public class QuoridorGUI extends  JFrame{
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
     }
+
     private JPanel infoPlayerGame2(){
         int tampanel = (int)(screenSize.height * 0.5);
         JPanel inf = new JPanel(new GridLayout(5,1));
         JPanel infnombre = new JPanel(new FlowLayout());
         JLabel jnombre = new JLabel("Nombre P2:");
-        jnombre.setFont(new Font("Consolas", Font.BOLD, 20));
+        jnombre.setFont(gameFont20);
         JLabel nombre = new JLabel();
-        if(!namePlayer2.getText().isEmpty())
-        {
+        if(!namePlayer2.getText().isEmpty()) {
             nombre = new JLabel(namePlayer2.getText());
         }
-        nombre.setFont(new Font("Consolas", Font.BOLD, 20));
+        nombre.setFont(gameFont20);
         infnombre.add(jnombre);
         infnombre.add(nombre);
         inf.add(infnombre);
@@ -660,10 +678,9 @@ public class QuoridorGUI extends  JFrame{
         String[] key =  {"Normal B:",  "Temporal:",  "Larga:", "Aliada:"};
         if(!(customs.get(key[0]) == null)) {
             for (int i = 0; i < 4; i++) {
-                String llave = key[i];
-                String textField = customs.get(llave).getText();
-                JLabel barrera = new JLabel(llave);
-                barrera.setFont(new Font("Consolas", Font.BOLD, 20));
+                String textField = customs.get(key[i]).getText();
+                JLabel barrera = new JLabel(key[i]);
+                barrera.setFont(gameFont20);
                 barrera.setHorizontalAlignment(SwingConstants.CENTER);
                 JLabel cantb;
                 if (!textField.equals("")) {
@@ -671,20 +688,19 @@ public class QuoridorGUI extends  JFrame{
                 } else {
                     cantb = new JLabel("0");
                 }
-                cantb.setFont(new Font("Consolas", Font.BOLD, 20));
+                cantb.setFont(gameFont20);
                 cantb.setHorizontalAlignment(SwingConstants.CENTER);
                 barrerasdis.add(barrera);
                 barrerasdis.add(cantb);
             }
-
         }
         else{
             JLabel barrera = new JLabel("Normales");
-            barrera.setFont(new Font("Consolas", Font.BOLD, 20));
+            barrera.setFont(gameFont20);
             barrera.setHorizontalAlignment(SwingConstants.CENTER);
             String cant = "10";
             JLabel cantb = new JLabel(cant);
-            cantb.setFont(new Font("Consolas", Font.BOLD, 20));
+            cantb.setFont(gameFont20);
             cantb.setHorizontalAlignment(SwingConstants.CENTER);
             barrerasdis.add(barrera);
             barrerasdis.add(cantb);
@@ -693,12 +709,13 @@ public class QuoridorGUI extends  JFrame{
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
     }
+
     private JPanel createBoard(Color board) {
         boardPanel = new JPanel(null);
         int tamBoard = screenSize.height * 4 / 5;
         int numero = boardSize.getText().isEmpty() ? 9 : Integer.parseInt(boardSize.getText().trim());
         int CELL_SIZE = (int)((float)(tamBoard*0.75)/numero);
-        int BAR_WIDTH = (int)((float)(tamBoard*0.25)/numero);
+        int BAR_WIDTH = (int)((float)(tamBoard*0.15)/numero);
         cells = new JPanel[numero][numero];
         horizontalBarriers = new JPanel[numero - 1][numero];
         verticalBarriers = new JPanel[numero][numero - 1];
@@ -742,6 +759,7 @@ public class QuoridorGUI extends  JFrame{
                         int emptyWidth = (int) (BAR_WIDTH);
                         int emptyHeight = (int) (BAR_WIDTH);
                         emptyPanel.setBounds(emptyX, emptyY, emptyWidth, emptyHeight);
+                        emptyPanel.setBackground(board);
                         boardPanel.add(emptyPanel);
                     }
                 }
@@ -769,7 +787,6 @@ public class QuoridorGUI extends  JFrame{
                 else if (e.getComponent() == horizontalBarriers[row][col] && col != horizontalBarriers[row].length - 1) {
                     horizontalBarriers[row][col + 1].setBackground(Color.BLUE);
                 }
-
             }
             @Override
             public void mouseExited(MouseEvent e) {
@@ -786,11 +803,19 @@ public class QuoridorGUI extends  JFrame{
         };
     }
     public void prepareStartGameWindowActions(){
+        finishButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setContentPane(newGameOp);
+                revalidate();
+                repaint();
+            }
+        });
     }
     private JButton createButton(String text, Dimension size) {
         JButton button = new JButton(text);
         button.setPreferredSize(size);
-        button.setFont(new Font("Consolas", Font.BOLD, 30));
+        button.setFont(gameFont30);
         button.setBackground(new Color(200, 173, 127));
         button.setForeground(Color.BLACK);
         return button;
@@ -801,7 +826,7 @@ public class QuoridorGUI extends  JFrame{
         gbc.insets = new Insets(5, 5, 5, 5);
         // Título
         JLabel titleLabel = new JLabel("CUSTOMIZES");
-        titleLabel.setFont(new Font("Consolas", Font.BOLD, 60));
+        titleLabel.setFont(gameFont30);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -811,7 +836,7 @@ public class QuoridorGUI extends  JFrame{
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         JLabel labelBoardSize = new JLabel("BOARD SIZE:");
-        labelBoardSize.setFont(new Font("Consolas", Font.BOLD, 20));
+        labelBoardSize.setFont(gameFont20);
         labelBoardSize.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -835,13 +860,13 @@ public class QuoridorGUI extends  JFrame{
                 gbc.gridy = 0;
                 gbc.gridx = 0;
                 JLabel barrierLabel = new JLabel("Barrera");
-                barrierLabel.setFont(new Font("Consolas", Font.BOLD, 20));
+                barrierLabel.setFont(gameFont20);
                 barrierLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 barrierLabel.setPreferredSize(buttonSize);
                 options.add(barrierLabel, gbc);
                 gbc.gridx = 2;
                 JLabel squaresLabel = new JLabel("Casillas");
-                squaresLabel.setFont(new Font("Consolas", Font.BOLD, 20));
+                squaresLabel.setFont(gameFont20);
                 squaresLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 squaresLabel.setPreferredSize(buttonSize);
                 options.add(squaresLabel, gbc);
@@ -850,7 +875,7 @@ public class QuoridorGUI extends  JFrame{
             gbc.gridy = i; // Fila i
             gbc.anchor = GridBagConstraints.WEST; // Alinear a la izquierda
             JLabel label = new JLabel(labels[i-1]); // Crea una nueva etiqueta con el texto del array
-            label.setFont(new Font("Consolas", Font.BOLD, 20));
+            label.setFont(gameFont20);
             label.setPreferredSize(buttonSize);
             options.add(label, gbc); // Agrega la etiqueta con GridBagConstraints
             gbc.gridx = 1; // Columna 1 para los campos de texto
@@ -864,7 +889,7 @@ public class QuoridorGUI extends  JFrame{
             gbc.gridx = 2; // Columna 1 para los campos de texto
             // Alinear a la derecha
             JLabel label2 = new JLabel(labels[i]);
-            label2.setFont(new Font("Consolas", Font.BOLD, 20));// Crea una nueva etiqueta con el texto del array
+            label2.setFont(gameFont20);// Crea una nueva etiqueta con el texto del array
             options.add(label2, gbc); // Agrega la etiqueta con GridBagConstraints
             gbc.gridx = 3;
             gbc.anchor = GridBagConstraints.EAST; // Alinear a la derecha
@@ -875,15 +900,15 @@ public class QuoridorGUI extends  JFrame{
             customs.put(labels[i], textField);
         }
         // Botón
-        applyCustoms = createButton("APPLY", buttonSize);
+        applyCustomsButton = createButton("APPLY", buttonSize);
         gbc.gridx = 0; // Columna 0
         gbc.gridy++; // Siguiente fila
         gbc.gridwidth = 3; // Ocupar dos columnas
         gbc.anchor = GridBagConstraints.SOUTHEAST; // Alinear al centro
-        customPanel.add(applyCustoms, gbc);
+        customPanel.add(applyCustomsButton, gbc);
     }
     private void prepareCustomizeWindowActions(){
-        applyCustoms.addActionListener(new ActionListener(){
+        applyCustomsButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 setContentPane(newGameOp);

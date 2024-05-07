@@ -28,6 +28,7 @@ public class Board {
             }
             System.out.println();
         }
+        System.out.println();
     }
 
     public String getTypeField(int row, int column){
@@ -39,8 +40,8 @@ public class Board {
 
     }
 
-    public Peon getPeon1InitialMoment(){return Quoridor.turns == 0 ? (Peon)board[getBoardLimit() - 1][midColumn] : null;}
-    public Peon getPeon2InitialMoment(){return Quoridor.turns == 0 ? (Peon)board[0][midColumn] : null;}
+    public Peon getPeon1InitialMoment(){return Quoridor.turns.equals(0) ? (Peon)board[getBoardLimit() - 1][midColumn] : null;}
+    public Peon getPeon2InitialMoment(){return Quoridor.turns.equals(0) ? (Peon)board[0][midColumn] : null;}
 
     public int getBoardLimit() {return board.length;}
 
@@ -72,6 +73,7 @@ public class Board {
     public void movePeon(int oldRow, int oldColumn, int newRow, int newColumn) throws QuoridorException{
         board[newRow][newColumn] = board[oldRow][oldColumn];
         board[oldRow][oldColumn] = null;
+        printBoard();
     }
 
     public void addBarrier(Color playerColor, int row, int column, boolean horizontal, int length, char type) throws QuoridorException {
@@ -84,6 +86,7 @@ public class Board {
             Temporary temporary = (Temporary)barrier;
             temporaries.add(temporary);
         }
+        printBoard();
     }
     private void addBarrierToTheBoard(int row, int column, boolean horizontal, Barrier barrier){
         if (horizontal){

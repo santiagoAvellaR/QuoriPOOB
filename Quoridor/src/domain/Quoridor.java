@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 public class Quoridor {
-    public static int turns;
+    public static Integer turns;
     private Board board;
     private Player  player1;
     private Player  player2;
@@ -28,7 +28,7 @@ public class Quoridor {
             throw new QuoridorException(QuoridorException.INVLID_SIZE);
         }
         int sizeInt = Integer.parseInt(size);
-        if (sizeInt < 2 || sizeInt > 20) {
+        if (sizeInt < 2 || sizeInt >1000) {
             throw new QuoridorException(QuoridorException.MAXIMUN_SIZE_EXCEEDED);
         }
         if(!(teleporterSquares.matches("[0-9]+") && !teleporterSquares.isEmpty()) ||
@@ -85,6 +85,7 @@ public class Quoridor {
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         if (!vsMachine || selectedPlayer.equals(player1)) {
             selectedPlayer.movePeon(direction);
+            turns += 1;
         }
     }
 
@@ -94,6 +95,7 @@ public class Quoridor {
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         if (!vsMachine || selectedPlayer.equals(player1)) {
             board.addBarrier(playerColor, row, column, horizontal, length, type);
+            turns += 1;
         }
     }
 
