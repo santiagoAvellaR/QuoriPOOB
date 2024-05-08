@@ -20,5 +20,6 @@ public abstract class Field {
     public abstract boolean hasBarrier();
     public abstract boolean hasSquare();
     public abstract boolean hasPeon();
+    public abstract void act() throws QuoridorException;
 
 }

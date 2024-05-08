@@ -22,7 +22,8 @@ public class Temporary extends Barrier{
         return "Temporary";
     }
 
-    public void reduceRemainingTime() throws QuoridorException {
+    @Override
+    public void act() throws QuoridorException {
         remainingTurns--;
         if(remainingTurns == 0){
             throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);

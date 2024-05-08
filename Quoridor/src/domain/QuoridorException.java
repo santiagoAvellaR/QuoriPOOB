@@ -15,6 +15,9 @@ public class QuoridorException extends Exception{
     public static final String MAXIMUN_NUMBER_SQUARES_EXCEEDED = "The sum of barriers must be maximun (board size + 1)";
     public static final String INVALID_NUMBER_BARRIERS = "Invalid number barrier, number must be a only numbers and not empty";
     public static final String MAXIMUN_NUMBER_BARRIERS_EXCEEDED = "The sum of barriers must be maximun (board size + 1)";
+    public static final String PLAYER_ONE_WON = "Player one won!";
+    public static final String PLAYER_TWO_WON = "Player two won!";
+
 
     public QuoridorException(String message){
         super(message);

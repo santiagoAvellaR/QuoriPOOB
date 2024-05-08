@@ -745,79 +745,77 @@ public class QuoridorGUI extends  JFrame{
     }
 
     private JPanel createBoard(Color board) {
-        boardPanel = new JPanel(null);
+        boardPanel = new JPanel(new GridBagLayout());
         int tamBoard = screenSize.height * 4 / 5;
-        int numero = boardSize.getText().isEmpty() ? 9 : Integer.parseInt(boardSize.getText().trim());
-        int CELL_SIZE = (int)((float)(tamBoard*0.75)/numero);
-        int BAR_WIDTH = (int)((float)(tamBoard*0.15)/numero);
+        int numero = boardSize.getText().isEmpty() ? 17 : 2 * Integer.parseInt(boardSize.getText().trim()) - 1;
+        int CELL_SIZE = (int) ((float) (tamBoard * 0.75) / numero);
+        int BAR_WIDTH = (int) ((float) (tamBoard * 0.15) / numero); // Ancho de la barrera ajustado para ser proporcional al tamaño de la celda
         cells = new JPanel[numero][numero];
-        horizontalBarriers = new JPanel[numero - 1][numero];
-        verticalBarriers = new JPanel[numero][numero - 1];
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH; // Los componentes se expanden para llenar el espacio disponible
+
         for (int i = 0; i < numero; i++) {
             for (int j = 0; j < numero; j++) {
-                int midColumn = numero%2==0?(numero/2)-1:(numero/2);
-
-                cells[i][j] = new JPanel(new BorderLayout());
-                int cellX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
-                int cellY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
-                int cell = (int) (CELL_SIZE);
-                cells[i][j].setBounds(cellX, cellY, cell, cell);
-                cells[i][j].setBackground(board);
-
-                if( i== 0 && j == midColumn) {
-                    JPanel P1 = new JPanel();
-                    P1.setPreferredSize(new Dimension(CELL_SIZE-5,CELL_SIZE-5));
-                    P1.setBackground(colorP1Selected);
-                    cells[i][midColumn].add(P1, BorderLayout.CENTER);
-                }
-                else if(i==numero-1 && j == midColumn) {
-                    JPanel P2 = new JPanel();
-                    P2.setBackground(colorP2Selected);
-                    P2.setPreferredSize((new Dimension(CELL_SIZE-5,CELL_SIZE-5)));
-                    cells[numero-1][midColumn].add(P2, BorderLayout.CENTER);
-                }
-
-                boardPanel.add(cells[i][j]);
-                if (j < numero - 1 ) { // Evitar la última fila de barreras verticales
-                    verticalBarriers[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, CELL_SIZE);
+                gbc.gridx = j;
+                gbc.gridy = i;
+                int midColumn = numero % 2 == 0 ? (numero/2)-1 : (numero/2);
+                if (i % 2 == 0 && j % 2 == 0) {
+                    cells[i][j] = new JPanel(new BorderLayout());
+                    cells[i][j].setBackground(board);
+                    int cellX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
+                    int cellY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
+                    int cell = (int) (CELL_SIZE);
+                    cells[i][j].setBounds(cellX, cellY, cell, cell);
+                    cells[i][j].setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
+                    if (i == 0 && j == midColumn) {
+                        JPanel P1 = new JPanel();
+                        P1.setPreferredSize(new Dimension(CELL_SIZE - 5, CELL_SIZE - 5));
+                        P1.setBackground(colorP1Selected);
+                        cells[i][midColumn].add(P1, BorderLayout.CENTER);
+                    } else if (i == numero - 1 && j == midColumn) {
+                        JPanel P2 = new JPanel();
+                        P2.setBackground(colorP2Selected);
+                        P2.setPreferredSize(new Dimension(CELL_SIZE - 5, CELL_SIZE - 5));
+                        cells[numero - 1][midColumn].add(P2, BorderLayout.CENTER);
+                    }
+                    boardPanel.add(cells[i][j], gbc);
+                } else if (i % 2 == 0 && j % 2 == 1) {
+                    // Creación de barreras horizontales
+                    cells[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, CELL_SIZE);
                     int barrierX = (int) ((j + 1) * CELL_SIZE + j * BAR_WIDTH);
                     int barrierY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
-                    verticalBarriers[i][j].setBounds(barrierX, barrierY, BAR_WIDTH, CELL_SIZE);
-                    // Evitar añadir MouseListener a las barreras verticales de la última fila
-                    if (i < verticalBarriers.length - 1) {
-                        verticalBarriers[i][j].addMouseListener(createBarrierMouseListener(verticalBarriers[i][j], i, j));
+                    cells[i][j].setPreferredSize(new Dimension(BAR_WIDTH, CELL_SIZE));
+                    cells[i][j].setBounds(barrierX, barrierY, BAR_WIDTH, CELL_SIZE);
+
+                    // Crear un nuevo GridBagConstraints para las barreras horizontales
+                    GridBagConstraints gbcBarrierHorizontal = new GridBagConstraints();
+                    gbcBarrierHorizontal.gridx = j;  // Usar el mismo valor de j para gridx
+                    gbcBarrierHorizontal.gridy = i;  // Usar el mismo valor de i para gridy
+                    gbcBarrierHorizontal.fill = GridBagConstraints.BOTH;
+
+                    if (i < cells.length - 1) {
+                        cells[i][j].addMouseListener(createBarrierMouseListener(cells[i][j], i, j));
                     }
-                    boardPanel.add(verticalBarriers[i][j]);
+                    boardPanel.add(cells[i][j], gbcBarrierHorizontal); // Usar el GridBagConstraints actualizado
                 }
-            }
-            if (i < numero - 1) {
-                for (int j = 0; j < numero; j++) {
-                    horizontalBarriers[i][j] = createBarrier(Color.GRAY, CELL_SIZE, BAR_WIDTH);
+                else {
+                    cells[i][j] = createBarrier(Color.GRAY, CELL_SIZE, BAR_WIDTH); // Cambia el orden de CELL_SIZE y BAR_WIDTH
                     int barrierX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
                     int barrierY = (int) ((i + 1) * CELL_SIZE + i * BAR_WIDTH);
-                    horizontalBarriers[i][j].setBounds(barrierX, barrierY, CELL_SIZE, BAR_WIDTH);
-                    // Evitar añadir MouseListener a las barreras horizontales de la última columna
-                    if (j < horizontalBarriers[i].length - 1) {
-                        horizontalBarriers[i][j].addMouseListener(createBarrierMouseListener(horizontalBarriers[i][j], i, j));
+                    cells[i][j].setPreferredSize(new Dimension(CELL_SIZE, BAR_WIDTH)); // Cambia el orden de CELL_SIZE y BAR_WIDTH
+                    cells[i][j].setBounds(barrierX, barrierY, CELL_SIZE, BAR_WIDTH);
+                    if (j < cells[i].length - 1) {
+                        cells[i][j].addMouseListener(createBarrierMouseListener(cells[i][j], i, j));
                     }
-                    boardPanel.add(horizontalBarriers[i][j]);
-                    if (j < numero - 1) {
-                        JPanel emptyPanel = new JPanel();
-                        emptyPanel.setBackground(boardPanel.getBackground());
-                        int emptyX = (int) ((j + 1) * CELL_SIZE + j * BAR_WIDTH);
-                        int emptyY = (int) ((i + 1) * CELL_SIZE + i * BAR_WIDTH);
-                        int emptyWidth = (int) (BAR_WIDTH);
-                        int emptyHeight = (int) (BAR_WIDTH);
-                        emptyPanel.setBounds(emptyX, emptyY, emptyWidth, emptyHeight);
-                        emptyPanel.setBackground(board);
-                        boardPanel.add(emptyPanel);
-                    }
+                    boardPanel.add(cells[i][j], gbc);
                 }
-            }
-        }
+            }}
         boardPanel.setPreferredSize(new Dimension(tamBoard, tamBoard));
         return boardPanel;
     }
+
+
+
     private JPanel createBarrier(Color color, int width, int height) {
         JPanel barrierPanel = new JPanel();
         barrierPanel.setBackground(color);

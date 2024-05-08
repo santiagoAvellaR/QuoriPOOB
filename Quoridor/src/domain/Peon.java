@@ -5,17 +5,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Peon extends Field{
+    private int playerNumber;
     private int row;
     private int column;
     private final Board board;
     private ArrayList<String> tracker;
 
-    public Peon(int row, int column, Board board, Color color) {
+    public Peon(int row, int column, Board board, Color color, int numberPlayer) {
         super(color);
         this.row = row;
         this.column = column;
         this.board = board;
         tracker = new ArrayList<String>();
+        this.playerNumber = numberPlayer;
     }
     public int getRow() {
         return row;
@@ -45,6 +47,15 @@ public class Peon extends Field{
     public boolean hasSquare(){return false;}
     @Override
     public boolean hasPeon(){return true;}
+    @Override
+    public void act() throws QuoridorException {
+        if((playerNumber == 1 && row == 0)){
+            throw new QuoridorException(QuoridorException.PLAYER_ONE_WON);
+        }
+        else if ((playerNumber == 2 && row == board.getBoardLimit()-1)) {
+            throw new QuoridorException(QuoridorException.PLAYER_TWO_WON);
+        }
+    }
 
     public void moveVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
@@ -72,30 +83,14 @@ public class Peon extends Field{
     }
 
     public void move(String direction) throws QuoridorException{
-        if (direction.equals("u")){
-            moveVertical(true);
-        }
-        else if (direction.equals("d")){
-            moveVertical(false);
-        }
-        else if (direction.equals("l")){
-            moveHorizontal(true);
-        }
-        else if (direction.equals("r")){
-            moveHorizontal(false);
-        }
-        else if (direction.equals("ju")){
-            jumpVertical(true);
-        }
-        else if (direction.equals("jd")){
-            jumpVertical(false);
-        }
-        else if (direction.equals("jl")){
-            jumpHorizontal(true);
-        }
-        else if (direction.equals("jr")){
-            jumpHorizontal(false);
-        }
+        if (direction.equals("u")){moveVertical(true);}
+        else if (direction.equals("d")){moveVertical(false);}
+        else if (direction.equals("l")){moveHorizontal(true);}
+        else if (direction.equals("r")){moveHorizontal(false);}
+        else if (direction.equals("ju")){jumpVertical(true);}
+        else if (direction.equals("jd")){jumpVertical(false);}
+        else if (direction.equals("jl")){jumpHorizontal(true);}
+        else if (direction.equals("jr")){jumpHorizontal(false);}
     }
 
     public ArrayList<String> getValidMovements(){
@@ -175,4 +170,100 @@ public class Peon extends Field{
         }
         return validHorizontalMovements;
     }
+
+    public boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited){
+        for (int i = 0; i < positionsVisited.length-1;i++){
+            for (int j = 0; j < positionsVisited[0].length-1;j++){
+                System.out.print(positionsVisited[i][j]+" ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+        if (simulateRow == 0  && playerNumber == 1){return true;}
+        if (playerNumber == 2 && simulateRow == board.getBoardLimit()-2){return true;}
+        System.out.println(simulateRow + ", " + simulateColumn);
+        positionsVisited[simulateRow][simulateColumn] = true;
+        ArrayList<String> validDirections = getValidMovementsExits(simulateRow, simulateColumn);
+        System.out.println(validDirections);
+        for (String direction : validDirections){
+            int[] newPosition = getTheNewPositionAccordingDirection(simulateRow, simulateColumn, direction);
+            if (hasAnExit(newPosition[0], newPosition[1], positionsVisited) && !positionsVisited[newPosition[0]][newPosition[1]]){
+                return true;
+            }
+        }
+        return false;
+    }
+    private ArrayList<String> getValidMovementsExits(int simulateRow, int simulateColumn){
+        ArrayList<String> movements = validateVerticalExits(simulateRow, simulateColumn, new ArrayList<String>(), true);
+        movements = validateVerticalExits(simulateRow, simulateColumn, movements, false);
+        movements = validateHorizontalExits(simulateRow, simulateColumn, movements, true);
+        movements = validateHorizontalExits(simulateRow, simulateColumn, movements, false);
+        return movements;
+    }
+    private ArrayList<String> validateVerticalExits(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesUp){
+        ArrayList<String> validVericalMovements = validMovementsCalculated;
+        if (row == 0 && goesUp) {return validVericalMovements;}
+        if (row == board.getBoardLimit()-1 && !goesUp) {return validVericalMovements;}
+        int direction = goesUp ? -1 : 1;
+        // verificar salto Simple
+        if (board.getField(row + direction, column) != null) {
+            return validVericalMovements;
+        }
+        if (!board.hasPeon(row + 2*direction, column)){
+            String directionString = goesUp ? "u" : "d";
+            validVericalMovements.add(directionString);
+            return validVericalMovements;
+        }
+        if (row <= 2 && goesUp){return validVericalMovements;}
+        if (row >= board.getBoardLimit()-2 && !goesUp){return validVericalMovements;}
+        // verificar salto Doble
+        if (board.getField(row + 3*direction, column) != null) {
+            return validVericalMovements;
+        }
+        if (!board.hasPeon(row + 4*direction, column)) {
+            String directionCharacter = goesUp ? "ju" : "jd";
+            validVericalMovements.add(directionCharacter);
+            return validVericalMovements;
+        }
+        return validVericalMovements;
+    }
+    public ArrayList<String> validateHorizontalExits(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesLeft){
+        ArrayList<String> validHorizontalMovements = validMovementsCalculated;
+        if (column == 0 && goesLeft) {return validHorizontalMovements;}
+        if (column == board.getBoardLimit()-1 && !goesLeft) {return validHorizontalMovements;}
+        int direction = goesLeft ? -1 : 1;
+        // verificar salto Simple
+        if (board.getField(row, column + direction) != null) {
+            return validHorizontalMovements;
+        }
+        if (!board.hasPeon(row, column + 2*direction)) {
+            String directionString = goesLeft ? "l" : "r";
+            validHorizontalMovements.add(directionString);
+            return validHorizontalMovements;
+        }
+        if (column <= 2 && goesLeft){return validHorizontalMovements;}
+        if (column >= board.getBoardLimit()-2 && !goesLeft){return validHorizontalMovements;}
+        // verificar salto Doble
+        if (board.getField(row, column + 3*direction) != null) {
+            return validHorizontalMovements;
+        }
+        if (board.hasPeon(row, column + 4*direction)) {
+            String directionCharacter = goesLeft ? "jr" : "jl";
+            validHorizontalMovements.add(directionCharacter);
+            return validHorizontalMovements;
+        }
+        return validHorizontalMovements;
+    }
+    private int[] getTheNewPositionAccordingDirection(int row, int column, String direction){
+        if (direction.equals("u")){return new int[]{row - 2,column};}
+        else if (direction.equals("d")){return new int[]{row + 2,column};}
+        else if (direction.equals("l")){return new int[]{row,column - 2};}
+        else if (direction.equals("r")){return new int[]{row,column + 2};}
+        else if (direction.equals("ju")){return new int[]{row - 4,column};}
+        else if (direction.equals("jd")){return new int[]{row + 4,column};}
+        else if (direction.equals("jl")){return new int[]{row,column - 4};}
+        else if (direction.equals("jr")){return new int[]{row,column + 4};}
+        return new int[]{};
+    }
+
 }

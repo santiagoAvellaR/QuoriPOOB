@@ -20,7 +20,15 @@ public abstract class Player {
         this.longBarriers = longBarriers;
         this.alliedBarriers = alliedBarriers;
     }
-
+    public boolean peonHasAnExit() {
+        Boolean[][] visited = new Boolean[Board.size * 2][Board.size * 2];
+        for (int i = 0; i < visited.length; i++) {
+            for (int j = 0; j < visited[i].length; j++) {
+                visited[i][j] = false;
+            }
+        }
+        return peon.hasAnExit(peon.getRow(), peon.getColumn(), visited);
+    }
     public Color getColor() {return color;}
     public Peon getPeon() {return peon;}
 

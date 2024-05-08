@@ -230,7 +230,7 @@ class QuoridorTest {
             quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
-            quoridor.addBarrier(Color.blue, 0, 1, false, 2, 'n');
+            quoridor.addBarrier(Color.blue, 0, 1, false,  'n');
             assertEquals("Normal", quoridor.getTypeOfField(0,1));
             assertEquals("Normal", quoridor.getTypeOfField(1,1));
             assertEquals("Normal", quoridor.getTypeOfField(2,1));
@@ -246,7 +246,7 @@ class QuoridorTest {
             quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
-            quoridor.addBarrier(Color.blue, 0, 1, false, 2, 'n');
+            quoridor.addBarrier(Color.blue, 0, 1, false, 'n');
             String[]expectedResult = {"d", "r"};
             assertArrayEquals(expectedResult, quoridor.getPeonValidMovements(Color.red).toArray(new String[0]));
         }
@@ -261,7 +261,7 @@ class QuoridorTest {
             quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
-            quoridor.addBarrier(Color.blue, 1, 0, true, 2, 'n');
+            quoridor.addBarrier(Color.blue, 1, 0, true,  'n');
             assertEquals("Normal", quoridor.getTypeOfField(1,0));
             assertEquals("Normal", quoridor.getTypeOfField(1,1));
             assertEquals("Normal", quoridor.getTypeOfField(1,2));
@@ -277,9 +277,22 @@ class QuoridorTest {
             quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
-            quoridor.addBarrier(Color.blue, 1, 0, true, 2, 'n');
+            quoridor.addBarrier(Color.blue, 1, 0, true,  'n');
             String[]expectedResult = {"l", "r"};
             assertArrayEquals(expectedResult, quoridor.getPeonValidMovements(Color.red).toArray(new String[0]));
+        }
+        catch(QuoridorException e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldReturnThatPeonHasAnExit() {
+        try{
+            quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
+                    "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
+                    "Timed", "30", false, "beginner");
+            assertTrue(quoridor.peonsHasAnExit());
         }
         catch(QuoridorException e){
             fail("threw the exception: " + e.getMessage());

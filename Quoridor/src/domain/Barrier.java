@@ -23,4 +23,6 @@ public abstract class Barrier extends Field{
     public boolean hasPeon() {return false;}
     @Override
     public boolean hasBarrier() {return true;}
+    @Override
+    public void act() throws QuoridorException{}
 }

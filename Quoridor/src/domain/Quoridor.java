@@ -107,6 +107,10 @@ public class Quoridor {
         }
     }
 
+    public int[] getDeletedTemporary(){
+        return board.getPsotionsDeletedTemporary();
+    }
+
     public boolean areSimilarColors(Color color1, Color color2) {
         int redDiff = color1.getRed() - color2.getRed();
         int greenDiff = color1.getGreen() - color2.getGreen();
@@ -117,8 +121,10 @@ public class Quoridor {
     }
 
     public void actualizeEachTurn() throws QuoridorException {
-        board.actualizeTemporaries();
+        board.fieldAct();
     }
+
+    public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
 
     // TEST FUNCTIONS
     public Peon getPeon1(){return player1.getPeon();}

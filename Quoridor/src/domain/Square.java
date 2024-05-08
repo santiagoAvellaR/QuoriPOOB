@@ -10,9 +10,10 @@ public abstract class Square extends Field{
 
     @Override
     public boolean hasBarrier() {return false;}
-
     @Override
     public boolean hasPeon() {return false;}
+    @Override
+    public void act(){}
 
     protected abstract void applySpecialAction();
 }

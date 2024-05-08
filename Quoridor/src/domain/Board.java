@@ -4,18 +4,17 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Board {
-    public int size;
+    public static int size;
     private Field[][] board;
     private final int midColumn;
-    ArrayList<Temporary> temporaries;
+    private Temporary deletedTemporary;
 
     public Board(int size, Color player1Color, Color player2Color, int teletransporterSquares, int rewindSquares, int skipTurnSquares) {
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         midColumn = size % 2 == 0 ? size - 2 : size - 1;
-        board[getBoardLimit() - 1][midColumn] = new Peon(getBoardLimit() - 1, midColumn, this, player1Color);
-        board[0][midColumn] = new Peon(0, midColumn, this, player2Color);
-        temporaries = new ArrayList<>();
+        board[getBoardLimit() - 1][midColumn] = new Peon(getBoardLimit() - 1, midColumn, this, player1Color, 1);
+        board[0][midColumn] = new Peon(0, midColumn, this, player2Color, 2);
         fillTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
         printBoard();
     }
@@ -82,10 +81,6 @@ public class Board {
         }
         Barrier barrier = createBarrierGivenTheType(playerColor, row, column, horizontal, type);
         addBarrierToTheBoard(row, column, horizontal, barrier);
-        if (type == 't'){
-            Temporary temporary = (Temporary)barrier;
-            temporaries.add(temporary);
-        }
         printBoard();
     }
     private void addBarrierToTheBoard(int row, int column, boolean horizontal, Barrier barrier){
@@ -123,21 +118,22 @@ public class Board {
         }
     }
 
-    public void actualizeTemporaries() throws QuoridorException {
-        for (Temporary temporary : temporaries){
-            try{
-                temporary.reduceRemainingTime();
-            }
-            catch (QuoridorException e){
-                if (e.getMessage().equals(QuoridorException.ERRAASE_TEMPORARY_BARRIER)){
-                    deleteTemporaryFromBoard(temporary);
-                    temporaries.remove(temporary);
-                    throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);
+    public void fieldAct() throws QuoridorException {
+        for (Field[] fieldRow : board){
+            for (Field field : fieldRow) {
+                try {
+                    field.act();
+                } catch (QuoridorException e) {
+                    if (e.getMessage().equals(QuoridorException.ERRAASE_TEMPORARY_BARRIER)) {
+                        Temporary temporary = (Temporary)field;
+                        deleteTemporaryFromBoard(temporary);
+                        deletedTemporary = temporary;
+                        throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);
+                    }
                 }
             }
         }
     }
-
     private void deleteTemporaryFromBoard(Temporary temporary){
         int column = temporary.getColumn();
         int row = temporary.getRow();
@@ -152,6 +148,9 @@ public class Board {
                 board[row + i][column] = null;
             }
         }
+    }
+    public int[] getPsotionsDeletedTemporary(){
+        return new int[]{deletedTemporary.getRow(), deletedTemporary.getColumn()};
     }
 
 }
