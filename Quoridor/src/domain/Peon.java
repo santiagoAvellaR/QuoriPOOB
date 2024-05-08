@@ -35,6 +35,7 @@ public class Peon extends Field{
         }
         return false;
     }
+    @Override
     public String getType(){
         return "Peon";
     }

@@ -47,6 +47,7 @@ public class QuoridorGUI extends  JFrame{
     private JPanel[][] cells;
     private JPanel[][] horizontalBarriers;
     private JPanel[][] verticalBarriers;
+    private JComboBox<String> barreraP1, barreraP2;
     private JLabel labelTurns;
     private JPanel gamePanel;
     private JPanel boardPanel;
@@ -291,6 +292,20 @@ public class QuoridorGUI extends  JFrame{
                             (nPlayers.getSelectedItem().equals("1 PLAYERS")),
                             (String)modes.getSelectedItem());
                     turns = quoridor.getTurns();
+                    colorP1Selected = colorP1Selected == Color.WHITE ? Color.CYAN : colorP1Selected;
+                    colorP2Selected = colorP2Selected == Color.WHITE ? Color.RED : colorP2Selected;
+                    barreraP1 = new JComboBox<String>();
+                    barreraP2 = new JComboBox<String>();
+                    barreraP1.addItem("Normales");
+                    barreraP2.addItem("Normales");
+                    if(!boardSize.getText().isEmpty()){
+                        barreraP1.addItem("Larga");
+                        barreraP2.addItem("Larga");
+                        barreraP1.addItem("Temporal");
+                        barreraP2.addItem("Temporal");
+                        barreraP1.addItem("Aliada");
+                        barreraP2.addItem("Aliada");
+                    }
                     prepareStartGameWindowElements();
                     prepareStartGameWindowActions();
                     setContentPane(gamePanel);
@@ -592,7 +607,14 @@ public class QuoridorGUI extends  JFrame{
             barrerasdis.add(barrera);
             barrerasdis.add(cantb);
         }
+        JPanel barreraEsc = new JPanel(new FlowLayout());
+        JLabel barrera = new JLabel("Barrera :");
+        barrera.setFont(gameFont20);
+        barreraEsc.add(barrera);
+        barreraEsc.add(barreraP1);
+        inf.add(barreraEsc);
         inf.add(barrerasdis);
+
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
 
@@ -646,6 +668,12 @@ public class QuoridorGUI extends  JFrame{
             barrerasdis.add(barrera);
             barrerasdis.add(cantb);
         }
+        JPanel barreraEsc = new JPanel(new FlowLayout());
+        JLabel barrera = new JLabel("Barrera :");
+        barrera.setFont(gameFont20);
+        barreraEsc.add(barrera);
+        barreraEsc.add(barreraP2);
+        inf.add(barreraEsc);
         inf.add(barrerasdis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
@@ -705,6 +733,12 @@ public class QuoridorGUI extends  JFrame{
             barrerasdis.add(barrera);
             barrerasdis.add(cantb);
         }
+        JPanel barreraEsc = new JPanel(new FlowLayout());
+        JLabel barrera = new JLabel("Barrera :");
+        barrera.setFont(gameFont20);
+        barreraEsc.add(barrera);
+        barreraEsc.add(barreraP2);
+        inf.add(barreraEsc);
         inf.add(barrerasdis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
@@ -721,12 +755,28 @@ public class QuoridorGUI extends  JFrame{
         verticalBarriers = new JPanel[numero][numero - 1];
         for (int i = 0; i < numero; i++) {
             for (int j = 0; j < numero; j++) {
-                cells[i][j] = new JPanel();
+                int midColumn = numero%2==0?(numero/2)-1:(numero/2);
+
+                cells[i][j] = new JPanel(new BorderLayout());
                 int cellX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
                 int cellY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
                 int cell = (int) (CELL_SIZE);
                 cells[i][j].setBounds(cellX, cellY, cell, cell);
                 cells[i][j].setBackground(board);
+
+                if( i== 0 && j == midColumn) {
+                    JPanel P1 = new JPanel();
+                    P1.setPreferredSize(new Dimension(CELL_SIZE-5,CELL_SIZE-5));
+                    P1.setBackground(colorP1Selected);
+                    cells[i][midColumn].add(P1, BorderLayout.CENTER);
+                }
+                else if(i==numero-1 && j == midColumn) {
+                    JPanel P2 = new JPanel();
+                    P2.setBackground(colorP2Selected);
+                    P2.setPreferredSize((new Dimension(CELL_SIZE-5,CELL_SIZE-5)));
+                    cells[numero-1][midColumn].add(P2, BorderLayout.CENTER);
+                }
+
                 boardPanel.add(cells[i][j]);
                 if (j < numero - 1 ) { // Evitar la última fila de barreras verticales
                     verticalBarriers[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, CELL_SIZE);

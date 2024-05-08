@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Board {
     public int size;
     private Field[][] board;
-    private int midColumn;
+    private final int midColumn;
     ArrayList<Temporary> temporaries;
 
     public Board(int size, Color player1Color, Color player2Color, int teletransporterSquares, int rewindSquares, int skipTurnSquares) {
@@ -16,7 +16,7 @@ public class Board {
         board[getBoardLimit() - 1][midColumn] = new Peon(getBoardLimit() - 1, midColumn, this, player1Color);
         board[0][midColumn] = new Peon(0, midColumn, this, player2Color);
         temporaries = new ArrayList<>();
-        fieldTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
+        fillTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
         printBoard();
     }
 
@@ -36,7 +36,7 @@ public class Board {
         return "Empty";
     }
 
-    private void fieldTheBoard(int teletransporterSquares, int rewindSquares, int skipTurnSquares){
+    private void fillTheBoard(int teletransporterSquares, int rewindSquares, int skipTurnSquares){
 
     }
 
@@ -76,7 +76,7 @@ public class Board {
         printBoard();
     }
 
-    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, int length, char type) throws QuoridorException {
+    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, char type) throws QuoridorException {
         if(board[row][column]!=null){
             throw new QuoridorException(QuoridorException.BARRIER_ALREADY_CREATED);
         }
@@ -126,7 +126,7 @@ public class Board {
     public void actualizeTemporaries() throws QuoridorException {
         for (Temporary temporary : temporaries){
             try{
-                temporary.reduceTime();
+                temporary.reduceRemainingTime();
             }
             catch (QuoridorException e){
                 if (e.getMessage().equals(QuoridorException.ERRAASE_TEMPORARY_BARRIER)){
@@ -141,8 +141,9 @@ public class Board {
     private void deleteTemporaryFromBoard(Temporary temporary){
         int column = temporary.getColumn();
         int row = temporary.getRow();
+        int length = temporary.getLength();
         if (temporary.isHorizontal()){
-            for (int j = 0; j < temporary.getLength()*2 - 1; j++) {
+            for (int j = 0; j < length*2 - 1; j++) {
                 board[row][column + j] = null;
             }
         }

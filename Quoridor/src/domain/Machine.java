@@ -12,7 +12,7 @@ public class Machine extends Player{
         this.board = board;
     }
 
-    public void makeMovement(){
+    public void play(){
 
     }
 }

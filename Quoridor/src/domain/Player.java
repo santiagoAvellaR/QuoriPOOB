@@ -24,8 +24,4 @@ public abstract class Player {
     public Color getColor() {return color;}
     public Peon getPeon() {return peon;}
 
-    public final void movePeon(String direction) throws QuoridorException {
-        peon.move(direction);
-    }
-
 }

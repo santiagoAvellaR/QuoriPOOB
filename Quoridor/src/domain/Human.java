@@ -11,4 +11,8 @@ public class Human extends Player{
     public ArrayList<String> getPeonValidMovements() {
         return peon.getValidMovements();
     }
+
+    public void movePeon(String direction) throws QuoridorException {
+        peon.move(direction);
+    }
 }

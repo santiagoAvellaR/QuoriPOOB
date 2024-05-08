@@ -3,7 +3,7 @@ package src.domain;
 import java.awt.*;
 
 public class Temporary extends Barrier{
-    private int remainingTime;
+    private int remainingTurns;
     private int row;
     private int column;
 
@@ -11,7 +11,7 @@ public class Temporary extends Barrier{
         super(color, horizontal, 2);
         this.row = row;
         this.column = column;
-        remainingTime = 5;
+        remainingTurns = 5;
     }
 
     public int getRow(){return row;}
@@ -22,9 +22,9 @@ public class Temporary extends Barrier{
         return "Temporary";
     }
 
-    public void reduceTime() throws QuoridorException {
-        remainingTime--;
-        if(remainingTime == 0){
+    public void reduceRemainingTime() throws QuoridorException {
+        remainingTurns--;
+        if(remainingTurns == 0){
             throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);
         }
     }

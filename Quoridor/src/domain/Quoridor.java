@@ -84,17 +84,18 @@ public class Quoridor {
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         if (!vsMachine || selectedPlayer.equals(player1)) {
-            selectedPlayer.movePeon(direction);
+            Human human = (Human) selectedPlayer;
+            human.movePeon(direction);
             turns += 1;
         }
     }
 
-    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, int length, char type) throws QuoridorException {
+    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, char type) throws QuoridorException {
         Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         if (!vsMachine || selectedPlayer.equals(player1)) {
-            board.addBarrier(playerColor, row, column, horizontal, length, type);
+            board.addBarrier(playerColor, row, column, horizontal, type);
             turns += 1;
         }
     }
@@ -102,7 +103,7 @@ public class Quoridor {
     public void machineTurn(){
         if (vsMachine){
             Machine machine = (Machine) player2;
-            machine.makeMovement();
+            machine.play();
         }
     }
 
