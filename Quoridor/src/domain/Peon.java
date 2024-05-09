@@ -10,6 +10,7 @@ public class Peon extends Field{
     private int column;
     private final Board board;
     private ArrayList<String> tracker;
+    private boolean hasFoundAndExit;
 
     public Peon(int row, int column, Board board, Color color, int numberPlayer) {
         super(color);
@@ -18,6 +19,7 @@ public class Peon extends Field{
         this.board = board;
         tracker = new ArrayList<String>();
         this.playerNumber = numberPlayer;
+        hasFoundAndExit = false;
     }
     public int getRow() {
         return row;
@@ -29,6 +31,7 @@ public class Peon extends Field{
     public void setColor(Color color) {
         this.color = color;
     }
+    public void setHasFoundAndExit(boolean hasFoundAndExit) {this.hasFoundAndExit = hasFoundAndExit;}
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Peon) {
@@ -52,7 +55,7 @@ public class Peon extends Field{
         if((playerNumber == 1 && row == 0)){
             throw new QuoridorException(QuoridorException.PLAYER_ONE_WON);
         }
-        else if ((playerNumber == 2 && row == board.getBoardLimit()-1)) {
+        else if ((playerNumber == 2 && row == board.getBoardSize()-1)) {
             throw new QuoridorException(QuoridorException.PLAYER_TWO_WON);
         }
     }
@@ -106,7 +109,7 @@ public class Peon extends Field{
     public ArrayList<String> validateVertical(ArrayList<String> validMovementsCalculated, boolean goesUp){
         ArrayList<String> validVericalMovements = validMovementsCalculated;
         if (row == 0 && goesUp) {return validVericalMovements;}
-        if (row == board.getBoardLimit()-1 && !goesUp) {return validVericalMovements;}
+        if (row == board.getBoardSize()-1 && !goesUp) {return validVericalMovements;}
         int direction = goesUp ? -1 : 1;
         // verificar salto Simple
         if (board.getField(row + direction, column) != null) {
@@ -121,7 +124,7 @@ public class Peon extends Field{
             return validVericalMovements;
         }
         if (row <= 2 && goesUp){return validVericalMovements;}
-        if (row >= board.getBoardLimit()-2 && !goesUp){return validVericalMovements;}
+        if (row >= board.getBoardSize()-3 && !goesUp){return validVericalMovements;}
         // verificar salto Doble
         if (board.getField(row + 3*direction, column) != null) {
             Barrier barrier = (Barrier) board.getField(row + 3*direction, column);
@@ -140,7 +143,7 @@ public class Peon extends Field{
     public ArrayList<String> validateHorizontal(ArrayList<String> validMovementsCalculated, boolean goesLeft){
         ArrayList<String> validHorizontalMovements = validMovementsCalculated;
         if (column == 0 && goesLeft) {return validHorizontalMovements;}
-        if (column == board.getBoardLimit()-1 && !goesLeft) {return validHorizontalMovements;}
+        if (column == board.getBoardSize()-1 && !goesLeft) {return validHorizontalMovements;}
         int direction = goesLeft ? -1 : 1;
         // verificar salto Simple
         if (board.getField(row, column + direction) != null) {
@@ -155,7 +158,7 @@ public class Peon extends Field{
             return validHorizontalMovements;
         }
         if (column <= 2 && goesLeft){return validHorizontalMovements;}
-        if (column >= board.getBoardLimit()-2 && !goesLeft){return validHorizontalMovements;}
+        if (column >= board.getBoardSize()-3 && !goesLeft){return validHorizontalMovements;}
         // verificar salto Doble
         if (board.getField(row, column + 3*direction) != null) {
             Barrier barrier = (Barrier) board.getField(row, column + 3*direction);
@@ -172,23 +175,17 @@ public class Peon extends Field{
     }
 
     public boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited){
-        for (int i = 0; i < positionsVisited.length-1;i++){
-            for (int j = 0; j < positionsVisited[0].length-1;j++){
-                System.out.print(positionsVisited[i][j]+" ");
-            }
-            System.out.println();
-        }
-        System.out.println();
         if (simulateRow == 0  && playerNumber == 1){return true;}
-        if (playerNumber == 2 && simulateRow == board.getBoardLimit()-2){return true;}
-        System.out.println(simulateRow + ", " + simulateColumn);
+        if (simulateRow == board.getBoardSize()-1 && playerNumber == 2){return true;}
         positionsVisited[simulateRow][simulateColumn] = true;
         ArrayList<String> validDirections = getValidMovementsExits(simulateRow, simulateColumn);
-        System.out.println(validDirections);
         for (String direction : validDirections){
             int[] newPosition = getTheNewPositionAccordingDirection(simulateRow, simulateColumn, direction);
-            if (hasAnExit(newPosition[0], newPosition[1], positionsVisited) && !positionsVisited[newPosition[0]][newPosition[1]]){
-                return true;
+            if (!positionsVisited[newPosition[0]][newPosition[1]] && !hasFoundAndExit) {
+                if (hasAnExit(newPosition[0], newPosition[1], positionsVisited)) {
+                    hasFoundAndExit = true;
+                    return true;
+                }
             }
         }
         return false;
@@ -203,10 +200,10 @@ public class Peon extends Field{
     private ArrayList<String> validateVerticalExits(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesUp){
         ArrayList<String> validVericalMovements = validMovementsCalculated;
         if (row == 0 && goesUp) {return validVericalMovements;}
-        if (row == board.getBoardLimit()-1 && !goesUp) {return validVericalMovements;}
+        if (row == board.getBoardSize()-1 && !goesUp) {return validVericalMovements;}
         int direction = goesUp ? -1 : 1;
         // verificar salto Simple
-        if (board.getField(row + direction, column) != null) {
+        if (board.hasBarrier(row + direction, column)) {
             return validVericalMovements;
         }
         if (!board.hasPeon(row + 2*direction, column)){
@@ -215,7 +212,7 @@ public class Peon extends Field{
             return validVericalMovements;
         }
         if (row <= 2 && goesUp){return validVericalMovements;}
-        if (row >= board.getBoardLimit()-2 && !goesUp){return validVericalMovements;}
+        if (row >= board.getBoardSize()-3 && !goesUp){return validVericalMovements;}
         // verificar salto Doble
         if (board.getField(row + 3*direction, column) != null) {
             return validVericalMovements;
@@ -230,7 +227,7 @@ public class Peon extends Field{
     public ArrayList<String> validateHorizontalExits(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesLeft){
         ArrayList<String> validHorizontalMovements = validMovementsCalculated;
         if (column == 0 && goesLeft) {return validHorizontalMovements;}
-        if (column == board.getBoardLimit()-1 && !goesLeft) {return validHorizontalMovements;}
+        if (column == board.getBoardSize()-1 && !goesLeft) {return validHorizontalMovements;}
         int direction = goesLeft ? -1 : 1;
         // verificar salto Simple
         if (board.getField(row, column + direction) != null) {
@@ -242,7 +239,7 @@ public class Peon extends Field{
             return validHorizontalMovements;
         }
         if (column <= 2 && goesLeft){return validHorizontalMovements;}
-        if (column >= board.getBoardLimit()-2 && !goesLeft){return validHorizontalMovements;}
+        if (column >= board.getBoardSize()-2 && !goesLeft){return validHorizontalMovements;}
         // verificar salto Doble
         if (board.getField(row, column + 3*direction) != null) {
             return validHorizontalMovements;

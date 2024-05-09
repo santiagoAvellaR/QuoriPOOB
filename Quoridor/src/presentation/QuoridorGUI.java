@@ -7,6 +7,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+
 import java.util.HashMap;
 
 import src.domain.Quoridor;
@@ -748,13 +749,12 @@ public class QuoridorGUI extends  JFrame{
         boardPanel = new JPanel(new GridBagLayout());
         int tamBoard = screenSize.height * 4 / 5;
         int numero = boardSize.getText().isEmpty() ? 17 : 2 * Integer.parseInt(boardSize.getText().trim()) - 1;
-        int CELL_SIZE = (int) ((float) (tamBoard * 0.75) / numero);
+        int CELL_SIZE = (int) ( (tamBoard * 4/5) / numero);
         int BAR_WIDTH = (int) ((float) (tamBoard * 0.15) / numero); // Ancho de la barrera ajustado para ser proporcional al tamaño de la celda
         cells = new JPanel[numero][numero];
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH; // Los componentes se expanden para llenar el espacio disponible
-
         for (int i = 0; i < numero; i++) {
+            int barrerah = 0;
             for (int j = 0; j < numero; j++) {
                 gbc.gridx = j;
                 gbc.gridy = i;
@@ -765,7 +765,6 @@ public class QuoridorGUI extends  JFrame{
                     int cellX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
                     int cellY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
                     int cell = (int) (CELL_SIZE);
-                    cells[i][j].setBounds(cellX, cellY, cell, cell);
                     cells[i][j].setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
                     if (i == 0 && j == midColumn) {
                         JPanel P1 = new JPanel();
@@ -778,37 +777,32 @@ public class QuoridorGUI extends  JFrame{
                         P2.setPreferredSize(new Dimension(CELL_SIZE - 5, CELL_SIZE - 5));
                         cells[numero - 1][midColumn].add(P2, BorderLayout.CENTER);
                     }
-                    boardPanel.add(cells[i][j], gbc);
+
                 } else if (i % 2 == 0 && j % 2 == 1) {
-                    // Creación de barreras horizontales
                     cells[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, CELL_SIZE);
                     int barrierX = (int) ((j + 1) * CELL_SIZE + j * BAR_WIDTH);
                     int barrierY = (int) (i * CELL_SIZE + i * BAR_WIDTH);
-                    cells[i][j].setPreferredSize(new Dimension(BAR_WIDTH, CELL_SIZE));
                     cells[i][j].setBounds(barrierX, barrierY, BAR_WIDTH, CELL_SIZE);
-
-                    // Crear un nuevo GridBagConstraints para las barreras horizontales
-                    GridBagConstraints gbcBarrierHorizontal = new GridBagConstraints();
-                    gbcBarrierHorizontal.gridx = j;  // Usar el mismo valor de j para gridx
-                    gbcBarrierHorizontal.gridy = i;  // Usar el mismo valor de i para gridy
-                    gbcBarrierHorizontal.fill = GridBagConstraints.BOTH;
-
                     if (i < cells.length - 1) {
                         cells[i][j].addMouseListener(createBarrierMouseListener(cells[i][j], i, j));
                     }
-                    boardPanel.add(cells[i][j], gbcBarrierHorizontal); // Usar el GridBagConstraints actualizado
                 }
-                else {
-                    cells[i][j] = createBarrier(Color.GRAY, CELL_SIZE, BAR_WIDTH); // Cambia el orden de CELL_SIZE y BAR_WIDTH
+                else if(i%2==1 && j%2==0){
+
+                    cells[i][j] = createBarrier(Color.GRAY, CELL_SIZE, BAR_WIDTH); // Cambia el orden de CELL_SIZE y BAR_WIDTHc
                     int barrierX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
                     int barrierY = (int) ((i + 1) * CELL_SIZE + i * BAR_WIDTH);
-                    cells[i][j].setPreferredSize(new Dimension(CELL_SIZE, BAR_WIDTH)); // Cambia el orden de CELL_SIZE y BAR_WIDTH
                     cells[i][j].setBounds(barrierX, barrierY, CELL_SIZE, BAR_WIDTH);
                     if (j < cells[i].length - 1) {
                         cells[i][j].addMouseListener(createBarrierMouseListener(cells[i][j], i, j));
                     }
-                    boardPanel.add(cells[i][j], gbc);
+
+
                 }
+                else{
+                    cells[i][j] = createBarrier(Color.GRAY, BAR_WIDTH, BAR_WIDTH); // Cambia el orden de CELL_SIZE y BAR_WIDTH
+                }
+                boardPanel.add(cells[i][j], gbc);
             }}
         boardPanel.setPreferredSize(new Dimension(tamBoard, tamBoard));
         return boardPanel;

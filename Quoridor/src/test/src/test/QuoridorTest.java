@@ -230,7 +230,7 @@ class QuoridorTest {
             quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
-            quoridor.addBarrier(Color.blue, 0, 1, false,  'n');
+            quoridor.addBarrier(Color.blue, 0, 1,  false,  'n');
             assertEquals("Normal", quoridor.getTypeOfField(0,1));
             assertEquals("Normal", quoridor.getTypeOfField(1,1));
             assertEquals("Normal", quoridor.getTypeOfField(2,1));
@@ -277,7 +277,7 @@ class QuoridorTest {
             quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
-            quoridor.addBarrier(Color.blue, 1, 0, true,  'n');
+            quoridor.addBarrier(Color.blue, 1, 0,true,  'n');
             String[]expectedResult = {"l", "r"};
             assertArrayEquals(expectedResult, quoridor.getPeonValidMovements(Color.red).toArray(new String[0]));
         }

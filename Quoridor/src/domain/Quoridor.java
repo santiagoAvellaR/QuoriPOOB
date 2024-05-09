@@ -2,6 +2,7 @@ package src.domain;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Quoridor {
     public static Integer turns;
@@ -10,7 +11,7 @@ public class Quoridor {
     private Player  player2;
     private String gameMode;
     private boolean vsMachine;
-
+    private HashMap<Character, Integer> lengthBarriersTypes;
     public Quoridor(String size,
                     String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers,
                     String teleporterSquares, String rewindSquares, String skipTurnSquares,
@@ -66,6 +67,14 @@ public class Quoridor {
         else{player2 = new Human(peon2, playerTwoName, playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);}
     }
 
+    private void initializeHashMaps(){
+        lengthBarriersTypes = new HashMap<>();
+        lengthBarriersTypes.put('n', 2);
+        lengthBarriersTypes.put('a', 2);
+        lengthBarriersTypes.put('t', 2);
+        lengthBarriersTypes.put('l', 3);
+    }
+
     public int getTurns(){
         return turns;
     }
@@ -95,7 +104,15 @@ public class Quoridor {
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         if (!vsMachine || selectedPlayer.equals(player1)) {
-            board.addBarrier(playerColor, row, column, horizontal, type);
+            board.addBarrier(playerColor, row, column, lengthBarriersTypes.get(type), horizontal, type);
+            if (!player1.peonHasAnExit()){
+                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal);
+                throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON1);
+            }
+            if (!player2.peonHasAnExit()){
+                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal);
+                throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON2);
+            }
             turns += 1;
         }
     }

@@ -1,7 +1,6 @@
 package src.domain;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public class Board {
     public static int size;
@@ -13,7 +12,7 @@ public class Board {
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         midColumn = size % 2 == 0 ? size - 2 : size - 1;
-        board[getBoardLimit() - 1][midColumn] = new Peon(getBoardLimit() - 1, midColumn, this, player1Color, 1);
+        board[getBoardSize() - 1][midColumn] = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1);
         board[0][midColumn] = new Peon(0, midColumn, this, player2Color, 2);
         fillTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
         printBoard();
@@ -39,10 +38,10 @@ public class Board {
 
     }
 
-    public Peon getPeon1InitialMoment(){return Quoridor.turns.equals(0) ? (Peon)board[getBoardLimit() - 1][midColumn] : null;}
+    public Peon getPeon1InitialMoment(){return Quoridor.turns.equals(0) ? (Peon)board[getBoardSize() - 1][midColumn] : null;}
     public Peon getPeon2InitialMoment(){return Quoridor.turns.equals(0) ? (Peon)board[0][midColumn] : null;}
 
-    public int getBoardLimit() {return board.length;}
+    public int getBoardSize() {return board.length;}
 
     public Field getField(int row, int column){return board[row][column];}
 
@@ -75,7 +74,20 @@ public class Board {
         printBoard();
     }
 
-    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, char type) throws QuoridorException {
+    public void deleteBarrier(int row, int column, int length, boolean horizontal){
+        if (horizontal){
+            for (int j = 0; j < length - 1; j++) {
+                board[row][column + j] = null;
+            }
+        }
+        else {
+            for (int i = 0; i < length - 1; i++) {
+                board[row + i][column] = null;
+            }
+        }
+    }
+
+    public void addBarrier(Color playerColor, int row, int column, int length, boolean horizontal, char type) throws QuoridorException {
         if(board[row][column]!=null){
             throw new QuoridorException(QuoridorException.BARRIER_ALREADY_CREATED);
         }

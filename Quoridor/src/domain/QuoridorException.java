@@ -17,6 +17,8 @@ public class QuoridorException extends Exception{
     public static final String MAXIMUN_NUMBER_BARRIERS_EXCEEDED = "The sum of barriers must be maximun (board size + 1)";
     public static final String PLAYER_ONE_WON = "Player one won!";
     public static final String PLAYER_TWO_WON = "Player two won!";
+    public static final String BARRIER_TRAP_PEON1 = "You can't place the barrier because it would trap the pawn 1.";
+    public static final String BARRIER_TRAP_PEON2 = "You can't place the barrier because it would trap the pawn 2.";
 
 
     public QuoridorException(String message){
