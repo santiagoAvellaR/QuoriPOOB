@@ -45,13 +45,15 @@ public class QuoridorGUI extends  JFrame{
     private HashMap<String, JTextField> customs;
     private JButton applyCustomsButton;
     // Game window
+    private Color barrera;
     private JPanel[][] cells;
     private JComboBox<String> barreraP1, barreraP2;
     private JLabel labelTurns;
     private JPanel gamePanel;
     private JPanel boardPanel;
     private JButton finishButton;
-    private Color barrera;
+    private HashMap<String, JLabel> barrerasDisP1, barrerasDisP2;
+    private JPanel colorTurn;
     private JButton homeButton;
     private JButton upButton;
     private JButton downButton;
@@ -64,6 +66,8 @@ public class QuoridorGUI extends  JFrame{
         super("Quoridor");
         customs = new HashMap<>();
         boardSize = new JTextField();
+        barrerasDisP1 = new HashMap<>();
+        barrerasDisP2 = new HashMap<>();
         prepareElements();
         prepareActions();
     }
@@ -543,7 +547,8 @@ public class QuoridorGUI extends  JFrame{
             gamePanel.add(infoPlayer2Panel, BorderLayout.WEST);
         }
         JPanel options = new JPanel(new BorderLayout());
-        labelTurns = new JLabel("Turno :");
+        String turno = turns%2 == 0 ? namePlayer.getText() :namePlayer2.getText();
+        labelTurns = new JLabel("Turno :" + turno);
         labelTurns.setFont(gameFont20);
         finishButton = createButton("Finish", buttonSize);
         options.add(new Label(), BorderLayout.WEST);
@@ -551,6 +556,11 @@ public class QuoridorGUI extends  JFrame{
         options.add(finishButton, BorderLayout.EAST);
         options.add(new Label(), BorderLayout.SOUTH);
         gamePanel.add(options, BorderLayout.SOUTH);
+    }
+    private void actualizarTurnos(){
+        String turno = turns%2 == 0 ? namePlayer.getText() :namePlayer2.getText();
+        labelTurns.setText("Turno :"+ turno);
+
     }
 
     private JPanel infoPlayerGame(){
@@ -889,8 +899,10 @@ public class QuoridorGUI extends  JFrame{
                     type = (turns % 2 == 0) ? String.valueOf(barreraP1.getSelectedItem().toString().toLowerCase().charAt(0)) :
                             String.valueOf(barreraP2.getSelectedItem().toString().toLowerCase().charAt(0));
                     quoridor.addBarrier(colorPlayer, row, col, !vertical, type);
-                    changeColorBarrier(colorPlayer, barrera, vertical, type, row, col);
+                    changeColorBarrier(colorPlayer, vertical, type, row, col);
                     turns += 1;
+                    actualizarTurnos();
+                    System.out.println(quoridor.getTurns());
                 } catch (QuoridorException i) {
                     JOptionPane.showMessageDialog(null, i);
 
@@ -917,7 +929,7 @@ public class QuoridorGUI extends  JFrame{
         }
         return false;
     }
-    public void changeColorBarrier(Color newC, Color oldC, boolean vertical, String type, int row, int column) {
+    public void changeColorBarrier(Color newC, boolean vertical, String type, int row, int column) {
         int n = (type.charAt(0) == 'l') ? 5 : 3;
         System.out.println(type);
         if(!isCreateBarrier(row,column,vertical, type))
@@ -925,14 +937,11 @@ public class QuoridorGUI extends  JFrame{
             if (vertical) {
                 for (int i = row; i < row + n && i < cells.length-1; i++) {
                     cells[i][column].setBackground(newC);
-
                 }
             }
             else{
                 for (int j = column; j < column + n && j < cells[row].length-1; j++) {
-
                     cells[row][j].setBackground(newC);
-
                 }
             }
 

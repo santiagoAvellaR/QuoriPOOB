@@ -230,7 +230,7 @@ class QuoridorTest {
     @Test
     public void shouldAddANormalVerticalBarrier() {
         try{
-            quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
+            quoridor = new Quoridor("4", "1", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
             quoridor.addBarrier(Color.blue, 0, 1,  false,  "n");
@@ -246,7 +246,7 @@ class QuoridorTest {
     @Test
     public void shouldAddANormalVerticalBarrierAndValidateTheNewValidMovements() {
         try{
-            quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
+            quoridor = new Quoridor("4", "1", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
             quoridor.addBarrier(Color.blue, 0, 1, false, "n");
@@ -261,7 +261,7 @@ class QuoridorTest {
     @Test
     public void shouldAddANormalHorizontalBarrier() {
         try{
-            quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
+            quoridor = new Quoridor("4", "4", "0", "0", "0", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
             quoridor.addBarrier(Color.blue, 1, 0, true,  "n");
@@ -277,7 +277,7 @@ class QuoridorTest {
     @Test
     public void shouldAddANormalHorizontalBarrierAndValidateTheNewValidMovements() {
         try{
-            quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
+            quoridor = new Quoridor("4", "4", "0", "0", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
             quoridor.addBarrier(Color.blue, 1, 0,true,  "n");
@@ -305,7 +305,7 @@ class QuoridorTest {
     @Test
     public void shouldAvoidAddABarrierThatTrapThePeon1() {
         try{
-            quoridor = new Quoridor("3", "0", "0", "1", "1", "0",
+            quoridor = new Quoridor("3", "1", "1", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
             quoridor.addBarrier(Color.blue, 2,1,false,"n");
@@ -322,7 +322,7 @@ class QuoridorTest {
     @Test
     public void shouldAvoidAddABarrierThatTrapThePeon2() {
         try{
-            quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
+            quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
                     "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", false, "beginner");
             quoridor.addBarrier(Color.blue, 0,1,false,"n");

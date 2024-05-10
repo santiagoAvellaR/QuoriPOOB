@@ -1,6 +1,7 @@
 package src.domain;
 
 import java.awt.Color;
+import java.util.Arrays;
 
 public abstract class Player {
     protected String name;
@@ -44,9 +45,7 @@ public abstract class Player {
     public boolean peonHasAnExit() {
         Boolean[][] visited = new Boolean[Board.size*2 - 1][Board.size*2 - 1];
         for (int i = 0; i < visited.length; i++) {
-            for (int j = 0; j < visited[i].length; j++) {
-                visited[i][j] = false;
-            }
+            Arrays.fill(visited[i], false);
         }
         peon.setHasFoundAndExit(false);
         return peon.hasAnExit(peon.getRow(), peon.getColumn(), visited);

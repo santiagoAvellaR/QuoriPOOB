@@ -143,14 +143,16 @@ public class Board {
     public void fieldAct() throws QuoridorException {
         for (Field[] fieldRow : board){
             for (Field field : fieldRow) {
-                try {
-                    field.act();
-                } catch (QuoridorException e) {
-                    if (e.getMessage().equals(QuoridorException.ERRAASE_TEMPORARY_BARRIER)) {
-                        Temporary temporary = (Temporary)field;
-                        deleteTemporaryFromBoard(temporary);
-                        deletedTemporary = temporary;
-                        throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);
+                if (field != null) {
+                    try {
+                        field.act();
+                    } catch (QuoridorException e) {
+                        if (e.getMessage().equals(QuoridorException.ERRAASE_TEMPORARY_BARRIER)) {
+                            Temporary temporary = (Temporary) field;
+                            deleteTemporaryFromBoard(temporary);
+                            deletedTemporary = temporary;
+                            throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);
+                        }
                     }
                 }
             }
