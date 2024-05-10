@@ -18,7 +18,7 @@ public class Board {
         printBoard();
     }
 
-    private void printBoard(){
+    public void printBoard(){
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length; j++) {
                 if (board[i][j] != null) {System.out.print(board[i][j].getType() + " ");}
@@ -74,20 +74,22 @@ public class Board {
         printBoard();
     }
 
-    public void deleteBarrier(int row, int column, int length, boolean horizontal){
+    public void deleteBarrier(int row, int column, int length, boolean horizontal, Integer lastRowColumn){
+        int limit = lastRowColumn == null ? length*2 - 1 : lastRowColumn;
         if (horizontal){
-            for (int j = 0; j < length - 1; j++) {
+            for (int j = 0; j < limit; j++) {
                 board[row][column + j] = null;
             }
         }
         else {
-            for (int i = 0; i < length - 1; i++) {
+            for (int i = 0; i < limit; i++) {
                 board[row + i][column] = null;
             }
         }
+        printBoard();
     }
 
-    public void addBarrier(Color playerColor, int row, int column, int length, boolean horizontal, char type) throws QuoridorException {
+    public void addBarrier(Color playerColor, int row, int column, int length, boolean horizontal, String type) throws QuoridorException {
         if(board[row][column]!=null){
             throw new QuoridorException(QuoridorException.BARRIER_ALREADY_CREATED);
         }
@@ -95,38 +97,46 @@ public class Board {
         addBarrierToTheBoard(row, column, horizontal, barrier);
         printBoard();
     }
-    private void addBarrierToTheBoard(int row, int column, boolean horizontal, Barrier barrier){
+    private void addBarrierToTheBoard(int row, int column, boolean horizontal, Barrier barrier) throws QuoridorException {
         if (horizontal){
             for (int j = 0; j < barrier.getLength()*2 - 1; j++) {
+                if (board[row][column + j] != null) {
+                    deleteBarrier(row, column, barrier.getLength(), horizontal, j);
+                    throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+                }
                 board[row][column + j] = barrier;
             }
         }
         else {
             for (int i = 0; i < barrier.getLength()*2 - 1; i++) {
+                if (board[row + i][column] != null) {
+                    deleteBarrier(row, column, barrier.getLength(), horizontal, i);
+                    throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+                }
                 board[row + i][column] = barrier;
             }
         }
     }
-    private Barrier createBarrierGivenTheType(Color playerColor, int row, int column, boolean horizontal, char type) throws QuoridorException {
+    private Barrier createBarrierGivenTheType(Color playerColor, int row, int column, boolean horizontal, String type) throws QuoridorException {
         Barrier barrier = null;
-        if (type == 'n'){
+        if (type.equals("n")){
             barrier = new Normal(playerColor, horizontal);
             return barrier;
         }
-        else if (type == 'l') {
+        else if (type.equals("l")) {
             barrier = new Long(playerColor, horizontal);
             return barrier;
         }
-        else if (type == 'a') {
+        else if (type.equals("a")) {
             barrier = new Allied(playerColor, horizontal);
             return barrier;
         }
-        else if (type == 't') {
+        else if (type.equals("t")) {
             barrier = new Temporary(playerColor, horizontal, row, column);
             return barrier;
         }
         else {
-            throw new QuoridorException(QuoridorException.INVELID_BARRIER_TYPE);
+            throw new QuoridorException(QuoridorException.INVALID_BARRIER_TYPE);
         }
     }
 

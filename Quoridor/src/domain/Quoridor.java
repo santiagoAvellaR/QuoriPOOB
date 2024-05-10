@@ -11,7 +11,7 @@ public class Quoridor {
     private Player  player2;
     private String gameMode;
     private boolean vsMachine;
-    private HashMap<Character, Integer> lengthBarriersTypes;
+    private HashMap<String, Integer> lengthBarriersTypes;
     public Quoridor(String size,
                     String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers,
                     String teleporterSquares, String rewindSquares, String skipTurnSquares,
@@ -65,14 +65,15 @@ public class Quoridor {
         player1 = new Human(peon1, playerOneName, playerOneColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);
         if (vsMachine){player2 = new Machine(peon2,"Machine", playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt, machineMode, board);}
         else{player2 = new Human(peon2, playerTwoName, playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);}
+        initializeHashMaps();
     }
 
     private void initializeHashMaps(){
         lengthBarriersTypes = new HashMap<>();
-        lengthBarriersTypes.put('n', 2);
-        lengthBarriersTypes.put('a', 2);
-        lengthBarriersTypes.put('t', 2);
-        lengthBarriersTypes.put('l', 3);
+        lengthBarriersTypes.put("n", 2);
+        lengthBarriersTypes.put("a", 2);
+        lengthBarriersTypes.put("t", 2);
+        lengthBarriersTypes.put("l", 3);
     }
 
     public int getTurns(){
@@ -95,32 +96,38 @@ public class Quoridor {
         if (!vsMachine || selectedPlayer.equals(player1)) {
             Human human = (Human) selectedPlayer;
             human.movePeon(direction);
-            turns += 1;
+            actualizeEachTurn();
         }
     }
 
-    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, char type) throws QuoridorException {
+    public void addBarrier(Color playerColor, int row, int column, boolean horizontal, String type) throws QuoridorException {
         Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         if (!vsMachine || selectedPlayer.equals(player1)) {
+            if (!selectedPlayer.stillHasBarrierType(playerColor, type)) {
+                throw new QuoridorException(QuoridorException.DONT_HAVE_BARRIERS_LEFT);
+            }
             board.addBarrier(playerColor, row, column, lengthBarriersTypes.get(type), horizontal, type);
             if (!player1.peonHasAnExit()){
-                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal);
+                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal, null);
                 throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON1);
             }
             if (!player2.peonHasAnExit()){
-                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal);
+                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal, null);
                 throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON2);
             }
-            turns += 1;
+            selectedPlayer.reduceNumberBarriers(playerColor, type);
+            actualizeEachTurn();
+            board.printBoard();
         }
     }
 
-    public void machineTurn(){
+    public void machineTurn() throws QuoridorException {
         if (vsMachine){
             Machine machine = (Machine) player2;
             machine.play();
+            actualizeEachTurn();
         }
     }
 
@@ -138,6 +145,7 @@ public class Quoridor {
     }
 
     public void actualizeEachTurn() throws QuoridorException {
+        turns += 1;
         board.fieldAct();
     }
 
@@ -148,5 +156,6 @@ public class Quoridor {
     public Peon getPeon2(){return player2.getPeon();}
     public Field[][] getBoard(){return board.getBoard();}
     public String getTypeOfField(int row, int column){return board.getTypeField(row, column);}
+    public void printBoard(){board.printBoard();}
 
 }
