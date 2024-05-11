@@ -336,4 +336,36 @@ class QuoridorTest {
         }
     }
 
+    @Test
+    public void shouldAvoidAddABarrierOnTheLastRow() {
+        try{
+            quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
+                    "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
+                    "Timed", "30", false, "beginner");
+            quoridor.addBarrier(Color.blue, 6,1,false,"n");
+            assertEquals("Normal", quoridor.getTypeOfField(6,1));
+            assertEquals("Normal", quoridor.getTypeOfField(5,1));
+            assertEquals("Normal", quoridor.getTypeOfField(4,1));
+        }
+        catch(QuoridorException e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldAvoidAddABarrierOnTheLastColumn() {
+        try{
+            quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
+                    "4", "2", "Player1", Color.BLUE, "Player2", Color.red,
+                    "Timed", "30", false, "beginner");
+            quoridor.addBarrier(Color.blue, 1,6,true,"n");
+            assertEquals("Normal", quoridor.getTypeOfField(1,6));
+            assertEquals("Normal", quoridor.getTypeOfField(1,5));
+            assertEquals("Normal", quoridor.getTypeOfField(1,4));
+        }
+        catch(QuoridorException e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
+
 }

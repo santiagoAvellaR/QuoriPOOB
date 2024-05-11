@@ -147,9 +147,15 @@ public class Quoridor {
     public void actualizeEachTurn() throws QuoridorException {
         turns += 1;
         board.fieldAct();
+        System.out.println(player1.getPeonValidMovements());
+        System.out.println(player2.getPeonValidMovements());
     }
 
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
+
+    public int[][] getPeonsPositions(){
+        return new int[][]{{player1.getPeonRow(), player1.getPeonColumn()},{player2.getPeonRow(), player2.getPeonColumn()}};
+    }
 
     // TEST FUNCTIONS
     public Peon getPeon1(){return player1.getPeon();}

@@ -1,6 +1,7 @@
 package src.domain;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public abstract class Player {
@@ -20,6 +21,10 @@ public abstract class Player {
         this.temporaryBarriers = temporaryBarriers;
         this.longBarriers = longBarriers;
         this.alliedBarriers = alliedBarriers;
+    }
+
+    public ArrayList<String> getPeonValidMovements() {
+        return peon.getValidMovements();
     }
 
     public void reduceNumberBarriers(Color playerColor, String barrierType){
@@ -52,5 +57,7 @@ public abstract class Player {
     }
     public Color getColor() {return color;}
     public Peon getPeon() {return peon;}
+    public int getPeonRow() {return peon.getRow();}
+    public int getPeonColumn() {return peon.getColumn();}
 
 }

@@ -8,12 +8,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import src.domain.Quoridor;
-public class QuoridorGUI extends  JFrame{
+public class QuoridorGUI extends  JFrame {
     private Dimension screenSize;
-    private final Dimension buttonSize = new Dimension(250,60);
+    private final Dimension buttonSize = new Dimension(250, 60);
     private final Font gameFont30 = new Font("Consolas", Font.BOLD, 30);
     private final Font gameFont20 = new Font("Consolas", Font.BOLD, 20);
     private final QuoridorGUI gui = this;
@@ -41,11 +42,12 @@ public class QuoridorGUI extends  JFrame{
     private Color colorP2Selected = Color.WHITE;
     // Customize window;
     private JPanel customPanel;
-    private  JTextField boardSize ;
+    private JTextField boardSize;
     private HashMap<String, JTextField> customs;
     private JButton applyCustomsButton;
     // Game window
     private Color barrera;
+    private ArrayList<JPanel> movePosibles;
     private JPanel[][] cells;
     private JComboBox<String> barreraP1, barreraP2;
     private JLabel labelTurns;
@@ -62,7 +64,7 @@ public class QuoridorGUI extends  JFrame{
     private JButton changeSizeButton;
     private JButton reStartButton;
 
-    private QuoridorGUI()  {
+    private QuoridorGUI() {
         super("Quoridor");
         customs = new HashMap<>();
         boardSize = new JTextField();
@@ -71,7 +73,8 @@ public class QuoridorGUI extends  JFrame{
         prepareElements();
         prepareActions();
     }
-    private void prepareElements(){
+
+    private void prepareElements() {
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(screenSize.width, screenSize.height);
         setLocationRelativeTo(null);
@@ -79,12 +82,13 @@ public class QuoridorGUI extends  JFrame{
         prepareMenuElements();
         prepareMainWindowElements();
     }
-    private void prepareActions(){
-        addWindowListener(new WindowAdapter(){
+
+    private void prepareActions() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent event){
+            public void windowClosing(WindowEvent event) {
                 int option = JOptionPane.showConfirmDialog(gui, "¿Estás seguro de que quieres cerrar?", "Cofirmar cierre", JOptionPane.YES_NO_OPTION);
-                if(option == JOptionPane.YES_OPTION){
+                if (option == JOptionPane.YES_OPTION) {
                     gui.setVisible(false);
                     System.exit(0);
                 }
@@ -93,7 +97,8 @@ public class QuoridorGUI extends  JFrame{
         prepareMenuActions();
         prepareMainWindowActions();
     }
-    private void prepareMenuElements(){
+
+    private void prepareMenuElements() {
         // Botones-Opciones Menu
         JMenuBar menuBar;
         JMenu opciones;
@@ -113,12 +118,13 @@ public class QuoridorGUI extends  JFrame{
         opciones.add(cerrar);
         menuBar.add(opciones);
     }
-    private void prepareMenuActions(){
-        cerrar.addActionListener(new ActionListener(){
+
+    private void prepareMenuActions() {
+        cerrar.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent ev){
+            public void actionPerformed(ActionEvent ev) {
                 int option = JOptionPane.showConfirmDialog(gui, "¿Estás seguro de que quieres cerrar?", "Cofirmar cierre", JOptionPane.YES_NO_OPTION);
-                if(option == JOptionPane.YES_OPTION){
+                if (option == JOptionPane.YES_OPTION) {
                     gui.setVisible(false);
                     System.exit(0);
                 }
@@ -141,14 +147,15 @@ public class QuoridorGUI extends  JFrame{
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 int option = fileChooser.showSaveDialog(gui);
-                if(option == JFileChooser.APPROVE_OPTION){
+                if (option == JFileChooser.APPROVE_OPTION) {
                     java.io.File selectedFolder = fileChooser.getSelectedFile();
                     JOptionPane.showMessageDialog(gui, "Funcionalidad de guardar en construcción. Carpeta seleccionada: " + selectedFolder.getName(), "Guardar Juego", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
     }
-    private void prepareMainWindowElements(){
+
+    private void prepareMainWindowElements() {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(4, 1, 0, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -174,7 +181,8 @@ public class QuoridorGUI extends  JFrame{
         mainPanel.add(newGamePanel);
         add(mainPanel);
     }
-    private void prepareMainWindowActions(){
+
+    private void prepareMainWindowActions() {
         newGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -200,7 +208,8 @@ public class QuoridorGUI extends  JFrame{
             }
         });
     }
-    public void prepareNewGameWindowElements(){
+
+    public void prepareNewGameWindowElements() {
         newGameOp = new JPanel();
         newGameOp.setLayout(new GridLayout(3, 1, 0, 10));
         newGameOp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -244,7 +253,8 @@ public class QuoridorGUI extends  JFrame{
         startOp.add(customizeButton);
         newGameOp.add(startOp);
     }
-    public void prepareNewGameWindowActions(){
+
+    public void prepareNewGameWindowActions() {
         nPlayers.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -279,7 +289,7 @@ public class QuoridorGUI extends  JFrame{
             public void actionPerformed(ActionEvent e) {
                 try {
                     quoridor = new Quoridor(
-                            (String)(boardSize.getText().isEmpty() ? "9" :boardSize.getText()),
+                            (String) (boardSize.getText().isEmpty() ? "9" : boardSize.getText()),
                             customs.containsKey("Normal B:") && !customs.get("Normal B:").getText().isEmpty() ? customs.get("Normal B:").getText().trim() : "0",
                             customs.containsKey("Temporal:") && !customs.get("Temporal:").getText().isEmpty() ? customs.get("Temporal:").getText().trim() : "0",
                             customs.containsKey("Larga:") && !customs.get("Larga:").getText().isEmpty() ? customs.get("Larga:").getText().trim() : "0",
@@ -287,22 +297,23 @@ public class QuoridorGUI extends  JFrame{
                             customs.containsKey("Teletransportadora:") && !customs.get("Teletransportadora:").getText().isEmpty() ? customs.get("Teletransportadora:").getText().trim() : "0",
                             customs.containsKey("Regresar:") && !customs.get("Regresar:").getText().isEmpty() ? customs.get("Regresar:").getText().trim() : "0",
                             customs.containsKey("Turno Doble:") && !customs.get("Turno Doble:").getText().isEmpty() ? customs.get("Turno Doble:").getText().trim() : "0",
-                            (String)(namePlayer.getText().trim()),
+                            (String) (namePlayer.getText().trim()),
                             colorP1Selected == Color.WHITE ? Color.YELLOW : colorP1Selected,
-                            (String)(namePlayer2 != null ? namePlayer2.getText().trim() : ""),
+                            (String) (namePlayer2 != null ? namePlayer2.getText().trim() : ""),
                             colorP2Selected == Color.WHITE ? Color.RED : colorP2Selected,
-                            (String)difficulty.getSelectedItem(),
+                            (String) difficulty.getSelectedItem(),
                             "0",
                             (nPlayers.getSelectedItem().equals("1 PLAYERS")),
-                            (String)modes.getSelectedItem());
+                            (String) modes.getSelectedItem());
                     turns = quoridor.getTurns();
+
                     colorP1Selected = colorP1Selected == Color.WHITE ? Color.YELLOW : colorP1Selected;
                     colorP2Selected = colorP2Selected == Color.WHITE ? Color.RED : colorP2Selected;
                     barreraP1 = new JComboBox<String>();
                     barreraP2 = new JComboBox<String>();
                     barreraP1.addItem("Normales");
                     barreraP2.addItem("Normales");
-                    if(!boardSize.getText().isEmpty()){
+                    if (!boardSize.getText().isEmpty()) {
                         barreraP1.addItem("Larga");
                         barreraP2.addItem("Larga");
                         barreraP1.addItem("Temporal");
@@ -315,8 +326,7 @@ public class QuoridorGUI extends  JFrame{
                     setContentPane(gamePanel);
                     revalidate();
                     repaint();
-                }
-                catch (QuoridorException ex) {
+                } catch (QuoridorException ex) {
                     JOptionPane.showMessageDialog(gui, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -332,7 +342,8 @@ public class QuoridorGUI extends  JFrame{
             }
         });
     }
-    private JPanel infoPlayer(){
+
+    private JPanel infoPlayer() {
         infPlayer.removeAll();
         infPlayer.setLayout(new GridLayout(4, 1, 0, 10));
         JPanel panel = new JPanel();
@@ -379,7 +390,8 @@ public class QuoridorGUI extends  JFrame{
         infPlayer.add(info);
         return infPlayer;
     }
-    private JPanel infoPlayer2(){
+
+    private JPanel infoPlayer2() {
         infPlayer.removeAll();
         infPlayer.setLayout(new GridLayout(4, 1, 0, 10));
         JPanel panel = new JPanel();
@@ -420,6 +432,7 @@ public class QuoridorGUI extends  JFrame{
         infPlayer.add(player2);
         return infPlayer;
     }
+
     public void prepareSettingsWindowElements() {
         settingsPanel = new JPanel();
         settingsPanel.setLayout(new GridBagLayout());
@@ -461,51 +474,50 @@ public class QuoridorGUI extends  JFrame{
         applyConstraints.gridx = 0;
         applyConstraints.gridy = 2;
         applyConstraints.anchor = GridBagConstraints.SOUTHEAST; // Alineación en la esquina inferior derecha
-        applyConstraints.insets = new Insets(300, (screenSize.width)-250, 0, 0); // Espacio entre los botones y el borde inferior
+        applyConstraints.insets = new Insets(300, (screenSize.width) - 250, 0, 0); // Espacio entre los botones y el borde inferior
 
         applySettingsButton = createButton("APPLY", buttonSize);
         settingsPanel.add(applySettingsButton, applyConstraints);
     }
-    public void prepareSettingsWindowActions(){
-        colorBoard.addActionListener(new ActionListener(){
+
+    public void prepareSettingsWindowActions() {
+        colorBoard.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorBoardSelected);
                 if (newColor != null) {
                     colorBoardSelected = newColor;
                     colorBoard.setBackground(newColor);
-                }
-                else{
+                } else {
                     JOptionPane.showMessageDialog(null, "Debes elegir un color");
                 }
             }
         });
-        colorP1.addActionListener(new ActionListener(){
+        colorP1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorP1Selected);
                 if (newColor != null) {
                     colorP1Selected = newColor;
                     colorP1.setBackground(newColor);
-                }
-                else{
+                } else {
                     JOptionPane.showMessageDialog(null, "Debes elegir un color");
                 }
             }
         });
-        colorP2.addActionListener(new ActionListener(){
+        colorP2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Color newColor = JColorChooser.showDialog(gui, "Seleccionar Color", colorP2Selected);
                 if (newColor != null) {
                     colorP2Selected = newColor;
                     colorP2.setBackground(newColor);
-                } else{
+                } else {
                     JOptionPane.showMessageDialog(null, "Debes elegir un color");
                 }
             }
         });
-        applySettingsButton.addActionListener(new ActionListener(){
+        applySettingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!colorBoardSelected.equals(colorP1Selected) && !colorBoardSelected.equals(colorP2Selected) && !colorP1Selected.equals(colorP2Selected)) {
@@ -518,7 +530,8 @@ public class QuoridorGUI extends  JFrame{
             }
         });
     }
-    public void prepareStartGameWindowElements(){
+
+    public void prepareStartGameWindowElements() {
         gamePanel = new JPanel();
         gamePanel.setLayout(new BorderLayout());
         JPanel title = new JPanel();
@@ -529,7 +542,7 @@ public class QuoridorGUI extends  JFrame{
         gamePanel.add(title, BorderLayout.NORTH);
         gamePanel.add(createBoard(colorBoardSelected), BorderLayout.CENTER);
         String players = (String) nPlayers.getSelectedItem();
-        if(players.equals("1 PLAYER")){
+        if (players.equals("1 PLAYER")) {
             JPanel infoPlayerPanel = infoPlayerGame();
             infoPlayerPanel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoPlayerPanel, BorderLayout.EAST);
@@ -537,8 +550,7 @@ public class QuoridorGUI extends  JFrame{
             JPanel infoMachinePanel = infoMachine();
             infoMachinePanel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoMachinePanel, BorderLayout.WEST);
-        }
-        else if(players.equals("2 PLAYERS")){
+        } else if (players.equals("2 PLAYERS")) {
             JPanel infoPlayerPanel = infoPlayerGame();
             infoPlayerPanel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoPlayerPanel, BorderLayout.EAST);
@@ -547,7 +559,7 @@ public class QuoridorGUI extends  JFrame{
             gamePanel.add(infoPlayer2Panel, BorderLayout.WEST);
         }
         JPanel options = new JPanel(new BorderLayout());
-        String turno = turns%2 == 0 ? namePlayer.getText() :namePlayer2.getText();
+        String turno = turns % 2 == 0 ? namePlayer.getText() : namePlayer2.getText();
         labelTurns = new JLabel("Turno :" + turno);
         labelTurns.setFont(gameFont20);
         finishButton = createButton("Finish", buttonSize);
@@ -557,20 +569,22 @@ public class QuoridorGUI extends  JFrame{
         options.add(new Label(), BorderLayout.SOUTH);
         gamePanel.add(options, BorderLayout.SOUTH);
     }
-    private void actualizarTurnos(){
-        String turno = turns%2 == 0 ? namePlayer.getText() :namePlayer2.getText();
-        labelTurns.setText("Turno :"+ turno);
+
+    private void actualizarTurnos() {
+        turns = quoridor.getTurns();
+        String turno = turns % 2 == 0 ? namePlayer.getText() : namePlayer2.getText();
+        labelTurns.setText("Turno :" + turno);
 
     }
 
-    private JPanel infoPlayerGame(){
-        int tampanel = (int)(screenSize.height * 0.5);
-        JPanel inf = new JPanel(new GridLayout(5,1));
+    private JPanel infoPlayerGame() {
+        int tampanel = (int) (screenSize.height * 0.5);
+        JPanel inf = new JPanel(new GridLayout(5, 1));
         JPanel infnombre = new JPanel(new FlowLayout());
         JLabel jnombre = new JLabel("Nombre P1:");
         jnombre.setFont(gameFont20);
         JLabel nombre = new JLabel();
-        if(!namePlayer.getText().isEmpty()) {
+        if (!namePlayer.getText().isEmpty()) {
             nombre = new JLabel(namePlayer.getText());
         }
         nombre.setFont(gameFont20);
@@ -578,17 +592,16 @@ public class QuoridorGUI extends  JFrame{
         infnombre.add(nombre);
         inf.add(infnombre);
         JPanel colorP1 = new JPanel();
-        if(!colorP1Selected.equals(Color.WHITE)){
+        if (!colorP1Selected.equals(Color.WHITE)) {
             colorP1.setBackground(colorP1Selected);
-        }
-        else{
+        } else {
             colorP1.setBackground(Color.YELLOW);
         }
         colorP1.setPreferredSize(new Dimension(60, 60));
         infnombre.add(colorP1);
-        JPanel barrerasdis = new JPanel(new GridLayout(4,2));
-        String[] key =  {"Normal B:",  "Temporal:",  "Larga:", "Aliada:"};
-        if(!(customs.get(key[0]) == null)) {
+        JPanel barrerasdis = new JPanel(new GridLayout(4, 2));
+        String[] key = {"Normal B:", "Temporal:", "Larga:", "Aliada:"};
+        if (!(customs.get(key[0]) == null)) {
             for (int i = 0; i < 4; i++) {
                 String llave = key[i];
                 String textField = customs.get(llave).getText();
@@ -606,7 +619,7 @@ public class QuoridorGUI extends  JFrame{
                 barrerasdis.add(barrera);
                 barrerasdis.add(cantb);
             }
-        }else{
+        } else {
             JLabel barrera = new JLabel("Normales");
             barrera.setFont(gameFont20);
             barrera.setHorizontalAlignment(SwingConstants.CENTER);
@@ -630,26 +643,25 @@ public class QuoridorGUI extends  JFrame{
 
     }
 
-    private JPanel infoMachine(){
-        int tampanel = (int)(screenSize.height * 0.5);
-        JPanel inf = new JPanel(new GridLayout(5,1));
+    private JPanel infoMachine() {
+        int tampanel = (int) (screenSize.height * 0.5);
+        JPanel inf = new JPanel(new GridLayout(5, 1));
         JPanel infnombre = new JPanel(new FlowLayout());
         JLabel jnombre = new JLabel("Maquina:");
         jnombre.setFont(gameFont20);
         infnombre.add(jnombre);
         JPanel colorP2 = new JPanel();
-        if(!colorP2Selected.equals(Color.WHITE)){
+        if (!colorP2Selected.equals(Color.WHITE)) {
             colorP2.setBackground(colorP2Selected);
-        }
-        else{
+        } else {
             colorP2.setBackground(Color.RED);
         }
         colorP2.setPreferredSize(new Dimension(60, 60));
         infnombre.add(colorP2);
         inf.add(infnombre);
-        JPanel barrerasdis = new JPanel(new GridLayout(4,2));
-        String[] key =  {"Normal B:",  "Temporal:",  "Larga:", "Aliada:"};
-        if(!(customs.get(key[0]) == null)) {
+        JPanel barrerasdis = new JPanel(new GridLayout(4, 2));
+        String[] key = {"Normal B:", "Temporal:", "Larga:", "Aliada:"};
+        if (!(customs.get(key[0]) == null)) {
             for (int i = 0; i < 4; i++) {
                 String textField = customs.get(key[i]).getText();
                 JLabel barrera = new JLabel(key[i]);
@@ -666,8 +678,7 @@ public class QuoridorGUI extends  JFrame{
                 barrerasdis.add(barrera);
                 barrerasdis.add(cantb);
             }
-        }
-        else{
+        } else {
             JLabel barrera = new JLabel("Normales");
             barrera.setFont(gameFont20);
             barrera.setHorizontalAlignment(SwingConstants.CENTER);
@@ -689,14 +700,14 @@ public class QuoridorGUI extends  JFrame{
         return inf;
     }
 
-    private JPanel infoPlayerGame2(){
-        int tampanel = (int)(screenSize.height * 0.5);
-        JPanel inf = new JPanel(new GridLayout(5,1));
+    private JPanel infoPlayerGame2() {
+        int tampanel = (int) (screenSize.height * 0.5);
+        JPanel inf = new JPanel(new GridLayout(5, 1));
         JPanel infnombre = new JPanel(new FlowLayout());
         JLabel jnombre = new JLabel("Nombre P2:");
         jnombre.setFont(gameFont20);
         JLabel nombre = new JLabel();
-        if(!namePlayer2.getText().isEmpty()) {
+        if (!namePlayer2.getText().isEmpty()) {
             nombre = new JLabel(namePlayer2.getText());
         }
         nombre.setFont(gameFont20);
@@ -704,17 +715,16 @@ public class QuoridorGUI extends  JFrame{
         infnombre.add(nombre);
         inf.add(infnombre);
         JPanel colorP2 = new JPanel();
-        if(!colorP2Selected.equals(Color.WHITE)){
+        if (!colorP2Selected.equals(Color.WHITE)) {
             colorP2.setBackground(colorP2Selected);
-        }
-        else{
+        } else {
             colorP2.setBackground(Color.RED);
         }
         colorP2.setPreferredSize(new Dimension(60, 60));
         infnombre.add(colorP2);
-        JPanel barrerasdis = new JPanel(new GridLayout(4,2));
-        String[] key =  {"Normal B:",  "Temporal:",  "Larga:", "Aliada:"};
-        if(!(customs.get(key[0]) == null)) {
+        JPanel barrerasdis = new JPanel(new GridLayout(4, 2));
+        String[] key = {"Normal B:", "Temporal:", "Larga:", "Aliada:"};
+        if (!(customs.get(key[0]) == null)) {
             for (int i = 0; i < 4; i++) {
                 String textField = customs.get(key[i]).getText();
                 JLabel barrera = new JLabel(key[i]);
@@ -731,8 +741,7 @@ public class QuoridorGUI extends  JFrame{
                 barrerasdis.add(barrera);
                 barrerasdis.add(cantb);
             }
-        }
-        else{
+        } else {
             JLabel barrera = new JLabel("Normales");
             barrera.setFont(gameFont20);
             barrera.setHorizontalAlignment(SwingConstants.CENTER);
@@ -757,16 +766,16 @@ public class QuoridorGUI extends  JFrame{
     private JPanel createBoard(Color board) {
         boardPanel = new JPanel(new GridBagLayout());
         int tamBoard = screenSize.height;
-        int numero = boardSize.getText().isEmpty() ? 9 :   Integer.parseInt(boardSize.getText().trim());
-        int CELL_SIZE = (int) ((tamBoard) / (2*numero-1));
+        int numero = boardSize.getText().isEmpty() ? 9 : Integer.parseInt(boardSize.getText().trim());
+        int CELL_SIZE = (int) ((tamBoard) / (2 * numero - 1));
         int BAR_WIDTH = (int) ((float) (tamBoard * 0.15) / numero); // Ancho de la barrera ajustado para ser proporcional al tamaño de la celda
-        cells = new JPanel[2*numero-1][2*numero-1];
+        cells = new JPanel[2 * numero - 1][2 * numero - 1];
         GridBagConstraints gbc = new GridBagConstraints();
-        for (int i = 0; i < 2*numero-1; i++) {
-            for (int j = 0; j < 2*numero-1; j++) {
+        for (int i = 0; i < 2 * numero - 1; i++) {
+            for (int j = 0; j < 2 * numero - 1; j++) {
                 gbc.gridx = j;
                 gbc.gridy = i;
-                int midColumn =  numero%2==0?numero-2:numero-1;
+                int midColumn = numero % 2 == 0 ? numero - 2 : numero - 1;
                 if (i % 2 == 0 && j % 2 == 0) {
                     cells[i][j] = new JPanel(new BorderLayout());
                     cells[i][j].setBackground(board);
@@ -775,15 +784,15 @@ public class QuoridorGUI extends  JFrame{
                     int cell = (int) (CELL_SIZE);
                     cells[i][j].setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
                     if (i == 0 && j == midColumn) {
-                        JPanel P1 = new JPanel();
-                        P1.setPreferredSize(new Dimension(CELL_SIZE - 5, CELL_SIZE - 5));
-                        P1.setBackground(colorP1Selected);
-                        cells[i][midColumn].add(P1, BorderLayout.CENTER);
-                    } else if (i == cells.length-1 && j == midColumn) {
                         JPanel P2 = new JPanel();
                         P2.setBackground(colorP2Selected);
-                        P2.setPreferredSize(new Dimension(CELL_SIZE - 5, CELL_SIZE - 5));
-                        cells[cells.length-1][midColumn].add(P2, BorderLayout.CENTER);
+                        cells[i][midColumn].add(P2, BorderLayout.CENTER);
+                        cells[i][midColumn].addMouseListener(movePlayer(colorP2Selected, i, j));
+                    } else if (i == cells.length - 1 && j == midColumn) {
+                        JPanel P1 = new JPanel();
+                        P1.setBackground(colorP1Selected);
+                        cells[cells.length - 1][midColumn].add(P1, BorderLayout.CENTER);
+                        cells[i][midColumn].addMouseListener(movePlayer(colorP1Selected, i, j));
                     }
 
                 } else if (i % 2 == 0 && j % 2 == 1) {
@@ -793,8 +802,7 @@ public class QuoridorGUI extends  JFrame{
                     cells[i][j].setBounds(barrierX, barrierY, BAR_WIDTH, CELL_SIZE);
                     //verticales
                     cells[i][j].addMouseListener(createBarrierMouseListener(cells[i][j], i, j, true));
-                }
-                else if(i%2==1 && j%2==0){
+                } else if (i % 2 == 1 && j % 2 == 0) {
 
                     cells[i][j] = createBarrier(Color.GRAY, CELL_SIZE, BAR_WIDTH); // Cambia el orden de CELL_SIZE y BAR_WIDTHc
                     int barrierX = (int) (j * CELL_SIZE + j * BAR_WIDTH);
@@ -802,8 +810,7 @@ public class QuoridorGUI extends  JFrame{
                     cells[i][j].setBounds(barrierX, barrierY, CELL_SIZE, BAR_WIDTH);
                     // horizontales
                     cells[i][j].addMouseListener(createBarrierMouseListener(cells[i][j], i, j, false));
-                }
-                else{
+                } else {
                     //espacio vacio
                     JPanel espacio = new JPanel();
                     espacio.setPreferredSize(new Dimension(BAR_WIDTH, BAR_WIDTH));
@@ -811,34 +818,39 @@ public class QuoridorGUI extends  JFrame{
                     cells[i][j] = espacio; // Cambia el orden de CELL_SIZE y BAR_WIDTH
                 }
                 boardPanel.add(cells[i][j], gbc);
-            }}
+            }
+        }
         boardPanel.setPreferredSize(new Dimension(tamBoard, tamBoard));
         return boardPanel;
     }
+
     private JPanel createBarrier(Color color, int width, int height) {
         JPanel barrierPanel = new JPanel();
         barrierPanel.setBackground(color);
         barrierPanel.setPreferredSize(new Dimension(width, height));
         return barrierPanel;
     }
+
     private MouseAdapter createBarrierMouseListener(JPanel barrier, int row, int col, boolean vertical) {
         return new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
+                turns = quoridor.getTurns();
                 String type = (turns % 2 == 0) ? String.valueOf(barreraP1.getSelectedItem().toString().toLowerCase().charAt(0)) :
                         String.valueOf(barreraP2.getSelectedItem().toString().toLowerCase().charAt(0));
                 int n = (type.charAt(0) == 'l') ? 5 : 3;
-                System.out.println("holaaa el n es " + n);
-                if(!isCreateBarrier(row, col, vertical,type)){
+
+                if (!isCreateBarrier(row, col, vertical, type)) {
                     barrier.setBackground(Color.BLUE);
                     // vertical
 
                     if (vertical) {
                         if (e.getComponent() == cells[row][col] && row + n <= cells.length - 1) {
-                            for (int i = row +1; i < row+n; i++) {
-                                cells[i][col].setBackground(Color.BLUE);}
+                            for (int i = row + 1; i < row + n; i++) {
+                                cells[i][col].setBackground(Color.BLUE);
+                            }
                         } else if (e.getComponent() == cells[row][col] && row + n > cells.length - 1) {
-                            for(int i = row -1; i > row-n;i--) {
+                            for (int i = row - 1; i > row - n; i--) {
                                 cells[i][col].setBackground(Color.BLUE);
                             }
                         }
@@ -846,31 +858,34 @@ public class QuoridorGUI extends  JFrame{
                     // horizontal
                     else {
                         if (e.getComponent() == cells[row][col] && col + n <= cells[row].length - 1) {
-                            for (int j = col +1; j < col+n; j++) {
+                            for (int j = col + 1; j < col + n; j++) {
                                 cells[row][j].setBackground(Color.BLUE);
                             }
                         } else if (e.getComponent() == cells[row][col] && col + n > cells[row].length - 1) {
-                            for(int j = col -1; j > col-n;j--) {
+                            for (int j = col - 1; j > col - n; j--) {
                                 cells[row][j].setBackground(Color.BLUE);
                             }
                         }
                     }
                 }
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
+                turns = quoridor.getTurns();
                 String type = (turns % 2 == 0) ? String.valueOf(barreraP1.getSelectedItem().toString().toLowerCase().charAt(0)) :
                         String.valueOf(barreraP2.getSelectedItem().toString().toLowerCase().charAt(0));
                 int n = (type.charAt(0) == 'l') ? 5 : 3;
-                if(!isCreateBarrier(row, col, vertical,type)){
+                if (!isCreateBarrier(row, col, vertical, type)) {
                     barrier.setBackground(Color.GRAY);
                     // Verificar si la barrera es vertical
                     if (vertical) {
                         if (e.getComponent() == cells[row][col] && row + n <= cells.length - 1) {
-                            for (int i = row +1; i < row+n; i++) {
-                                cells[i][col].setBackground(Color.GRAY);}
-                        } else if (e.getComponent() == cells[row][col] && row +n > cells.length - 1) {
-                            for(int i = row -1; i > row-n;i--) {
+                            for (int i = row + 1; i < row + n; i++) {
+                                cells[i][col].setBackground(Color.GRAY);
+                            }
+                        } else if (e.getComponent() == cells[row][col] && row + n > cells.length - 1) {
+                            for (int i = row - 1; i > row - n; i--) {
                                 cells[i][col].setBackground(Color.GRAY);
                             }
                         }
@@ -878,31 +893,32 @@ public class QuoridorGUI extends  JFrame{
                     // Verificar si la barrera es horizontal
                     else {
                         if (e.getComponent() == cells[row][col] && col + n <= cells[row].length - 1) {
-                            for (int j = col +1; j < col+n; j++) {
+                            for (int j = col + 1; j < col + n; j++) {
                                 cells[row][j].setBackground(Color.GRAY);
                             }
-                        } else if (e.getComponent() == cells[row][col] && col+n > cells[row].length - 1) {
-                            for(int j = col -1; j > col-n;j--) {
+                        } else if (e.getComponent() == cells[row][col] && col + n > cells[row].length - 1) {
+                            for (int j = col - 1; j > col - n; j--) {
                                 cells[row][j].setBackground(Color.GRAY);
                             }
                         }
                     }
                 }
             }
+
             @Override
             public void mousePressed(MouseEvent e) {
                 Color colorPlayer = null;
                 String type = null;
                 try {
+                    turns = quoridor.getTurns();
                     colorPlayer = turns % 2 == 0 ? colorP1Selected : colorP2Selected;
                     barrera = barrier.getBackground();
                     type = (turns % 2 == 0) ? String.valueOf(barreraP1.getSelectedItem().toString().toLowerCase().charAt(0)) :
                             String.valueOf(barreraP2.getSelectedItem().toString().toLowerCase().charAt(0));
                     quoridor.addBarrier(colorPlayer, row, col, !vertical, type);
                     changeColorBarrier(colorPlayer, vertical, type, row, col);
-                    turns += 1;
                     actualizarTurnos();
-                    System.out.println(quoridor.getTurns());
+
                 } catch (QuoridorException i) {
                     JOptionPane.showMessageDialog(null, i);
 
@@ -911,20 +927,191 @@ public class QuoridorGUI extends  JFrame{
 
         };
     }
+
+    private MouseAdapter movePlayer(Color playerPeon, int row, int col) {
+        return new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                ArrayList<String> move;
+                turns = quoridor.getTurns();
+                Color player = (turns % 2 == 0) ? colorP1Selected : colorP2Selected;
+                if(playerPeon.equals(player)) {
+                    System.out.println(turns +" turnos en mover");
+                    if (player.equals(playerPeon)) {
+                        if (turns % 2 == 0) {
+                            move = quoridor.getPeonValidMovements(playerPeon);
+
+                        } else {
+                            move = quoridor.getPeonValidMovements(playerPeon);
+                        }
+                        createvalidMovements(row, col, move);
+                    }
+                }
+
+            }
+        };
+    }
+
+    private MouseAdapter movePeon(Color playerPeon, int rowI, int colI, int rowF, int colF, String sentido) {
+        return new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                try {
+                    quoridor.movePeon(playerPeon,sentido);
+                    cells[rowI][colI].removeAll();
+                    movePosibles.remove(cells[rowF][colF]);
+                    cells[rowF][colF].removeAll();
+                    cells[rowF][colF].setBackground(playerPeon);
+                    cells[rowF][colF].addMouseListener(movePlayer(playerPeon, rowF, colF));
+                    cells[rowI][colI].revalidate();
+                    cells[rowI][colI].repaint();
+                    cells[rowF][colF].revalidate();
+                    cells[rowF][colF].repaint();
+                    eliminarOpciones();
+                }
+                catch(QuoridorException i) {
+                    JOptionPane.showMessageDialog(null, i);
+                }
+
+            }
+        };
+    }
+    private void eliminarOpciones(){
+        for(JPanel p:movePosibles){
+            p.removeAll();
+            p.setBackground(colorBoardSelected);
+            p.revalidate();
+            p.repaint();
+
+        }
+    }
+
+    private void createvalidMovements(int row, int col, ArrayList<String> movements){
+        turns = quoridor.getTurns();
+        Color player = (turns % 2 == 0) ?colorP1Selected : colorP2Selected;
+        movePosibles = new ArrayList<>();
+        for(String s : movements){
+            if(s.equals("s")){
+                cells[row+2][col].addMouseListener(movePeon(player, row,col,row+2,col,s));
+                cells[row+2][col].setBackground(Color.black);
+                cells[row+2][col].revalidate();
+                cells[row+2][col].repaint();
+                movePosibles.add(cells[row+2][col]);
+            }
+            else if(s.equals("n")){
+                cells[row-2][col].addMouseListener(movePeon(player, row,col,row-2,col,s));
+                cells[row-2][col].setBackground(Color.black);
+                cells[row-2][col].revalidate();
+                cells[row-2][col].repaint();
+                movePosibles.add(cells[row-2][col]);
+            }
+            else if(s.equals("e")){
+                cells[row][col+2].addMouseListener(movePeon(player, row,col,row,col+2,s));
+                cells[row][col+2].setBackground(Color.black);
+                cells[row][col+2].revalidate();
+                cells[row][col+2].repaint();
+                movePosibles.add(cells[row][col+2]);
+            }
+            else if(s.equals("w")){
+                cells[row][col-2].addMouseListener(movePeon(player, row,col,row,col-2,s));
+                cells[row][col-2].setBackground(Color.black);
+                cells[row][col-2].revalidate();
+                cells[row][col-2].repaint();
+                movePosibles.add(cells[row][col-2]);
+
+            }
+            else if(s.equals("js")){
+                cells[row+4][col].addMouseListener(movePeon(player, row,col,row+4,col,s));
+                cells[row+4][col].setBackground(Color.black);
+                cells[row+4][col].revalidate();
+                cells[row+4][col].repaint();
+                movePosibles.add(cells[row+4][col]);
+
+            }
+            else if(s.equals("jn")){
+                cells[row-4][col].addMouseListener(movePeon(player, row,col,row-4,col,s));
+                cells[row-4][col].setBackground(Color.black);
+                cells[row-4][col].revalidate();
+                cells[row-4][col].repaint();
+                movePosibles.add(cells[row+4][col]);
+            }
+            else if(s.equals("je")){
+                cells[row][col+4].addMouseListener(movePeon(player, row,col,row,col+4,s));
+                cells[row][col+4].setBackground(Color.black);
+                cells[row][col+4].revalidate();
+                cells[row][col+4].repaint();
+                movePosibles.add(cells[row][col+4]);
+            }
+            else if(s.equals("jw")){
+                cells[row][col-4].addMouseListener(movePeon(player, row,col,row,col-4,s));
+                cells[row][col-4].setBackground(Color.black);
+                cells[row][col-4].revalidate();
+                cells[row][col-4].repaint();
+                movePosibles.add(cells[row][col-4]);
+            }
+            else if(s.equals("ne")){
+                cells[row-2][col+2].addMouseListener(movePeon(player, row,col,row-2,col+2,s));
+                cells[row-2][col+2].setBackground(Color.black);
+                cells[row-2][col+2].revalidate();
+                cells[row-2][col+2].repaint();
+                movePosibles.add(cells[row-2][col+2]);
+            }
+            else if(s.equals("nw")){
+                cells[row-2][col-2].addMouseListener(movePeon(player, row,col,row-2,col-2,s));
+                cells[row-2][col-2].setBackground(Color.black);
+                cells[row-2][col-2].revalidate();
+                cells[row-2][col-2].repaint();
+                movePosibles.add(cells[row-2][col-2]);
+            }
+            else if(s.equals("se")){
+                cells[row+2][col+2].addMouseListener(movePeon(player, row,col,row+2,col+2,s));
+                cells[row+2][col+2].setBackground(Color.black);
+                cells[row+2][col+2].revalidate();
+                cells[row+2][col+2].repaint();
+                movePosibles.add(cells[row+2][col+2]);
+            }
+            else if(s.equals("sw")){
+                cells[row+2][col-2].addMouseListener(movePeon(player, row,col,row+2,col-2,s));
+                cells[row+2][col-2].setBackground(Color.black);
+                cells[row+2][col-2].revalidate();
+                cells[row+2][col-2].repaint();
+                movePosibles.add(cells[row+2][col-2]);
+            }
+        }
+
+    }
     public boolean isCreateBarrier(int row, int col, boolean vert,  String type){
         int n = (type.charAt(0) == 'l') ? 5 : 3;
-
         if(vert) {
-            System.out.println("Desde fila " + row + "colunmna " + col + "hasta " + row+n);
-            for (int i = row; i < row + n; i++) {
-                if (i < cells.length - 1 && (cells[i][col].getBackground() == colorP1Selected || cells[i][col].getBackground() == colorP2Selected))
-                {return true;}
+            if(row + n < cells.length-1) {
+                for (int i = row; i < row + n; i++) {
+                    if (i < cells.length - 1 && (cells[i][col].getBackground() == colorP1Selected || cells[i][col].getBackground() == colorP2Selected)) {
+                        return true;
+                    }
+                }
+            }
+            else{
+                for (int i = row; i > row - n; i--) {
+                    if (i < cells.length - 1 && (cells[i][col].getBackground() == colorP1Selected || cells[i][col].getBackground() == colorP2Selected)) {
+                        return true;
+                    }
+                }
             }
         }
         else{
-            for (int j = col; j < col + n; j++) {
-                if (j < cells[row].length - 1 && (cells[row][j].getBackground() == colorP1Selected || cells[row][j].getBackground() == colorP2Selected))
-                {return true;}
+            if(col + n < cells[row].length-1) {
+                for (int j = col; j < col + n; j++) {
+                    if (j < cells[row].length - 1 && (cells[row][j].getBackground() == colorP1Selected || cells[row][j].getBackground() == colorP2Selected)) {
+                        return true;
+                    }
+                }
+            }
+            else{
+                for (int j = col; j > col - n; j--) {
+                    if (j >= 0 && (cells[row][j].getBackground() == colorP1Selected || cells[row][j].getBackground() == colorP2Selected)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -934,14 +1121,29 @@ public class QuoridorGUI extends  JFrame{
         System.out.println(type);
         if(!isCreateBarrier(row,column,vertical, type))
         {
+
             if (vertical) {
-                for (int i = row; i < row + n && i < cells.length-1; i++) {
-                    cells[i][column].setBackground(newC);
+                if(row + n < cells.length-1) {
+                    for (int i = row; i < row + n && i < cells.length - 1; i++) {
+                        cells[i][column].setBackground(newC);
+                    }
+                }else{
+                    for (int i = row; i > row - n; i--) {
+                        cells[i][column].setBackground(newC);
+                    }
                 }
             }
             else{
-                for (int j = column; j < column + n && j < cells[row].length-1; j++) {
-                    cells[row][j].setBackground(newC);
+                if(column + n < cells.length-1) {
+                    for (int j = column; j < column + n && j < cells[row].length - 1; j++) {
+                        cells[row][j].setBackground(newC);
+                    }
+                }
+                else{
+                    for (int j = column; j > column - n; j--) {
+                        cells[row][j].setBackground(newC);
+                    }
+
                 }
             }
 

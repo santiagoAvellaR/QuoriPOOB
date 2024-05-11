@@ -98,22 +98,43 @@ public class Board {
         printBoard();
     }
     private void addBarrierToTheBoard(int row, int column, boolean horizontal, Barrier barrier) throws QuoridorException {
-        if (horizontal){
-            for (int j = 0; j < barrier.getLength()*2 - 1; j++) {
-                if (board[row][column + j] != null) {
-                    deleteBarrier(row, column, barrier.getLength(), horizontal, j);
-                    throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+        if(row == getBoardSize() - 1 || column == getBoardSize() - 1){
+            if (horizontal) {
+                for (int j = 0; j < (barrier.getLength() * 2 - 1); j++) {
+                    if (board[row][column - j] != null) {
+                        deleteBarrier(row, column, barrier.getLength(), horizontal, j);
+                        throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+                    }
+                    board[row][column - j] = barrier;
                 }
-                board[row][column + j] = barrier;
+            }
+            else {
+                for (int i = 0; i < (barrier.getLength() * 2 - 1); i++) {
+                    if (board[row - i][column] != null) {
+                        deleteBarrier(row, column, barrier.getLength(), horizontal, i);
+                        throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+                    }
+                    board[row - i][column] = barrier;
+                }
             }
         }
         else {
-            for (int i = 0; i < barrier.getLength()*2 - 1; i++) {
-                if (board[row + i][column] != null) {
-                    deleteBarrier(row, column, barrier.getLength(), horizontal, i);
-                    throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+            if (horizontal) {
+                for (int j = 0; j < barrier.getLength() * 2 - 1; j++) {
+                    if (board[row][column + j] != null) {
+                        deleteBarrier(row, column, barrier.getLength(), horizontal, j);
+                        throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+                    }
+                    board[row][column + j] = barrier;
                 }
-                board[row + i][column] = barrier;
+            } else {
+                for (int i = 0; i < barrier.getLength() * 2 - 1; i++) {
+                    if (board[row + i][column] != null) {
+                        deleteBarrier(row, column, barrier.getLength(), horizontal, i);
+                        throw new QuoridorException(QuoridorException.BARRIER_OVERLAP);
+                    }
+                    board[row + i][column] = barrier;
+                }
             }
         }
     }
