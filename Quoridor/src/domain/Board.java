@@ -39,8 +39,8 @@ public class Board {
 
     }
 
-    public Peon getPeon1InitialMoment(){return Quoridor.turns.equals(0) ? (Peon)board[getBoardSize() - 1][midColumn] : null;}
-    public Peon getPeon2InitialMoment(){return Quoridor.turns.equals(0) ? (Peon)board[0][midColumn] : null;}
+    public Peon getPeon1InitialMoment(){return (Peon)board[getBoardSize() - 1][midColumn];}
+    public Peon getPeon2InitialMoment(){return (Peon)board[0][midColumn];}
 
     public int getBoardSize() {return board.length;}
 

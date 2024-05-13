@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Quoridor {
-    public static Integer turns;
+    public Integer turns;
     private Board board;
     private Player  player1;
     private Player  player2;
