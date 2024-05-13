@@ -102,7 +102,6 @@ public class Peon extends Field{
         validMovements = validateVertical(validMovements, false);
         validMovements = validateHorizontal(validMovements, true);
         validMovements = validateHorizontal(validMovements, false);
-        System.out.println((Arrays.toString(validMovements.toArray(new String[0]))));
         return validMovements;
     }
 

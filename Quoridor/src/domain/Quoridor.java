@@ -15,10 +15,11 @@ public class Quoridor {
     public Quoridor(String size,
                     String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers,
                     String teleporterSquares, String rewindSquares, String skipTurnSquares,
+                    boolean vsMachine,
                     String playerOneName, Color playerOneColor,
                     String playerTwoName, Color playerTwoColor,
                     String gameMode, String gameTime,
-                    boolean vsMachine, String machineMode) throws QuoridorException {
+                    String machineMode) throws QuoridorException {
         turns = 0;
         this.vsMachine = vsMachine;
         this.gameMode = gameMode;
@@ -56,10 +57,8 @@ public class Quoridor {
         int largeBarriersInt = Integer.parseInt(largeBarriers);
         int alliedBarriersInt = Integer.parseInt(alliedBarriers);
         int totalBarriers = temporaryBarriersInt + largeBarriersInt + alliedBarriersInt + normalBarriersInt;
-        if (totalBarriers > sizeInt + 1){
-            throw new QuoridorException(QuoridorException.MAXIMUN_NUMBER_BARRIERS_EXCEEDED);
-        }
-        normalBarriersInt = totalBarriers == 0 ? sizeInt +1 : normalBarriersInt;
+        if (totalBarriers > sizeInt + 1){throw new QuoridorException(QuoridorException.MAXIMUN_NUMBER_BARRIERS_EXCEEDED);}
+        normalBarriersInt = totalBarriers == 0 ? sizeInt + 1 : normalBarriersInt;
         Peon peon1 = board.getPeon1InitialMoment();
         Peon peon2 = board.getPeon2InitialMoment();
         player1 = new Human(peon1, playerOneName, playerOneColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);
@@ -76,7 +75,7 @@ public class Quoridor {
         lengthBarriersTypes.put("l", 3);
     }
 
-    public int getTurns(){
+    public Integer getTurns(){
         return turns;
     }
 
@@ -119,7 +118,6 @@ public class Quoridor {
             }
             selectedPlayer.reduceNumberBarriers(playerColor, type);
             actualizeEachTurn();
-            board.printBoard();
         }
     }
 
@@ -147,8 +145,10 @@ public class Quoridor {
     public void actualizeEachTurn() throws QuoridorException {
         turns += 1;
         board.fieldAct();
-        System.out.println(player1.getPeonValidMovements());
-        System.out.println(player2.getPeonValidMovements());
+        System.out.println("tuno: " + turns);
+        System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
+        System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
+        board.printBoard();
     }
 
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}

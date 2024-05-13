@@ -15,6 +15,7 @@ public class Board {
         board[getBoardSize() - 1][midColumn] = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1);
         board[0][midColumn] = new Peon(0, midColumn, this, player2Color, 2);
         fillTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
+        System.out.println("tablero inicial");
         printBoard();
     }
 
@@ -71,7 +72,6 @@ public class Board {
     public void movePeon(int oldRow, int oldColumn, int newRow, int newColumn) throws QuoridorException{
         board[newRow][newColumn] = board[oldRow][oldColumn];
         board[oldRow][oldColumn] = null;
-        printBoard();
     }
 
     public void deleteBarrier(int row, int column, int length, boolean horizontal, Integer lastRowColumn){
@@ -86,6 +86,7 @@ public class Board {
                 board[row + i][column] = null;
             }
         }
+        System.out.println("barrera eliminada");
         printBoard();
     }
 
@@ -95,7 +96,6 @@ public class Board {
         }
         Barrier barrier = createBarrierGivenTheType(playerColor, row, column, horizontal, type);
         addBarrierToTheBoard(row, column, horizontal, barrier);
-        printBoard();
     }
     private void addBarrierToTheBoard(int row, int column, boolean horizontal, Barrier barrier) throws QuoridorException {
         if(row == getBoardSize() - 1 || column == getBoardSize() - 1){

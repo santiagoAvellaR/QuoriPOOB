@@ -23,6 +23,15 @@ public abstract class Player {
         this.alliedBarriers = alliedBarriers;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Player) {
+            Player p = (Player) obj;
+            return p.name.equals(this.name) && p.color.equals(this.color) && p.peon.equals(this.peon);
+        }
+        return false;
+    }
+
     public ArrayList<String> getPeonValidMovements() {
         return peon.getValidMovements();
     }
