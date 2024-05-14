@@ -23,10 +23,10 @@ public class Temporary extends Barrier{
     }
 
     @Override
-    public void act() throws QuoridorException {
+    public void actEachTurn() throws QuoridorException {
         remainingTurns--;
         if(remainingTurns == 0){
-            throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);
+            throw new QuoridorException(QuoridorException.ERASE_TEMPORARY_BARRIER);
         }
     }
 }

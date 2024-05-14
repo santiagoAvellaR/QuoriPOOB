@@ -35,7 +35,15 @@ public abstract class Player {
     public ArrayList<String> getPeonValidMovements() {
         return peon.getValidMovements();
     }
-
+    public int numberBarrier(Color playerColor, String type){
+        if (color.equals(playerColor)){
+            if (type.equals("n")){return normalBarriers;}
+            else if (type.equals("t")){return temporaryBarriers;}
+            else if (type.equals("l")){return longBarriers;}
+            else if (type.equals("a")){return alliedBarriers;}
+        }
+        return 0;
+    }
     public void reduceNumberBarriers(Color playerColor, String barrierType){
         if (color.equals(playerColor)){
             if (barrierType.equals("n")){normalBarriers -= 1;}
@@ -57,7 +65,7 @@ public abstract class Player {
     }
 
     public boolean peonHasAnExit() {
-        Boolean[][] visited = new Boolean[Board.size*2 - 1][Board.size*2 - 1];
+        Boolean[][] visited = new Boolean[peon.getBoardSize()*2 - 1][peon.getBoardSize()*2 - 1];
         for (int i = 0; i < visited.length; i++) {
             Arrays.fill(visited[i], false);
         }

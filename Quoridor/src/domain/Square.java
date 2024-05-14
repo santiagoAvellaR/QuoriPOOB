@@ -1,19 +1,34 @@
 package src.domain;
 
-import java.awt.*;
+import java.awt.Color;
 
 public abstract class Square extends Field{
+    protected int row;
+    protected int column;
+    protected Peon peon;
 
-    public Square(Color color){
+    public Square(Color color, int row, int column){
         super(color);
+        this.row = row;
+        this.column = column;
+        peon = null;
     }
 
     @Override
     public boolean hasBarrier() {return false;}
     @Override
-    public boolean hasPeon() {return false;}
+    public boolean hasPeon() {return peon != null;}
     @Override
-    public void act(){}
+    public void actEachTurn(){}
+    @Override
+    public boolean hasSquare() {return true;}
 
-    protected abstract void applySpecialAction();
+    public void setPeon(Peon peon){this.peon = peon;}
+
+    public Peon getPeon(){return peon;}
+    public int getRow(){return this.row;}
+    public int getColumn(){return this.column;}
+
+    @Override
+    public void applySpecialAction() throws QuoridorException{}
 }

@@ -22,13 +22,15 @@ class QuoridorTest {
     void tearDown() {
     }
 
+    // TEST CREATE BOARDS
+
     @Test
     public void shouldCreateQuoridorBoardAndInitializeThePeonsOddSize() {
         try{
             quoridor = new Quoridor("5", "0", "0", "1", "1", "0",
                     "4", "2", false,"Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30", "beginner");
-            assertEquals("Peon", quoridor.getTypeOfField(0, 4));
+            assertEquals("Peon2", quoridor.getTypeOfField(0, 4));
         }
         catch(QuoridorException e){
             fail("threw the exception: " + e.getMessage());
@@ -41,12 +43,14 @@ class QuoridorTest {
             quoridor = new Quoridor("4", "0", "0", "1", "1", "0",
                     "4", "2", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30",  "beginner");
-            assertEquals("Peon", quoridor.getTypeOfField(0, 2));
+            assertEquals("Peon2", quoridor.getTypeOfField(0, 2));
         }
         catch(QuoridorException e){
             fail("threw the exception: " + e.getMessage());
         }
     }
+
+    // TEST VALID MOVEMENTS
 
     @Test
     public void shouldReturnTheValidMovementsOfThePeon1InTheInitialPosition() {
@@ -83,7 +87,7 @@ class QuoridorTest {
                     "4", "2", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "Timed", "30",  "beginner");
             quoridor.movePeon(Color.BLUE, "n");
-            assertEquals("Peon", quoridor.getTypeOfField(4, 2));
+            assertEquals("Peon1", quoridor.getTypeOfField(4, 2));
         }
         catch(QuoridorException e){
             fail("threw the exception: " + e.getMessage());
@@ -116,7 +120,7 @@ class QuoridorTest {
             quoridor.printBoard();
             quoridor.movePeon(Color.red, "s");
             quoridor.printBoard();
-            assertEquals("Peon", quoridor.getTypeOfField(2, 2));
+            assertEquals("Peon2", quoridor.getTypeOfField(2, 2));
         }
         catch(QuoridorException e){
             fail("threw the exception: " + e.getMessage());
@@ -187,7 +191,7 @@ class QuoridorTest {
             quoridor.movePeon(Color.red, "s");
             quoridor.movePeon(Color.BLUE, "n");
             quoridor.movePeon(Color.red, "js");
-            assertEquals("Peon", quoridor.getTypeOfField(6, 4));
+            assertEquals("Peon2", quoridor.getTypeOfField(6, 4));
 
         }
         catch(QuoridorException e){
@@ -226,6 +230,8 @@ class QuoridorTest {
             fail("threw the exception: " + e.getMessage());
         }
     }
+
+    // BARRIER TEST
 
     @Test
     public void shouldAddANormalVerticalBarrier() {
@@ -362,6 +368,26 @@ class QuoridorTest {
             assertEquals("Normal", quoridor.getTypeOfField(1,6));
             assertEquals("Normal", quoridor.getTypeOfField(1,5));
             assertEquals("Normal", quoridor.getTypeOfField(1,4));
+        }
+        catch(QuoridorException e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
+
+    // TEST FOR SQUARES
+
+    @Test
+    public void peon1CantStepBack2Steps() {
+        try{
+            quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
+                    "4", "2", false, "Player1", Color.BLUE, "Player2", Color.red,
+                    "Timed", "30",  "beginner");
+            quoridor.movePeon(Color.BLUE, "n");
+            quoridor.movePeon(Color.red, "s");
+            quoridor.movePeon(Color.BLUE, "jn");
+            quoridor.movePeon(Color.red, "s");
+            quoridor.setpBackPeon1(2);
+            assertEquals("Peon1", quoridor.getTypeOfField(0, 2));
         }
         catch(QuoridorException e){
             fail("threw the exception: " + e.getMessage());

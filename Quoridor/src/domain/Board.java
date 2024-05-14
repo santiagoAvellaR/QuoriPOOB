@@ -1,9 +1,9 @@
 package src.domain;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class Board {
-    public static int size;
+    public int size;
     private Field[][] board;
     private final int midColumn;
     private Temporary deletedTemporary;
@@ -69,9 +69,26 @@ public class Board {
         return false;
     }
 
-    public void movePeon(int oldRow, int oldColumn, int newRow, int newColumn) throws QuoridorException{
-        board[newRow][newColumn] = board[oldRow][oldColumn];
-        board[oldRow][oldColumn] = null;
+    public void movePeon(int oldRow, int oldColumn, int newRow, int newColumn) throws QuoridorException {
+        Peon peon;
+        if (hasSquare(oldRow, oldColumn) && hasPeon(oldRow, oldColumn)) {
+            Square square = (Square)board[oldRow][oldColumn];
+            peon = square.getPeon();
+            square.setPeon(null);
+        }
+        else{
+            peon = (Peon)board[oldRow][oldColumn];
+        }
+        if (hasSquare(newRow, newColumn)) {
+            Square square = (Square)board[newRow][newColumn];
+            square.setPeon(peon);
+            board[oldRow][oldColumn] = null;
+            square.applySpecialAction();
+        }
+        else {
+            board[newRow][newColumn] = peon;
+            board[oldRow][oldColumn] = null;
+        }
     }
 
     public void deleteBarrier(int row, int column, int length, boolean horizontal, Integer lastRowColumn){
@@ -139,40 +156,33 @@ public class Board {
         }
     }
     private Barrier createBarrierGivenTheType(Color playerColor, int row, int column, boolean horizontal, String type) throws QuoridorException {
-        Barrier barrier = null;
         if (type.equals("n")){
-            barrier = new Normal(playerColor, horizontal);
-            return barrier;
+            return new Normal(playerColor, horizontal);
         }
         else if (type.equals("l")) {
-            barrier = new Long(playerColor, horizontal);
-            return barrier;
+            return new Long(playerColor, horizontal);
         }
         else if (type.equals("a")) {
-            barrier = new Allied(playerColor, horizontal);
-            return barrier;
+            return new Allied(playerColor, horizontal);
         }
         else if (type.equals("t")) {
-            barrier = new Temporary(playerColor, horizontal, row, column);
-            return barrier;
+            return new Temporary(playerColor, horizontal, row, column);
         }
-        else {
-            throw new QuoridorException(QuoridorException.INVALID_BARRIER_TYPE);
-        }
+        else {throw new QuoridorException(QuoridorException.INVALID_BARRIER_TYPE);}
     }
 
-    public void fieldAct() throws QuoridorException {
+    public void fieldActEachTurn() throws QuoridorException {
         for (Field[] fieldRow : board){
             for (Field field : fieldRow) {
                 if (field != null) {
                     try {
-                        field.act();
+                        field.actEachTurn();
                     } catch (QuoridorException e) {
-                        if (e.getMessage().equals(QuoridorException.ERRAASE_TEMPORARY_BARRIER)) {
+                        if (e.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER)) {
                             Temporary temporary = (Temporary) field;
                             deleteTemporaryFromBoard(temporary);
                             deletedTemporary = temporary;
-                            throw new QuoridorException(QuoridorException.ERRAASE_TEMPORARY_BARRIER);
+                            throw new QuoridorException(QuoridorException.ERASE_TEMPORARY_BARRIER);
                         }
                     }
                 }
@@ -194,7 +204,7 @@ public class Board {
             }
         }
     }
-    public int[] getPsotionsDeletedTemporary(){
+    public int[] getPositionsDeletedTemporary(){
         return new int[]{deletedTemporary.getRow(), deletedTemporary.getColumn()};
     }
 

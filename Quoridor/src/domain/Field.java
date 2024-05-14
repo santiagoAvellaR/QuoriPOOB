@@ -1,6 +1,6 @@
 package src.domain;
 
-import java.awt.*;
+import java.awt.Color;
 
 public abstract class Field {
     protected Color color;
@@ -20,6 +20,8 @@ public abstract class Field {
     public abstract boolean hasBarrier();
     public abstract boolean hasSquare();
     public abstract boolean hasPeon();
-    public abstract void act() throws QuoridorException;
+
+    public abstract void applySpecialAction() throws QuoridorException;
+    public abstract void actEachTurn() throws QuoridorException;
 
 }

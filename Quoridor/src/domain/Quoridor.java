@@ -92,10 +92,19 @@ public class Quoridor {
         Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
-        if (!vsMachine || selectedPlayer.equals(player1)) {
-            Human human = (Human) selectedPlayer;
-            human.movePeon(direction);
-            actualizeEachTurn();
+        try {
+            if (!vsMachine || selectedPlayer.equals(player1)) {
+                Human human = (Human) selectedPlayer;
+                human.movePeon(direction);
+                actualizeEachTurn();
+            }
+        } catch (QuoridorException e) {
+            if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                actualizeEachTurn();
+                turns += 1;
+                throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
+            }
+            else {throw new QuoridorException(e.getMessage());}
         }
     }
 
@@ -120,6 +129,10 @@ public class Quoridor {
             actualizeEachTurn();
         }
     }
+    public int getNumberBarrier(Color player, String type){
+        Player selectedPlayer = player1.getColor().equals(player) ? player1 : player2;
+        return selectedPlayer.numberBarrier(player, type);
+    }
 
     public void machineTurn() throws QuoridorException {
         if (vsMachine){
@@ -130,7 +143,7 @@ public class Quoridor {
     }
 
     public int[] getDeletedTemporary(){
-        return board.getPsotionsDeletedTemporary();
+        return board.getPositionsDeletedTemporary();
     }
 
     public boolean areSimilarColors(Color color1, Color color2) {
@@ -144,11 +157,11 @@ public class Quoridor {
 
     public void actualizeEachTurn() throws QuoridorException {
         turns += 1;
-        board.fieldAct();
+        board.fieldActEachTurn();
         System.out.println("tuno: " + turns);
         System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
         System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
-        board.printBoard();
+        printBoard();
     }
 
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
@@ -163,5 +176,10 @@ public class Quoridor {
     public Field[][] getBoard(){return board.getBoard();}
     public String getTypeOfField(int row, int column){return board.getTypeField(row, column);}
     public void printBoard(){board.printBoard();}
-
+    public void setpBackPeon1(int numberSteps) throws QuoridorException {
+        player1.getPeon().stepBackMovements(numberSteps);
+    }
+    public void setpBackPeon2(int numberSteps) throws QuoridorException {
+        player2.getPeon().stepBackMovements(numberSteps);
+    }
 }

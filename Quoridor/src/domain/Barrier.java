@@ -1,6 +1,6 @@
 package src.domain;
 
-import java.awt.*;
+import java.awt.Color;
 
 public abstract class Barrier extends Field{
     protected int length;
@@ -24,5 +24,7 @@ public abstract class Barrier extends Field{
     @Override
     public boolean hasBarrier() {return true;}
     @Override
-    public void act() throws QuoridorException{}
+    public void actEachTurn() throws QuoridorException{}
+    @Override
+    public void applySpecialAction(){}
 }
