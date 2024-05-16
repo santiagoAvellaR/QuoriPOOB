@@ -200,7 +200,7 @@ public class Peon extends Field{
             }
         }
         if (!board.hasPeon(row, column + 4*direction)) {
-            String directionCharacter = goesLeft ? "je" : "jw";
+            String directionCharacter = goesLeft ? "jw" : "je";
             validHorizontalMovements.add(directionCharacter);
             return validHorizontalMovements;
         }
@@ -311,11 +311,13 @@ public class Peon extends Field{
 
     public void stepBackMovements(int quantityMovements) throws QuoridorException {
         System.out.println(tracker);
-        for (int i = tracker.size() - 1; i > tracker.size() - quantityMovements; i--) {
+        for (int i = tracker.size() - 1; i >= tracker.size() - quantityMovements; i--) {
+            System.out.println(tracker.get(i));
             if (getValidMovements().contains(tracker.get(i))){
                 move(tracker.get(i));
                 tracker.remove(i);
             }
+            board.printBoard();
         }
     }
 

@@ -943,10 +943,8 @@ public class QuoridorGUI extends  JFrame {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if(possibleMovements.size() > 0){
-                    eliminarOpciones();
-                }
                 try {
+                    eliminarOpciones();
                     Color colorPlayer = turns % 2 == 0 ? player1Color : player2Color;
                     String type = (turns % 2 == 0) ? String.valueOf(Objects.requireNonNull(QuoridorGUI.this.barrierTypePlayer1.getSelectedItem()).toString().toLowerCase().charAt(0)) :
                             String.valueOf(Objects.requireNonNull(barrierTypePlayer2.getSelectedItem()).toString().toLowerCase().charAt(0));
@@ -993,7 +991,7 @@ public class QuoridorGUI extends  JFrame {
                 try {
                     System.out.println(playerPeonColor + "turno real " +playerTurno);
                     if(playerPeonColor.equals(playerTurno)) {
-                        if(board[finalRow][finalColumn].getBackground() ==Color.black) {
+                        if(board[finalRow][finalColumn].getBackground().equals(Color.black)) {
                             JPanel player = (turns % 2 == 0) ? P1 : P2;
                             quoridor.movePeon(playerTurno, direction);
                             eliminarOpciones();
@@ -1015,20 +1013,19 @@ public class QuoridorGUI extends  JFrame {
     }
 
     private void eliminarOpciones(){
-        for(JPanel p: possibleMovements){
+        for(JPanel p: possibleMovements) {
             p.removeAll();
             p.setBackground(boardColor);
             p.revalidate();
             p.repaint();
-
         }
-
+        possibleMovements.clear();
     }
 
     private void createvalidMovements(int row, int column, ArrayList<String> movements, Color playerColorP){
         possibleMovements.clear();
         for(String s : movements){
-
+            System.out.println(s + "  movimiento");
             if(s.equals("s")){
                 JPanel p = new JPanel();
                 p.setBackground(Color.BLACK);
