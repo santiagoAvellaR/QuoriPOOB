@@ -22,7 +22,7 @@ class QuoridorTest {
     void tearDown() {
     }
 
-    // TEST CREATE BOARDS
+    // ----------------------------      TEST CREATE BOARDS          ----------------------------------------------------
     @Test
     public void shouldCreateQuoridorBoardAndInitializeThePeonsOddSize() {
         try{
@@ -49,7 +49,7 @@ class QuoridorTest {
         }
     }
 
-    // TEST VALID MOVEMENTS
+    // ----------------------------------------------     TEST VALID MOVEMENTS        ----------------------------------------------
     @Test
     public void shouldReturnTheValidMovementsOfThePeon1InTheInitialPosition() {
         try{
@@ -201,7 +201,7 @@ class QuoridorTest {
         }
     }
 
-    // MOVE PEON
+    // ----------------------------------------        MOVE PEON          ---------------------------------------------------------------------
     @Test
     public void peon2ShouldJumpUpThePeon1() {
         try{
@@ -252,7 +252,7 @@ class QuoridorTest {
         }
     }
 
-    // BARRIER TEST
+    // ----------------------------------------     BARRIER TEST       ----------------------------------------------------
 
     @Test
     public void shouldAddANormalVerticalBarrier() {
@@ -364,7 +364,7 @@ class QuoridorTest {
     }
 
     @Test
-    public void shouldAvoidAddABarrierOnTheLastRow() {
+    public void shouldAddABarrierOnTheLastRow() {
         try{
             quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
                     "4", "2", false, "Player1", Color.BLUE, "Player2", Color.red,
@@ -380,7 +380,7 @@ class QuoridorTest {
     }
 
     @Test
-    public void shouldAvoidAddABarrierOnTheLastColumn() {
+    public void shouldAddABarrierOnTheLastColumn() {
         try{
             quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
                     "4", "2", false, "Player1", Color.BLUE, "Player2", Color.red,
@@ -395,7 +395,21 @@ class QuoridorTest {
         }
     }
 
-    // TEST FOR SQUARES
+    @Test
+    public void peon1ShouldPassThroughAlliedBarrier() {
+        try{
+            quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
+                    "4", "2", false, "Player1", Color.BLUE, "Player2", Color.red,
+                    "Timed", "30",  "beginner");
+            quoridor.addBarrier(Color.blue, 6,6,true,"a");
+            quoridor.addBarrier(Color.red, 4, 1, true,"n");
+        }
+        catch(QuoridorException e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
+
+    // -------------------------------------     TEST FOR SQUARES      -----------------------------------------------------------
 
     @Test
     public void peon1CantStepBack2Steps() {
