@@ -49,10 +49,11 @@ public class Peon extends Field{
     public boolean hasPeon(){return true;}
     @Override
     public void actEachTurn() throws QuoridorException {
-        if((playerNumber == 1 && row == 0)){
+        System.out.println("Peon: " + playerNumber + " fila: " + row);
+        if((this.playerNumber == 1 && this.row == 0)){
             throw new QuoridorException(QuoridorException.PLAYER_ONE_WON);
         }
-        else if ((playerNumber == 2 && row == board.getBoardSize()-1)) {
+        else if ((this.playerNumber == 2 && this.row == board.getBoardSize()-1)) {
             throw new QuoridorException(QuoridorException.PLAYER_TWO_WON);
         }
     }
@@ -64,38 +65,38 @@ public class Peon extends Field{
     public void moveVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
         board.movePeon(row, column, row + direction*2, column);
-        row += direction*2;
+        row += (direction*2);
         tracker.add(goesUp ? "s" : "n");
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
         board.movePeon(row, column, row, column + direction*2);
-        column += direction*2;
+        column += (direction*2);
         tracker.add(goesLeft ? "w" : "e");
     }
     public void jumpVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
         board.movePeon(row, column, row + direction*4, column);
-        row += direction*4;
+        row += (direction*4);
         tracker.add(goesUp ? "js" : "jn");
     }
     public void jumpHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
         board.movePeon(row, column, row, column + direction*4);
-        column += direction*4;
+        column += (direction*4);
         tracker.add(goesLeft ? "jw" : "je");
     }
     public void jumpDiagonalRight(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
         board.movePeon(row, column, row + 2*direction, column +2);
-        row += direction*2;
+        row += (direction*2);
         column += 2;
         tracker.add(goesUp ? "sw" : "nw");
     }
     public void jumpDiagonalLeft(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
         board.movePeon(row, column, row + 2*direction, column - 2);
-        row += direction*2;
+        row += (direction*2);
         column -= 2;
         tracker.add(goesUp ? "se" : "ne");
     }
@@ -129,6 +130,7 @@ public class Peon extends Field{
 
     private ArrayList<String> validateVertical(ArrayList<String> validMovementsCalculated, boolean goesUp){
         ArrayList<String> validVericalMovements = validMovementsCalculated;
+        String directionString = null;
         if (row == 0 && goesUp) {return validVericalMovements;}
         if (row == board.getBoardSize()-1 && !goesUp) {return validVericalMovements;}
         int direction = goesUp ? -1 : 1;
@@ -140,7 +142,7 @@ public class Peon extends Field{
             }
         }
         if (!board.hasPeon(row + 2*direction, column)){
-            String directionString = goesUp ? "n" : "s";
+            directionString = goesUp ? "n" : "s";
             validVericalMovements.add(directionString);
             return validVericalMovements;
         }
@@ -150,24 +152,24 @@ public class Peon extends Field{
         if (board.hasBarrier(row + 3*direction, column)) {
             Barrier barrier = (Barrier) board.getField(row + 3*direction, column);
             if (!barrier.isAllied(color)) {
-                return validVericalMovements;
+                return validateVerticalDiagonals(row, column, validVericalMovements, goesUp);
             }
         }
         if (!board.hasPeon(row + 4*direction, column)) {
-            String directionString = goesUp ? "jn" : "js";
+            directionString = goesUp ? "jn" : "js";
             validVericalMovements.add(directionString);
             return validVericalMovements;
         }
-        return validateVerticalDiagonals(row, column, validVericalMovements, goesUp);
+        return validVericalMovements;
     }
     private ArrayList<String> validateVerticalDiagonals(int row, int column, ArrayList<String> validVerticalMovements, boolean goesUp){
         int direction = goesUp ? -1 : 1;
         String directionString = goesUp ? "nw" : "sw";
-        if (!board.hasBarrier(row+2*direction, column - 1) && !validVerticalMovements.contains(directionString)){
+        if (!board.hasBarrier(row + 2*direction, column - 1) && !validVerticalMovements.contains(directionString)){
             validVerticalMovements.add(directionString);
         }
         directionString = goesUp ? "ne" : "se";
-        if (!board.hasBarrier(row+2*direction, column + 1) && !validVerticalMovements.contains(directionString)){
+        if (!board.hasBarrier(row + 2*direction, column + 1) && !validVerticalMovements.contains(directionString)){
             validVerticalMovements.add(directionString);
         }
         return validVerticalMovements;
@@ -175,6 +177,7 @@ public class Peon extends Field{
 
     public ArrayList<String> validateHorizontal(ArrayList<String> validMovementsCalculated, boolean goesLeft){
         ArrayList<String> validHorizontalMovements = validMovementsCalculated;
+        String directionString = null;
         if (column == 0 && goesLeft) {return validHorizontalMovements;}
         if (column == board.getBoardSize()-1 && !goesLeft) {return validHorizontalMovements;}
         int direction = goesLeft ? -1 : 1;
@@ -186,7 +189,7 @@ public class Peon extends Field{
             }
         }
         if (!board.hasPeon(row, column + 2*direction)) {
-            String directionString = goesLeft ? "w" : "e";
+            directionString = goesLeft ? "w" : "e";
             validHorizontalMovements.add(directionString);
             return validHorizontalMovements;
         }
@@ -196,15 +199,15 @@ public class Peon extends Field{
         if (board.hasBarrier(row, column + 3*direction)) {
             Barrier barrier = (Barrier) board.getField(row, column + 3*direction);
             if (!barrier.isAllied(color)) {
-                return validHorizontalMovements;
+                return validateHorizontalDiagonals(row, column, validHorizontalMovements, goesLeft);
             }
         }
         if (!board.hasPeon(row, column + 4*direction)) {
-            String directionCharacter = goesLeft ? "jw" : "je";
-            validHorizontalMovements.add(directionCharacter);
+            directionString = goesLeft ? "jw" : "je";
+            validHorizontalMovements.add(directionString);
             return validHorizontalMovements;
         }
-        return validateHorizontalDiagonals(row, column, validHorizontalMovements, goesLeft);
+        return validHorizontalMovements;
     }
     private ArrayList<String> validateHorizontalDiagonals(int row, int column, ArrayList<String> validVerticalMovements, boolean goesLeft){
         int direction = goesLeft ? -1 : 1;
@@ -310,13 +313,15 @@ public class Peon extends Field{
     }
 
     public void stepBackMovements(int quantityMovements) throws QuoridorException {
-        System.out.println(tracker);
+        System.out.println("tracker: " + tracker);
         for (int i = tracker.size() - 1; i >= tracker.size() - quantityMovements; i--) {
             System.out.println(tracker.get(i));
             if (getValidMovements().contains(tracker.get(i))){
                 move(tracker.get(i));
                 tracker.remove(i);
             }
+            else {break;}
+            System.out.println("Devolviendo movimiento: " + (tracker.size() - i));
             board.printBoard();
         }
     }

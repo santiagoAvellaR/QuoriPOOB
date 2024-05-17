@@ -4,7 +4,7 @@ import java.awt.Color;
 
 public class Rewind extends Square{
 
-    public Rewind(Color color, int row, int column) {
+    public Rewind(int row, int column, Color color) {
         super(color, row, column);
     }
 

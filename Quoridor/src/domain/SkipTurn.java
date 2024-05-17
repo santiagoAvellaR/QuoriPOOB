@@ -4,7 +4,7 @@ import java.awt.Color;
 
 public class SkipTurn extends Square{
 
-    public SkipTurn(Color color, int row, int column) {
+    public SkipTurn(int row, int column, Color color) {
         super(color, row, column);
     }
 

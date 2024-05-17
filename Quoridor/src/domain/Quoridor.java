@@ -94,8 +94,7 @@ public class Quoridor {
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         try {
             if (!vsMachine || selectedPlayer.equals(player1)) {
-                Human human = (Human) selectedPlayer;
-                human.movePeon(direction);
+                selectedPlayer.movePeon(direction);
                 actualizeEachTurn();
             }
         } catch (QuoridorException e) {
@@ -142,8 +141,11 @@ public class Quoridor {
         }
     }
 
-    public int[] getDeletedTemporary(){
-        return board.getPositionsDeletedTemporary();
+    public int[] getPositionDeletedTemporary(){
+        return board.getPositionDeletedTemporary();
+    }
+    public boolean getOrientationDeletedTemporary(){
+        return board.getOrientationDeletedTemporary();
     }
 
     public boolean areSimilarColors(Color color1, Color color2) {
@@ -157,11 +159,11 @@ public class Quoridor {
 
     public void actualizeEachTurn() throws QuoridorException {
         turns += 1;
-        board.fieldActEachTurn();
         System.out.println("tuno: " + turns);
         System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
         System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
         printBoard();
+        board.fieldActEachTurn();
     }
 
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}

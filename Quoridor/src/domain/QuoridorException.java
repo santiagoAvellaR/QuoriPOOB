@@ -17,7 +17,7 @@ public class QuoridorException extends Exception{
     // barriers
     public static final String BARRIER_TRAP_PEON1 = "You can't place the barrier because it would trap the pawn 1.";
     public static final String BARRIER_TRAP_PEON2 = "You can't place the barrier because it would trap the pawn 2.";
-    public static final String BARRIER_OVERLAP = "Barriers cannot be overlapped";
+    public static final String BARRIER_OVERLAP = "Barriers can not be overlapped";
     public static final String ERASE_TEMPORARY_BARRIER = "View must erase temporary barrier on the board";
     public static final String BARRIER_ALREADY_CREATED = "Barrier already created";
     public static final String DONT_HAVE_BARRIERS_LEFT = "You don't have a barriers to place of this type";

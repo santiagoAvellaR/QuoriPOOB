@@ -27,7 +27,7 @@ public abstract class Player {
     public boolean equals(Object obj) {
         if (obj instanceof Player) {
             Player p = (Player) obj;
-            return p.name.equals(this.name) && p.color.equals(this.color) && p.peon.equals(this.peon);
+            return p.getName().equals(this.name) && p.getColor().equals(this.color) && p.getPeon().equals(this.peon);
         }
         return false;
     }
@@ -64,6 +64,10 @@ public abstract class Player {
         return false;
     }
 
+    public void movePeon(String direction) throws QuoridorException {
+        peon.move(direction);
+    }
+
     public boolean peonHasAnExit() {
         Boolean[][] visited = new Boolean[peon.getBoardSize()*2 - 1][peon.getBoardSize()*2 - 1];
         for (int i = 0; i < visited.length; i++) {
@@ -72,6 +76,7 @@ public abstract class Player {
         peon.setHasFoundAndExit(false);
         return peon.hasAnExit(peon.getRow(), peon.getColumn(), visited);
     }
+    public String getName(){return name;}
     public Color getColor() {return color;}
     public Peon getPeon() {return peon;}
     public int getPeonRow() {return peon.getRow();}

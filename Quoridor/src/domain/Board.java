@@ -1,9 +1,10 @@
 package src.domain;
 
 import java.awt.Color;
+import java.util.Random;
 
 public class Board {
-    public int size;
+    public final int size;
     private Field[][] board;
     private final int midColumn;
     private Temporary deletedTemporary;
@@ -17,6 +18,63 @@ public class Board {
         fillTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
         System.out.println("tablero inicial");
         printBoard();
+    }
+
+    private void fillTheBoard(int transporterSquares, int rewindSquares, int skipTurnSquares){
+        fillTheBoardTransporterSquares(transporterSquares);
+        fillTheBoardRewindSquares(rewindSquares);
+        fillTheBoardSkipTurnSquares(skipTurnSquares);
+    }
+    private void fillTheBoardTransporterSquares(int transporterSquares){
+        while (transporterSquares > 0) {
+            int row1 = evenNumberGenerator(getBoardSize()-1);
+            int column1 = evenNumberGenerator(getBoardSize()-1);
+            int row2 = evenNumberGenerator(getBoardSize()-1);
+            int column2 = evenNumberGenerator(getBoardSize()-1);
+            if (board[row1][column1] == null && board[row2][column2] == null){
+                Color color = generateColor();
+                Teleporter teleporter1 = new Teleporter(row1, column1, color);
+                board[row1][column1] = teleporter1;
+                Teleporter teleporter2 = new Teleporter(row2, column2, color);
+                board[row2][column2] = teleporter2;
+                teleporter1.setOtherTeleporter(teleporter2);
+                teleporter2.setOtherTeleporter(teleporter1);
+                transporterSquares--;
+            }
+        }
+    }
+    private void fillTheBoardRewindSquares(int rewindSquares){
+        while (rewindSquares > 0) {
+            int row = evenNumberGenerator(getBoardSize()-1);
+            int column = evenNumberGenerator(getBoardSize()-1);
+            if (board[row][column] == null) {
+                Color color = generateColor();
+                board[row][column] = new Rewind(row, column, color);
+                rewindSquares--;
+            }
+        }
+    }
+    private void fillTheBoardSkipTurnSquares(int skipTurnSquares){
+        while (skipTurnSquares > 0) {
+            int row = evenNumberGenerator(getBoardSize()-1);
+            int column = evenNumberGenerator(getBoardSize()-1);
+            if (board[row][column] == null) {
+                Color color = generateColor();
+                board[row][column] = new SkipTurn(row, column, color);
+                skipTurnSquares--;
+            }
+        }
+    }
+    private int evenNumberGenerator(int limit){
+        Random random = new Random();
+        return random.nextInt((limit / 2) + 1) * 2;
+    }
+    private static Color generateColor() {
+        Random random = new Random();
+        int rojo = random.nextInt(256);
+        int verde = random.nextInt(256);
+        int azul = random.nextInt(256);
+        return new Color(rojo, verde, azul);
     }
 
     public void printBoard(){
@@ -33,10 +91,6 @@ public class Board {
     public String getTypeField(int row, int column){
         if (board[row][column] != null) {return board[row][column].getType();}
         return "Empty";
-    }
-
-    private void fillTheBoard(int teletransporterSquares, int rewindSquares, int skipTurnSquares){
-
     }
 
     public Peon getPeon1InitialMoment(){return (Peon)board[getBoardSize() - 1][midColumn];}
@@ -76,9 +130,7 @@ public class Board {
             peon = square.getPeon();
             square.setPeon(null);
         }
-        else{
-            peon = (Peon)board[oldRow][oldColumn];
-        }
+        else{peon = (Peon)board[oldRow][oldColumn];}
         if (hasSquare(newRow, newColumn)) {
             Square square = (Square)board[newRow][newColumn];
             square.setPeon(peon);
@@ -184,6 +236,9 @@ public class Board {
                             deletedTemporary = temporary;
                             throw new QuoridorException(QuoridorException.ERASE_TEMPORARY_BARRIER);
                         }
+                        else{
+                            throw new QuoridorException(e.getMessage());
+                        }
                     }
                 }
             }
@@ -204,8 +259,9 @@ public class Board {
             }
         }
     }
-    public int[] getPositionsDeletedTemporary(){
+    public int[] getPositionDeletedTemporary(){
         return new int[]{deletedTemporary.getRow(), deletedTemporary.getColumn()};
     }
+    public boolean getOrientationDeletedTemporary(){return deletedTemporary.isHorizontal();}
 
 }

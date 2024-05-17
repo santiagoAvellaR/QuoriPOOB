@@ -8,7 +8,4 @@ public class Human extends Player{
         super(peon, playerName, color, normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);
     }
 
-    public void movePeon(String direction) throws QuoridorException {
-        peon.move(direction);
-    }
 }

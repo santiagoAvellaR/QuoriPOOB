@@ -49,6 +49,7 @@ public class QuoridorGUI extends  JFrame {
     // Game window
     private JPanel P1,P2;
     private Color barrierColor;
+    private HashMap<String, JButton> buttonsMovements;
     private ArrayList<JPanel> possibleMovements;
     private JPanel[][] board;
     private JComboBox<String> barrierTypePlayer1, barrierTypePlayer2;
@@ -73,6 +74,7 @@ public class QuoridorGUI extends  JFrame {
         customsElements = new HashMap<>();
         barrerasDisP1 = new HashMap<>();
         barrerasDisP2 = new HashMap<>();
+        buttonsMovements = new HashMap<>();
         boardSize = new JTextField();
         possibleMovements = new ArrayList<>();
         prepareElements();
@@ -338,6 +340,7 @@ public class QuoridorGUI extends  JFrame {
                     prepareStartGameWindowElements();
                     prepareStartGameWindowActions();
                     setContentPane(gamePanel);
+                    creteButtonsMovements();
                     revalidate();
                     repaint();
                 } catch (QuoridorException ex) {
@@ -816,9 +819,6 @@ public class QuoridorGUI extends  JFrame {
                 if (i % 2 == 0 && j % 2 == 0) {
                     this.board[i][j] = new JPanel(new BorderLayout());
                     this.board[i][j].setBackground(board);
-                    int cellX = (int) (j * SQUARE_SIZE + j * BARRIER_WIDTH);
-                    int cellY = (int) (i * SQUARE_SIZE + i * BARRIER_WIDTH);
-                    int cell = (int) (SQUARE_SIZE);
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
                     if (i == 0 && j == midColumn) {
                         P2 = new JPanel();
@@ -984,38 +984,59 @@ public class QuoridorGUI extends  JFrame {
         };
     }
 
-    private MouseAdapter movePeon(Color playerPeonColor, int initialRow, int initialColumn, int finalRow, int finalColumn, String direction) {
+    private MouseAdapter movePeon(String direction) {
         return new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 try {
-                    System.out.println(playerPeonColor + "turno real " +playerTurno);
-                    if(playerPeonColor.equals(playerTurno)) {
-                        if(board[finalRow][finalColumn].getBackground().equals(Color.black)) {
-                            JPanel player = (turns % 2 == 0) ? P1 : P2;
-                            quoridor.movePeon(playerTurno, direction);
-                            eliminarOpciones();
-                            board[initialRow][initialColumn].setBackground(boardColor);
-                            board[initialRow][initialColumn].removeAll();
-                            board[finalRow][finalColumn].add(player);
-                            board[initialRow][initialColumn].revalidate();
-                            board[initialRow][initialColumn].repaint();
-                            board[finalRow][finalColumn].revalidate();
-                            board[finalRow][finalColumn].repaint();
-                            actualizarTurnos();
-                        }
-                    }
+                    int[][] ubicacioon = quoridor.getPeonsPositions();
+                    int[] peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
+                    quoridor.movePeon(playerTurno, direction);
+                    eliminarOpciones();
+                    eliminarPeon(peon[0], peon[1]);
+                    ubicacioon = quoridor.getPeonsPositions();
+                    peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
+                    JPanel player = (turns % 2 == 0) ? P1 : P2;
+                    agregarPeon(peon[0], peon[1], player);
+                    actualizarTurnos();
+
                 } catch (QuoridorException ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage());
                 }
             }
         };
     }
+    private void eliminarPeon(int row, int col){
+        board[row][col].removeAll();
+        board[row][col].setBackground(boardColor);
+        board[row][col].revalidate();
+        board[row][col].repaint();
+    }
+    private void agregarPeon(int row, int column, JPanel player){
+        board[row][column].add(player);
+        board[row][column].revalidate();
+        board[row][column].repaint();
 
+    }
+    private void creteButtonsMovements(){
+        String[] movements = {"s", "n", "w", "e", "jn", "jw","je","js", "ne","nw", "se", "sw"};
+        for(int i = 0; i < movements.length; i++){
+            JButton move = new JButton();
+            move.setBackground(Color.black);
+            move.setBackground(Color.black);
+            move.setForeground(Color.black);
+            /// Para que el boton no cambie de color cuando se le da Click
+            move.setFocusPainted(false);
+            move.setContentAreaFilled(false);
+            move.setBorderPainted(false);
+            move.setOpaque(true);
+            move.addMouseListener(movePeon(movements[i]));
+            buttonsMovements.put(movements[i], move);
+        }
+    }
     private void eliminarOpciones(){
         for(JPanel p: possibleMovements) {
             p.removeAll();
-            p.setBackground(boardColor);
             p.revalidate();
             p.repaint();
         }
@@ -1025,91 +1046,75 @@ public class QuoridorGUI extends  JFrame {
     private void createvalidMovements(int row, int column, ArrayList<String> movements, Color playerColorP){
         possibleMovements.clear();
         for(String s : movements){
-            System.out.println(s + "  movimiento");
             if(s.equals("s")){
-                JPanel p = new JPanel();
-                p.setBackground(Color.BLACK);
-                p.addMouseListener(movePeon(playerColorP, row,column,row+2,column,s));
-                board[row+2][column].add(p);
-                board[row+2][column].setBackground(Color.black);
+                board[row+2][column].add(buttonsMovements.get(s));
                 board[row+2][column].revalidate();
                 board[row+2][column].repaint();
                 possibleMovements.add(board[row+2][column]);
             }
             else if(s.equals("n")){
-                board[row-2][column].addMouseListener(movePeon(playerColorP, row,column,row-2,column,s));
-                board[row-2][column].setBackground(Color.black);
+                board[row-2][column].add(buttonsMovements.get(s));
                 board[row-2][column].revalidate();
                 board[row-2][column].repaint();
                 possibleMovements.add(board[row-2][column]);
             }
             else if(s.equals("e")){
-                board[row][column+2].addMouseListener(movePeon(playerColorP, row,column,row,column+2,s));
-                board[row][column+2].setBackground(Color.black);
+                board[row][column+2].add(buttonsMovements.get(s));
                 board[row][column+2].revalidate();
                 board[row][column+2].repaint();
                 possibleMovements.add(board[row][column+2]);
             }
             else if(s.equals("w")){
-                board[row][column-2].addMouseListener(movePeon(playerColorP, row,column,row,column-2,s));
-                board[row][column-2].setBackground(Color.black);
+                board[row][column-2].add(buttonsMovements.get(s));
                 board[row][column-2].revalidate();
                 board[row][column-2].repaint();
                 possibleMovements.add(board[row][column-2]);
 
             }
             else if(s.equals("js")){
-                board[row+4][column].addMouseListener(movePeon(playerColorP, row,column,row+4,column,s));
-                board[row+4][column].setBackground(Color.black);
+                board[row+4][column].add(buttonsMovements.get(s));
                 board[row+4][column].revalidate();
                 board[row+4][column].repaint();
                 possibleMovements.add(board[row+4][column]);
             }
             else if(s.equals("jn")){
-                board[row-4][column].addMouseListener(movePeon(playerColorP, row,column,row-4,column,s));
-                board[row-4][column].setBackground(Color.black);
+                board[row-4][column].add(buttonsMovements.get(s));
                 board[row-4][column].revalidate();
                 board[row-4][column].repaint();
                 possibleMovements.add(board[row-4][column]);
             }
             else if(s.equals("je")){
-                board[row][column+4].addMouseListener(movePeon(playerColorP, row,column,row,column+4,s));
-                board[row][column+4].setBackground(Color.black);
+                board[row][column+4].add(buttonsMovements.get(s));
                 board[row][column+4].revalidate();
                 board[row][column+4].repaint();
                 possibleMovements.add(board[row][column+4]);
             }
             else if(s.equals("jw")){
-                board[row][column-4].addMouseListener(movePeon(playerColorP, row,column,row,column-4,s));
-                board[row][column-4].setBackground(Color.black);
+                board[row][column-4].add(buttonsMovements.get(s));
                 board[row][column-4].revalidate();
                 board[row][column-4].repaint();
                 possibleMovements.add(board[row][column-4]);
             }
             else if(s.equals("ne")){
-                board[row-2][column+2].addMouseListener(movePeon(playerColorP, row,column,row-2,column+2,s));
-                board[row-2][column+2].setBackground(Color.black);
+                board[row-2][column+2].add(buttonsMovements.get(s));
                 board[row-2][column+2].revalidate();
                 board[row-2][column+2].repaint();
                 possibleMovements.add(board[row-2][column+2]);
             }
             else if(s.equals("nw")){
-                board[row-2][column-2].addMouseListener(movePeon(playerColorP, row,column,row-2,column-2,s));
-                board[row-2][column-2].setBackground(Color.black);
+                board[row-2][column-2].add(buttonsMovements.get(s));
                 board[row-2][column-2].revalidate();
                 board[row-2][column-2].repaint();
                 possibleMovements.add(board[row-2][column-2]);
             }
             else if(s.equals("se")){
-                board[row+2][column+2].addMouseListener(movePeon(playerColorP, row,column,row+2,column+2,s));
-                board[row+2][column+2].setBackground(Color.black);
+                board[row+2][column+2].add(buttonsMovements.get(s));
                 board[row+2][column+2].revalidate();
                 board[row+2][column+2].repaint();
                 possibleMovements.add(board[row+2][column+2]);
             }
             else if(s.equals("sw")){
-                board[row+2][column-2].addMouseListener(movePeon(playerColorP, row,column,row+2,column-2,s));
-                board[row+2][column-2].setBackground(Color.black);
+                board[row+2][column-2].add(buttonsMovements.get(s));
                 board[row+2][column-2].revalidate();
                 board[row+2][column-2].repaint();
                 possibleMovements.add(board[row+2][column-2]);
