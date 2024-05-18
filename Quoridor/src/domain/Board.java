@@ -140,9 +140,11 @@ public class Board {
         if (hasSquare(newRow, newColumn)) {
             Square square = (Square)board[newRow][newColumn];
             square.setPeon(peon);
+            peon.passThroughSquare(getTypeField(newRow, newColumn).substring(0,0));
             square.applySpecialAction();
         }
         else {
+            peon.passThroughSquare("n");
             board[newRow][newColumn] = peon;
         }
     }
@@ -212,19 +214,13 @@ public class Board {
         }
     }
     private Barrier createBarrierGivenTheType(Color playerColor, int row, int column, boolean horizontal, String type) throws QuoridorException {
-        if (type.equals("n")){
-            return new Normal(playerColor, horizontal);
-        }
-        else if (type.equals("l")) {
-            return new Long(playerColor, horizontal);
-        }
-        else if (type.equals("a")) {
-            return new Allied(playerColor, horizontal);
-        }
-        else if (type.equals("t")) {
-            return new Temporary(playerColor, horizontal, row, column);
-        }
-        else {throw new QuoridorException(QuoridorException.INVALID_BARRIER_TYPE);}
+        return switch (type) {
+            case "n" -> new Normal(playerColor, horizontal);
+            case "l" -> new Long(playerColor, horizontal);
+            case "a" -> new Allied(playerColor, horizontal);
+            case "t" -> new Temporary(playerColor, horizontal, row, column);
+            default -> throw new QuoridorException(QuoridorException.INVALID_BARRIER_TYPE);
+        };
     }
 
     public void fieldActEachTurn() throws QuoridorException {

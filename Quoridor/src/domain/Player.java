@@ -76,10 +76,12 @@ public abstract class Player {
         peon.setHasFoundAndExit(false);
         return peon.hasAnExit(peon.getRow(), peon.getColumn(), visited);
     }
+
     public String getName(){return name;}
     public Color getColor() {return color;}
     public Peon getPeon() {return peon;}
     public int getPeonRow() {return peon.getRow();}
     public int getPeonColumn() {return peon.getColumn();}
+    public int squaresVisited(String type){return peon.squaresVisited(type);}
 
 }

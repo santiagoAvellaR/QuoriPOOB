@@ -147,6 +147,10 @@ public class Quoridor {
                 turns += 1;
                 throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
             }
+            else if (e.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED)) {
+                turns += 1;
+                throw new QuoridorException(QuoridorException.PEON_HAS_BEEN_TELEPORTED);
+            }
             else {throw new QuoridorException(e.getMessage());}
         }
     }
@@ -217,6 +221,11 @@ public class Quoridor {
 
     public Color getFieldColor(int row, int column){
         return board.getFieldColor(row, column);
+    }
+
+    public int squaresVisited(Color playerColor, String type){
+        Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
+        return selectedPlayer.squaresVisited(type);
     }
 
     // TEST FUNCTIONS

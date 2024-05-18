@@ -10,6 +10,10 @@ public class Peon extends Field{
     private final Board board;
     private ArrayList<String> tracker;
     private boolean hasFoundAndExit;
+    private int rewindSquares;
+    private int skipTurnSquares;
+    private int teleporterSquares;
+    private int normalSquares;
 
     public Peon(int row, int column, Board board, Color color, int numberPlayer) {
         super(color);
@@ -19,6 +23,10 @@ public class Peon extends Field{
         tracker = new ArrayList<String>();
         this.playerNumber = numberPlayer;
         hasFoundAndExit = false;
+        rewindSquares = 0;
+        skipTurnSquares = 0;
+        teleporterSquares = 0;
+        normalSquares = 1;
     }
     public int getRow() {
         return row;
@@ -68,59 +76,61 @@ public class Peon extends Field{
 
     public void moveVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
+        tracker.add(goesUp ? "s" : "n");
         board.movePeon(row, column, row + direction * 2, column);
         row += (direction * 2);
-        tracker.add(goesUp ? "s" : "n");
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
+        tracker.add(goesLeft ? "w" : "e");
         board.movePeon(row, column, row, column + direction * 2);
         column += (direction * 2);
-        tracker.add(goesLeft ? "w" : "e");
     }
     public void jumpVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
+        tracker.add(goesUp ? "js" : "jn");
         board.movePeon(row, column, row + direction*4, column);
         row += (direction*4);
-        tracker.add(goesUp ? "js" : "jn");
     }
     public void jumpHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
+        tracker.add(goesLeft ? "jw" : "je");
         board.movePeon(row, column, row, column + direction*4);
         column += (direction*4);
-        tracker.add(goesLeft ? "jw" : "je");
     }
     public void jumpDiagonalRight(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
+        tracker.add(goesUp ? "sw" : "nw");
         board.movePeon(row, column, row + 2*direction, column +2);
         row += (direction*2);
         column += 2;
-        tracker.add(goesUp ? "sw" : "nw");
     }
     public void jumpDiagonalLeft(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
+        tracker.add(goesUp ? "se" : "ne");
         board.movePeon(row, column, row + 2*direction, column - 2);
         row += (direction*2);
         column -= 2;
-        tracker.add(goesUp ? "se" : "ne");
     }
 
     public void move(String direction) throws QuoridorException {
         //ortogonales
-        if (direction.equals("n")){moveVertical(true);}
-        else if (direction.equals("s")){moveVertical(false);}
-        else if (direction.equals("w")){moveHorizontal(true);}
-        else if (direction.equals("e")){moveHorizontal(false);}
-        // saltos
-        else if (direction.equals("jn")){jumpVertical(true);}
-        else if (direction.equals("js")){jumpVertical(false);}
-        else if (direction.equals("jw")){jumpHorizontal(true);}
-        else if (direction.equals("je")){jumpHorizontal(false);}
-        //diagonales
-        else if (direction.equals("ne")){jumpDiagonalRight(true);}
-        else if (direction.equals("se")){jumpDiagonalRight(false);}
-        else if (direction.equals("nw")){jumpDiagonalLeft(true);}
-        else if (direction.equals("sw")){jumpDiagonalLeft(false);}
+        switch (direction) {
+            case "n" -> moveVertical(true);
+            case "s" -> moveVertical(false);
+            case "w" -> moveHorizontal(true);
+            case "e" -> moveHorizontal(false);
+            // saltos
+            case "jn" -> jumpVertical(true);
+            case "js" -> jumpVertical(false);
+            case "jw" -> jumpHorizontal(true);
+            case "je" -> jumpHorizontal(false);
+            //diagonales
+            case "ne" -> jumpDiagonalRight(true);
+            case "se" -> jumpDiagonalRight(false);
+            case "nw" -> jumpDiagonalLeft(true);
+            case "sw" -> jumpDiagonalLeft(false);
+        }
     }
 
     public ArrayList<String> getValidMovements(){
@@ -305,15 +315,17 @@ public class Peon extends Field{
         return validHorizontalMovements;
     }
     private int[] getTheNewPositionAccordingDirection(int row, int column, String direction){
-        if (direction.equals("n")){return new int[]{row - 2,column};}
-        else if (direction.equals("s")){return new int[]{row + 2,column};}
-        else if (direction.equals("w")){return new int[]{row,column - 2};}
-        else if (direction.equals("e")){return new int[]{row,column + 2};}
-        else if (direction.equals("jn")){return new int[]{row - 4,column};}
-        else if (direction.equals("js")){return new int[]{row + 4,column};}
-        else if (direction.equals("jw")){return new int[]{row,column - 4};}
-        else if (direction.equals("je")){return new int[]{row,column + 4};}
-        return new int[]{};
+        return switch (direction) {
+            case "n" -> new int[]{row - 2, column};
+            case "s" -> new int[]{row + 2, column};
+            case "w" -> new int[]{row, column - 2};
+            case "e" -> new int[]{row, column + 2};
+            case "jn" -> new int[]{row - 4, column};
+            case "js" -> new int[]{row + 4, column};
+            case "jw" -> new int[]{row, column - 4};
+            case "je" -> new int[]{row, column + 4};
+            default -> new int[]{};
+        };
     }
 
     public void stepBackMovements(int quantityMovements) throws QuoridorException {
@@ -334,6 +346,24 @@ public class Peon extends Field{
         board.movePeon(this.row, this.column, row, column);
         this.row = row;
         this.column = column;
+    }
+
+    public void passThroughSquare(String type) {
+        switch (type) {
+            case "N" -> normalSquares += 1;
+            case "T" -> teleporterSquares += 1;
+            case "R" -> rewindSquares += 1;
+            case "S" -> skipTurnSquares += 1;
+        }
+    }
+    public int squaresVisited(String type){
+        switch (type) {
+            case "N" -> {return normalSquares;}
+            case "T" -> {return teleporterSquares;}
+            case "R" -> {return rewindSquares;}
+            case "S" -> {return skipTurnSquares;}
+            default -> {return 0;}
+        }
     }
 
 }
