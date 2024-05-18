@@ -17,13 +17,15 @@ public abstract class Square extends Field{
     @Override
     public boolean hasBarrier() {return false;}
     @Override
-    public boolean hasPeon() {return peon != null;}
+    public boolean hasPeon() {return (peon != null);}
     @Override
     public void actEachTurn(){}
     @Override
     public boolean hasSquare() {return true;}
 
-    public void setPeon(Peon peon){this.peon = peon;}
+    public void setPeon(Peon newPeon){
+        peon = newPeon;
+    }
 
     public Peon getPeon(){return peon;}
     public int getRow(){return this.row;}

@@ -803,7 +803,7 @@ public class QuoridorGUI extends  JFrame {
         return inf;
     }
 
-    private JPanel createBoard(Color board) {
+    private JPanel createBoard(Color boardColor) {
         boardPanel = new JPanel(new GridBagLayout());
         int tamBoard = screenSize.height;
         int numero = boardSize.getText().isEmpty() ? 9 : Integer.parseInt(boardSize.getText().trim());
@@ -811,27 +811,31 @@ public class QuoridorGUI extends  JFrame {
         int BARRIER_WIDTH = (int) ((float) (tamBoard * 0.15) / numero); // Ancho de la barrera ajustado para ser proporcional al tamaño de la celda
         this.board = new JPanel[2 * numero - 1][2 * numero - 1];
         GridBagConstraints gbc = new GridBagConstraints();
+
         for (int i = 0; i < 2 * numero - 1; i++) {
             for (int j = 0; j < 2 * numero - 1; j++) {
                 gbc.gridx = j;
                 gbc.gridy = i;
                 int midColumn = numero % 2 == 0 ? numero - 2 : numero - 1;
+
                 if (i % 2 == 0 && j % 2 == 0) {
-                    this.board[i][j] = new JPanel(new BorderLayout());
-                    this.board[i][j].setBackground(board);
+                    this.board[i][j] = new JPanel(new FlowLayout());
+                    this.board[i][j].setBackground(boardColor);
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
+
                     if (i == 0 && j == midColumn) {
                         P2 = new JPanel();
                         P2.setBackground(player2Color);
+                        P2.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
                         P2.addMouseListener(movePlayer(player2Color));
-                        this.board[i][midColumn].add(P2, BorderLayout.CENTER);
+                        this.board[i][midColumn].add(P2);
 
                     } else if (i == this.board.length - 1 && j == midColumn) {
                         P1 = new JPanel();
                         P1.setBackground(player1Color);
+                        P1.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
                         P1.addMouseListener(movePlayer(player1Color));
-                        this.board[this.board.length - 1][midColumn].add(P1, BorderLayout.CENTER);
-
+                        this.board[this.board.length - 1][midColumn].add(P1);
                     }
 
                 } else if (i % 2 == 0 && j % 2 == 1) {
@@ -839,21 +843,20 @@ public class QuoridorGUI extends  JFrame {
                     int barrierX = (int) ((j + 1) * SQUARE_SIZE + j * BARRIER_WIDTH);
                     int barrierY = (int) (i * SQUARE_SIZE + i * BARRIER_WIDTH);
                     this.board[i][j].setBounds(barrierX, barrierY, BARRIER_WIDTH, SQUARE_SIZE);
-                    //verticales
+                    // verticales
                     this.board[i][j].addMouseListener(createBarrierMouseListener(this.board[i][j], i, j, true));
                 } else if (i % 2 == 1 && j % 2 == 0) {
-
-                    this.board[i][j] = createBarrier(Color.GRAY, SQUARE_SIZE, BARRIER_WIDTH); // Cambia el orden de SQUARE_SIZE y BAR_WIDTHc
+                    this.board[i][j] = createBarrier(Color.GRAY, SQUARE_SIZE, BARRIER_WIDTH); // Cambia el orden de SQUARE_SIZE y BAR_WIDTH
                     int barrierX = (int) (j * SQUARE_SIZE + j * BARRIER_WIDTH);
                     int barrierY = (int) ((i + 1) * SQUARE_SIZE + i * BARRIER_WIDTH);
                     this.board[i][j].setBounds(barrierX, barrierY, SQUARE_SIZE, BARRIER_WIDTH);
                     // horizontales
                     this.board[i][j].addMouseListener(createBarrierMouseListener(this.board[i][j], i, j, false));
                 } else {
-                    //espacio vacio
+                    // espacio vacío
                     JPanel espacio = new JPanel();
                     espacio.setPreferredSize(new Dimension(BARRIER_WIDTH, BARRIER_WIDTH));
-                    espacio.setBackground(Color.gray);
+                    espacio.setBackground(Color.GRAY);
                     this.board[i][j] = espacio; // Cambia el orden de SQUARE_SIZE y BARRIER_WIDTH
                 }
                 boardPanel.add(this.board[i][j], gbc);
@@ -1020,9 +1023,12 @@ public class QuoridorGUI extends  JFrame {
     }
     private void creteButtonsMovements(){
         String[] movements = {"s", "n", "w", "e", "jn", "jw","je","js", "ne","nw", "se", "sw"};
+        int ancho = P1.getWidth();
+        int altura = P1.getHeight();
+        System.out.println("ancho es " + ancho + "altura es " + altura);
         for(int i = 0; i < movements.length; i++){
             JButton move = new JButton();
-            move.setBackground(Color.black);
+            move.setPreferredSize(new Dimension(ancho, altura));
             move.setBackground(Color.black);
             move.setForeground(Color.black);
             /// Para que el boton no cambie de color cuando se le da Click

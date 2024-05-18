@@ -26,7 +26,12 @@ public class Peon extends Field{
     public int getColumn() {
         return column;
     }
+    public int getPlayerNumber() {return playerNumber;}
 
+    public void setPosition(int row, int column) {
+        this.row = row;
+        this.column = column;
+    }
     public void setColor(Color color) {
         this.color = color;
     }
@@ -49,7 +54,6 @@ public class Peon extends Field{
     public boolean hasPeon(){return true;}
     @Override
     public void actEachTurn() throws QuoridorException {
-        System.out.println("Peon: " + playerNumber + " fila: " + row);
         if((this.playerNumber == 1 && this.row == 0)){
             throw new QuoridorException(QuoridorException.PLAYER_ONE_WON);
         }

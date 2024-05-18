@@ -4,12 +4,10 @@ import java.awt.Color;
 
 public class Teleporter extends Square{
     private Teleporter otherTeleporter;
-    private Peon peon;
 
     public Teleporter(int row, int column, Color color) {
         super(color, row, column);
         otherTeleporter = null;
-        peon = null;
     }
 
     public void setOtherTeleporter(Teleporter otherTeleporter) {
@@ -17,14 +15,14 @@ public class Teleporter extends Square{
     }
 
     @Override
-    public String getType(){return hasPeon() ? "TeleporterPeon" : "Teleporter";}
+    public String getType(){return hasPeon() ? "TeleporterPeon" + peon.getPlayerNumber() : "Teleporter";}
 
     @Override
     public void applySpecialAction() throws QuoridorException{
-        if(peon != null){
-            int newRow = otherTeleporter.getRow();
-            int newColumn = otherTeleporter.getColumn();
-            peon.move(newRow, newColumn);
+        if(hasPeon()){
+            otherTeleporter.setPeon(peon);
+            peon.setPosition(otherTeleporter.getRow(), otherTeleporter.getColumn());
+            setPeon(null);
             throw new QuoridorException(QuoridorException.PEON_HAS_BEEN_TELEPORTED);
         }
     }

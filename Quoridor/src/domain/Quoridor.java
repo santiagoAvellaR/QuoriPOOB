@@ -184,4 +184,10 @@ public class Quoridor {
     public void setpBackPeon2(int numberSteps) throws QuoridorException {
         player2.getPeon().stepBackMovements(numberSteps);
     }
+    public void addTeleporterSquare(int row1, int column1, int row2, int column2) throws QuoridorException {
+        board.addTeleporterSquare(row1, column1, row2, column2);
+    }
+    public void addSkipTurnSquare(int row, int column){
+        board.addSkipTurnSquare(row, column);
+    }
 }

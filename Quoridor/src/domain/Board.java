@@ -33,12 +33,7 @@ public class Board {
             int column2 = evenNumberGenerator(getBoardSize()-1);
             if (board[row1][column1] == null && board[row2][column2] == null){
                 Color color = generateColor();
-                Teleporter teleporter1 = new Teleporter(row1, column1, color);
-                board[row1][column1] = teleporter1;
-                Teleporter teleporter2 = new Teleporter(row2, column2, color);
-                board[row2][column2] = teleporter2;
-                teleporter1.setOtherTeleporter(teleporter2);
-                teleporter2.setOtherTeleporter(teleporter1);
+                addTeleporterSquare(row1, column1, row2, column2);
                 transporterSquares--;
             }
         }
@@ -48,8 +43,7 @@ public class Board {
             int row = evenNumberGenerator(getBoardSize()-1);
             int column = evenNumberGenerator(getBoardSize()-1);
             if (board[row][column] == null) {
-                Color color = generateColor();
-                board[row][column] = new Rewind(row, column, color);
+                addRewindSquare(row, column);
                 rewindSquares--;
             }
         }
@@ -59,8 +53,7 @@ public class Board {
             int row = evenNumberGenerator(getBoardSize()-1);
             int column = evenNumberGenerator(getBoardSize()-1);
             if (board[row][column] == null) {
-                Color color = generateColor();
-                board[row][column] = new SkipTurn(row, column, color);
+                addSkipTurnSquare(row, column);
                 skipTurnSquares--;
             }
         }
@@ -130,16 +123,18 @@ public class Board {
             peon = square.getPeon();
             square.setPeon(null);
         }
-        else{peon = (Peon)board[oldRow][oldColumn];}
+        else{
+            peon = (Peon)board[oldRow][oldColumn];
+            board[oldRow][oldColumn] = null;
+        }
+        System.out.println(peon);
         if (hasSquare(newRow, newColumn)) {
             Square square = (Square)board[newRow][newColumn];
             square.setPeon(peon);
-            board[oldRow][oldColumn] = null;
             square.applySpecialAction();
         }
         else {
             board[newRow][newColumn] = peon;
-            board[oldRow][oldColumn] = null;
         }
     }
 
@@ -264,4 +259,21 @@ public class Board {
     }
     public boolean getOrientationDeletedTemporary(){return deletedTemporary.isHorizontal();}
 
+    public void addRewindSquare(int row, int column) {
+        Color color = generateColor();
+        board[row][column] = new Rewind(row, column, color);
+    }
+    public void addTeleporterSquare(int row1, int column1, int row2, int column2) {
+        Color color = generateColor();
+        Teleporter teleporter1 = new Teleporter(row1, column1, color);
+        board[row1][column1] = teleporter1;
+        Teleporter teleporter2 = new Teleporter(row2, column2, color);
+        board[row2][column2] = teleporter2;
+        teleporter1.setOtherTeleporter(teleporter2);
+        teleporter2.setOtherTeleporter(teleporter1);
+    }
+    public void addSkipTurnSquare(int row, int column) {
+        Color color = generateColor();
+        board[row][column] = new SkipTurn(row, column, color);
+    }
 }
