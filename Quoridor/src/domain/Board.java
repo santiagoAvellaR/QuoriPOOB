@@ -1,6 +1,7 @@
 package src.domain;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Board {
@@ -10,6 +11,7 @@ public class Board {
     private Temporary deletedTemporary;
 
     public Board(int size, Color player1Color, Color player2Color, int teletransporterSquares, int rewindSquares, int skipTurnSquares) {
+        System.out.println(teletransporterSquares + " " + rewindSquares + " " + skipTurnSquares);
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         midColumn = size % 2 == 0 ? size - 2 : size - 1;
@@ -127,7 +129,6 @@ public class Board {
             peon = (Peon)board[oldRow][oldColumn];
             board[oldRow][oldColumn] = null;
         }
-        System.out.println(peon);
         if (hasSquare(newRow, newColumn)) {
             Square square = (Square)board[newRow][newColumn];
             square.setPeon(peon);
@@ -276,4 +277,5 @@ public class Board {
         Color color = generateColor();
         board[row][column] = new SkipTurn(row, column, color);
     }
+
 }

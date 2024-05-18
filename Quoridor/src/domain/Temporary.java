@@ -11,7 +11,7 @@ public class Temporary extends Barrier{
         super(color, horizontal, 2);
         this.row = row;
         this.column = column;
-        remainingTurns = 5;
+        remainingTurns = 10;
     }
 
     public int getRow(){return row;}
@@ -24,7 +24,7 @@ public class Temporary extends Barrier{
 
     @Override
     public void actEachTurn() throws QuoridorException {
-        remainingTurns--;
+        remainingTurns -= 1;
         if(remainingTurns == 0){
             throw new QuoridorException(QuoridorException.ERASE_TEMPORARY_BARRIER);
         }

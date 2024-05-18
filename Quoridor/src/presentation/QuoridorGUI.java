@@ -956,10 +956,21 @@ public class QuoridorGUI extends  JFrame {
                     changeColorBarrier(colorPlayer, vertical, type, row, col);
                     actualizarNumeroBarreras(colorPlayer, type);
                     actualizarTurnos();
-
-
-                } catch (QuoridorException ex) {
-                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+                catch (QuoridorException ex) {
+                    if(ex.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER)){
+                        boolean horizontal = quoridor.getOrientationDeletedTemporary();
+                        int[] ubicacion = quoridor.getPositionDeletedTemporary();
+                        eliminarTemporal(ubicacion[0],ubicacion[1], horizontal);
+                        Color colorPlayer = turns % 2 == 0 ? player1Color : player2Color;
+                        String type = (turns % 2 == 0) ? String.valueOf(Objects.requireNonNull(QuoridorGUI.this.barrierTypePlayer1.getSelectedItem()).toString().toLowerCase().charAt(0)) : String.valueOf(Objects.requireNonNull(barrierTypePlayer2.getSelectedItem()).toString().toLowerCase().charAt(0));
+                        changeColorBarrier(colorPlayer, vertical, type, row, col);
+                        actualizarNumeroBarreras(colorPlayer, type);
+                        actualizarTurnos();
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, ex.getMessage());
+                    }
                 }
             }
 
@@ -1003,12 +1014,58 @@ public class QuoridorGUI extends  JFrame {
                     agregarPeon(peon[0], peon[1], player);
                     actualizarTurnos();
 
-                } catch (QuoridorException ex) {
-                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+                catch (QuoridorException ex) {
+                    if(ex.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER)){
+                        boolean horizontal = quoridor.getOrientationDeletedTemporary();
+                        int[] ubicacion = quoridor.getPositionDeletedTemporary();
+                        eliminarTemporal(ubicacion[0],ubicacion[1], horizontal);
+                        eliminarOpciones();
+                        int[][] ubicacioon = quoridor.getPeonsPositions();
+                        int[] peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
+                        eliminarPeon(peon[0], peon[1]);
+                        ubicacioon = quoridor.getPeonsPositions();
+                        peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
+                        JPanel player = (turns % 2 == 0) ? P1 : P2;
+                        agregarPeon(peon[0], peon[1], player);
+                        actualizarTurnos();
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, ex.getMessage());
+                    }
+
                 }
             }
         };
     }
+    private void eliminarTemporal(int row, int col, boolean horizontal){
+        if(horizontal) {
+            if(col +2 <= board.length-1) {
+                for (int j = col; j <= col + 2; j++) {
+                    board[row][j].setBackground(Color.GRAY);
+                }
+            }
+            else{
+                for (int j = col-2; j <= col ; j++) {
+                    board[row][j].setBackground(Color.GRAY);
+                }
+            }
+        }
+        else{
+            if(row +2 <= board.length-1) {
+                for (int i = row; i <= row + 2; i++) {
+                    board[i][col].setBackground(Color.GRAY);
+                }
+            }else{
+                for (int i = row-2; i <= row; i--) {
+                    board[i][col].setBackground(Color.GRAY);
+                }
+            }
+        }
+    }
+
+
+
     private void eliminarPeon(int row, int col){
         board[row][col].removeAll();
         board[row][col].setBackground(boardColor);

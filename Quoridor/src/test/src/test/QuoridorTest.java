@@ -494,7 +494,8 @@ class QuoridorTest {
                     "Timed", "30",  "beginner");
             quoridor.addBarrier(Color.blue, 5,1,true,"t");
             quoridor.addBarrier(Color.red, 3, 1, true,"n");
-            quoridor.movePeon(Color.BLUE, "n");
+            quoridor.movePeon(Color.BLUE, "e");
+            quoridor.movePeon(Color.red, "s");
             assertEquals("Peon1", quoridor.getTypeOfField(4,2));
             fail("did not threw the exception of temporary");
         }
