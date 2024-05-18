@@ -59,6 +59,8 @@ public class QuoridorGUI extends  JFrame {
     private JPanel boardPanel;
     private JButton finishButton;
     private HashMap<String, JLabel> barrerasDisP1, barrerasDisP2;
+    private Color regresar = Color.green;
+    private Color dobleturno = Color.pink;
     private JPanel colorTurn;
     private JButton homeButton;
     private JButton upButton;
@@ -814,13 +816,20 @@ public class QuoridorGUI extends  JFrame {
 
         for (int i = 0; i < 2 * numero - 1; i++) {
             for (int j = 0; j < 2 * numero - 1; j++) {
+
                 gbc.gridx = j;
                 gbc.gridy = i;
                 int midColumn = numero % 2 == 0 ? numero - 2 : numero - 1;
 
                 if (i % 2 == 0 && j % 2 == 0) {
+                    String type = quoridor.getTypeOfField(i, j);
+
                     this.board[i][j] = new JPanel(new FlowLayout());
-                    this.board[i][j].setBackground(boardColor);
+                    if(type.equals("Empty")){this.board[i][j].setBackground(boardColor);}
+                    else if(type.equals("Rewind")){this.board[i][j].setBackground(regresar);}
+                    else if(type.equals("SkipTurn")){this.board[i][j].setBackground(dobleturno);}
+                    else if(type.equals("Teleporter")){ Color color = quoridor.getFieldColor(i,j);
+                        this.board[i][j].setBackground(color);}
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
 
                     if (i == 0 && j == midColumn) {

@@ -66,7 +66,6 @@ public class Quoridor {
         else{player2 = new Human(peon2, playerTwoName, playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);}
         initializeHashMaps();
     }
-
     private void initializeHashMaps(){
         lengthBarriersTypes = new HashMap<>();
         lengthBarriersTypes.put("n", 2);
@@ -128,9 +127,10 @@ public class Quoridor {
             actualizeEachTurn();
         }
     }
-    public int getNumberBarrier(Color player, String type){
-        Player selectedPlayer = player1.getColor().equals(player) ? player1 : player2;
-        return selectedPlayer.numberBarrier(player, type);
+
+    public int getNumberBarrier(Color playerColor, String type){
+        Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
+        return selectedPlayer.numberBarrier(playerColor, type);
     }
 
     public void machineTurn() throws QuoridorException {
@@ -166,22 +166,21 @@ public class Quoridor {
         board.fieldActEachTurn();
     }
 
-    public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
-
     public int[][] getPeonsPositions(){
         return new int[][]{{player1.getPeonRow(), player1.getPeonColumn()},{player2.getPeonRow(), player2.getPeonColumn()}};
     }
 
+    public Color getFieldColor(int row, int column){
+        return board.getFieldColor(row, column);
+    }
+
     // TEST FUNCTIONS
-    public Peon getPeon1(){return player1.getPeon();}
-    public Peon getPeon2(){return player2.getPeon();}
-    public Field[][] getBoard(){return board.getBoard();}
     public String getTypeOfField(int row, int column){return board.getTypeField(row, column);}
     public void printBoard(){board.printBoard();}
-    public void setpBackPeon1(int numberSteps) throws QuoridorException {
+    public void stepBackPeon1(int numberSteps) throws QuoridorException {
         player1.getPeon().stepBackMovements(numberSteps);
     }
-    public void setpBackPeon2(int numberSteps) throws QuoridorException {
+    public void stepBackPeon2(int numberSteps) throws QuoridorException {
         player2.getPeon().stepBackMovements(numberSteps);
     }
     public void addTeleporterSquare(int row1, int column1, int row2, int column2) throws QuoridorException {
@@ -190,4 +189,5 @@ public class Quoridor {
     public void addSkipTurnSquare(int row, int column){
         board.addSkipTurnSquare(row, column);
     }
+    public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
 }

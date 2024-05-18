@@ -515,7 +515,7 @@ class QuoridorTest {
             quoridor.movePeon(Color.BLUE, "n");
             quoridor.movePeon(Color.red, "s");
             quoridor.movePeon(Color.BLUE, "n");
-            quoridor.setpBackPeon1(2);
+            quoridor.stepBackPeon1(2);
             assertEquals("Peon1", quoridor.getTypeOfField(8, 4));
         }
         catch(Exception e){
@@ -533,7 +533,7 @@ class QuoridorTest {
             quoridor.movePeon(Color.red, "e");
             quoridor.movePeon(Color.BLUE, "n");
             quoridor.movePeon(Color.red, "s");
-            quoridor.setpBackPeon1(2);
+            quoridor.stepBackPeon1(2);
             assertEquals("Peon1", quoridor.getTypeOfField(6, 2));
         }
         catch(QuoridorException e){

@@ -1,20 +1,18 @@
 package src.domain;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Board {
     public final int size;
     private Field[][] board;
-    private final int midColumn;
     private Temporary deletedTemporary;
 
     public Board(int size, Color player1Color, Color player2Color, int teletransporterSquares, int rewindSquares, int skipTurnSquares) {
         System.out.println(teletransporterSquares + " " + rewindSquares + " " + skipTurnSquares);
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
-        midColumn = size % 2 == 0 ? size - 2 : size - 1;
+        int midColumn = size % 2 == 0 ? size - 2 : size - 1;
         board[getBoardSize() - 1][midColumn] = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1);
         board[0][midColumn] = new Peon(0, midColumn, this, player2Color, 2);
         fillTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
@@ -88,8 +86,19 @@ public class Board {
         return "Empty";
     }
 
-    public Peon getPeon1InitialMoment(){return (Peon)board[getBoardSize() - 1][midColumn];}
-    public Peon getPeon2InitialMoment(){return (Peon)board[0][midColumn];}
+    public Color getFieldColor(int row, int column){
+        if (board[row][column] != null) {return board[row][column].getColor();}
+        return null;
+    }
+
+    public Peon getPeon1InitialMoment(){
+        int midColumn = size % 2 == 0 ? size - 2 : size - 1;
+        return (Peon)board[getBoardSize() - 1][midColumn];
+    }
+    public Peon getPeon2InitialMoment(){
+        int midColumn = size % 2 == 0 ? size - 2 : size - 1;
+        return (Peon)board[0][midColumn];
+    }
 
     public int getBoardSize() {return board.length;}
 
