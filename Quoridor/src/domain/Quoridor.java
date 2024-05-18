@@ -3,6 +3,8 @@ package src.domain;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Quoridor {
     public Integer turns;
@@ -12,6 +14,12 @@ public class Quoridor {
     private String gameMode;
     private boolean vsMachine;
     private HashMap<String, Integer> lengthBarriersTypes;
+    private Timer timer;
+    private Timer timerGlobal;
+    private int tiempoTotalPartida;
+    private int tiempoRestanteGlobal;
+
+
     public Quoridor(String size,
                     String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers,
                     String teleporterSquares, String rewindSquares, String skipTurnSquares,
@@ -20,12 +28,24 @@ public class Quoridor {
                     String playerTwoName, Color playerTwoColor,
                     String gameMode, String gameTime,
                     String machineMode) throws QuoridorException {
-        turns = 0;
+        // initialize variables
         this.vsMachine = vsMachine;
         this.gameMode = gameMode;
-        if (areSimilarColors(playerOneColor, playerTwoColor)) {
-            throw new QuoridorException(QuoridorException.SIMILAR_PLAYER_COLORS);
-        }
+        turns = 0;
+        // size
+        int sizeInt = validateStringSize(size);
+        // board
+        if (areSimilarColors(playerOneColor, playerTwoColor)) {throw new QuoridorException(QuoridorException.SIMILAR_PLAYER_COLORS);}
+        validateBoardData(sizeInt, playerOneColor, playerTwoColor, teleporterSquares, rewindSquares, skipTurnSquares);
+        // players
+        validateStringNumberBarriers(normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers);
+        validatePlayerData(sizeInt, playerOneColor, playerOneName, playerTwoColor, playerTwoName, normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers, machineMode);
+        // time
+
+        //initialize containers
+        initializeHashMaps();
+    }
+    private int validateStringSize(String size) throws QuoridorException {
         if(!(size.matches("[0-9]+") && !size.isEmpty())) {
             throw new QuoridorException(QuoridorException.INVLID_SIZE);
         }
@@ -33,6 +53,9 @@ public class Quoridor {
         if (sizeInt < 2 || sizeInt >1000) {
             throw new QuoridorException(QuoridorException.MAXIMUN_SIZE_EXCEEDED);
         }
+        return sizeInt;
+    }
+    private void validateBoardData(int size, Color playerOneColor, Color playerTwoColor, String teleporterSquares, String rewindSquares, String skipTurnSquares) throws QuoridorException {
         if(!(teleporterSquares.matches("[0-9]+") && !teleporterSquares.isEmpty()) ||
                 !(rewindSquares.matches("[0-9]+") && !rewindSquares.isEmpty()) ||
                 !(skipTurnSquares.matches("[0-9]+") && !skipTurnSquares.isEmpty())){
@@ -42,29 +65,50 @@ public class Quoridor {
         int rewindSquaresInt = Integer.parseInt(rewindSquares);
         int skipTurnSquaresInt = Integer.parseInt(skipTurnSquares);
         int totalSpecialSquares = teleporterSquaresInt + rewindSquaresInt + skipTurnSquaresInt;
-        if (totalSpecialSquares > Math.pow(sizeInt, 2)-2){
+        if (totalSpecialSquares > Math.pow(size, 2)-2){
             throw new QuoridorException(QuoridorException.MAXIMUN_NUMBER_SQUARES_EXCEEDED);
         }
-        board = new Board(sizeInt, playerOneColor, playerTwoColor, teleporterSquaresInt, rewindSquaresInt, skipTurnSquaresInt);
+        board = new Board(size, playerOneColor, playerTwoColor, teleporterSquaresInt, rewindSquaresInt, skipTurnSquaresInt);
+    }
+    private void validateStringNumberBarriers(String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers) throws QuoridorException {
         if(!(temporaryBarriers.matches("[0-9]+") && !temporaryBarriers.isEmpty()) ||
                 !(largeBarriers.matches("[0-9]+") && !largeBarriers.isEmpty()) ||
                 !(alliedBarriers.matches("[0-9]+") && !alliedBarriers.isEmpty()) ||
                 !(normalBarriers.matches("[0-9]+") && !normalBarriers.isEmpty())){
             throw new QuoridorException(QuoridorException.INVALID_NUMBER_BARRIERS);
         }
+    }
+    private void validatePlayerData(int size, Color playerOneColor, String playerOneName, Color playerTwoColor, String playerTwoName, String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers, String machineMode) throws QuoridorException {
         int normalBarriersInt = Integer.parseInt(normalBarriers);
         int temporaryBarriersInt = Integer.parseInt(temporaryBarriers);
         int largeBarriersInt = Integer.parseInt(largeBarriers);
         int alliedBarriersInt = Integer.parseInt(alliedBarriers);
         int totalBarriers = temporaryBarriersInt + largeBarriersInt + alliedBarriersInt + normalBarriersInt;
-        if (totalBarriers > sizeInt + 1){throw new QuoridorException(QuoridorException.MAXIMUN_NUMBER_BARRIERS_EXCEEDED);}
-        normalBarriersInt = totalBarriers == 0 ? sizeInt + 1 : normalBarriersInt;
+        if (totalBarriers > size + 1){throw new QuoridorException(QuoridorException.MAXIMUN_NUMBER_BARRIERS_EXCEEDED);}
+        normalBarriersInt = totalBarriers == 0 ? size + 1 : normalBarriersInt;
         Peon peon1 = board.getPeon1InitialMoment();
         Peon peon2 = board.getPeon2InitialMoment();
         player1 = new Human(peon1, playerOneName, playerOneColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);
         if (vsMachine){player2 = new Machine(peon2,"Machine", playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt, machineMode, board);}
         else{player2 = new Human(peon2, playerTwoName, playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);}
-        initializeHashMaps();
+    }
+    private void iniciarCronometroGlobal(int tiempoTotalPartida) {
+        this.tiempoTotalPartida = tiempoTotalPartida;
+        this.tiempoRestanteGlobal = tiempoTotalPartida;
+        this.timerGlobal = new Timer();
+        timerGlobal.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (tiempoRestanteGlobal > 0) {
+                    System.out.println("Tiempo restante para la partida: " + tiempoRestanteGlobal + " segundos");
+                    tiempoRestanteGlobal--;
+                }
+                else {
+                    System.out.println("¡Tiempo agotado! El juego ha terminado.");
+                    timerGlobal.cancel();
+                }
+            }
+        }, 0, 1000);
     }
     private void initializeHashMaps(){
         lengthBarriersTypes = new HashMap<>();
@@ -73,6 +117,7 @@ public class Quoridor {
         lengthBarriersTypes.put("t", 2);
         lengthBarriersTypes.put("l", 3);
     }
+
 
     public Integer getTurns(){
         return turns;

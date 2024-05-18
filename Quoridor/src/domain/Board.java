@@ -9,7 +9,6 @@ public class Board {
     private Temporary deletedTemporary;
 
     public Board(int size, Color player1Color, Color player2Color, int teletransporterSquares, int rewindSquares, int skipTurnSquares) {
-        System.out.println(teletransporterSquares + " " + rewindSquares + " " + skipTurnSquares);
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         int midColumn = size % 2 == 0 ? size - 2 : size - 1;

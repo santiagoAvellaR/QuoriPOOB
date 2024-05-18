@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Set;
 
 import src.domain.Quoridor;
 public class QuoridorGUI extends  JFrame {
@@ -345,6 +346,10 @@ public class QuoridorGUI extends  JFrame {
                     creteButtonsMovements();
                     revalidate();
                     repaint();
+                    Set<String> llaves = customsElements.keySet();
+                    for (String llave : llaves) {
+                        System.out.println("Llave: " + llave  + "valor" + customsElements.get(llave).getText().trim());
+                    }
                 } catch (QuoridorException ex) {
                     JOptionPane.showMessageDialog(gui, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1011,15 +1016,15 @@ public class QuoridorGUI extends  JFrame {
         return new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                int[][] ubicacioon = quoridor.getPeonsPositions();
+                int[] peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
+                JPanel player = (turns % 2 == 0) ? P1 : P2;
                 try {
-                    int[][] ubicacioon = quoridor.getPeonsPositions();
-                    int[] peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
                     quoridor.movePeon(playerTurno, direction);
                     eliminarOpciones();
                     eliminarPeon(peon[0], peon[1]);
                     ubicacioon = quoridor.getPeonsPositions();
                     peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
-                    JPanel player = (turns % 2 == 0) ? P1 : P2;
                     agregarPeon(peon[0], peon[1], player);
                     actualizarTurnos();
 
@@ -1030,15 +1035,21 @@ public class QuoridorGUI extends  JFrame {
                         int[] ubicacion = quoridor.getPositionDeletedTemporary();
                         eliminarTemporal(ubicacion[0],ubicacion[1], horizontal);
                         eliminarOpciones();
-                        int[][] ubicacioon = quoridor.getPeonsPositions();
-                        int[] peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
                         eliminarPeon(peon[0], peon[1]);
                         ubicacioon = quoridor.getPeonsPositions();
                         peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
-                        JPanel player = (turns % 2 == 0) ? P1 : P2;
                         agregarPeon(peon[0], peon[1], player);
                         actualizarTurnos();
                     }
+                    else if(ex.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                        eliminarOpciones();
+                        eliminarPeon(peon[0], peon[1]);
+                        ubicacioon = quoridor.getPeonsPositions();
+                        peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
+                        agregarPeon(peon[0], peon[1], player);
+                        actualizarTurnos();
+                    }
+
                     else {
                         JOptionPane.showMessageDialog(null, ex.getMessage());
                     }
@@ -1256,13 +1267,11 @@ public class QuoridorGUI extends  JFrame {
                     for (int j = column; j >= column - n; j--) {
                         board[row][j].setBackground(newColor);
                     }
-
                 }
             }
         }
 
     }
-
 
     public void prepareStartGameWindowActions(){
         finishButton.addActionListener(new ActionListener(){
@@ -1344,7 +1353,6 @@ public class QuoridorGUI extends  JFrame {
             gbc.gridx = 1; // Columna 1 para los campos de texto
             gbc.anchor = GridBagConstraints.EAST; // Alinear a la derecha
             JTextField textField = new JTextField(20);
-            // Crea un nuevo campo de texto con un ancho de 20 caracteres
             textField.setPreferredSize(buttonSize); // Establece el tamaño preferido del campo de texto
             options.add(textField, gbc);// Agrega el campo de texto con GridBagConstraints
             customsElements.put(labels[i-1], textField);
@@ -1360,7 +1368,7 @@ public class QuoridorGUI extends  JFrame {
             // Crea un nuevo campo de texto con un ancho de 20 caracteres
             textField2.setPreferredSize(buttonSize); // Establece el tamaño preferido del campo de texto
             options.add(textField2, gbc);// Agrega el campo de texto con GridBagConstraints
-            customsElements.put(labels[i], textField);
+            customsElements.put(labels[i], textField2);
         }
         // Botón
         applyCustomsButton = createButton("APPLY", buttonSize);

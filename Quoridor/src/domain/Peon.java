@@ -68,41 +68,96 @@ public class Peon extends Field{
 
     public void moveVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        board.movePeon(row, column, row + direction*2, column);
-        row += (direction*2);
-        tracker.add(goesUp ? "s" : "n");
+        try {
+            board.movePeon(row, column, row + direction * 2, column);
+            row += (direction * 2);
+            tracker.add(goesUp ? "s" : "n");
+        }
+        catch (QuoridorException e) {
+            if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                row += (direction * 2);
+                tracker.add(goesUp ? "s" : "n");
+            }
+        }
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        board.movePeon(row, column, row, column + direction*2);
-        column += (direction*2);
-        tracker.add(goesLeft ? "w" : "e");
+        try {
+            board.movePeon(row, column, row, column + direction * 2);
+            column += (direction * 2);
+            tracker.add(goesLeft ? "w" : "e");
+        }
+        catch (QuoridorException e) {
+            if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                column += (direction * 2);
+                tracker.add(goesLeft ? "w" : "e");
+                throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
+            }
+        }
     }
     public void jumpVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        board.movePeon(row, column, row + direction*4, column);
-        row += (direction*4);
-        tracker.add(goesUp ? "js" : "jn");
+        try{
+            board.movePeon(row, column, row + direction*4, column);
+            row += (direction*4);
+            tracker.add(goesUp ? "js" : "jn");
+        }
+        catch (QuoridorException e) {
+            if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                row += (direction*4);
+                tracker.add(goesUp ? "js" : "jn");
+                throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
+            }
+        }
     }
     public void jumpHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        board.movePeon(row, column, row, column + direction*4);
-        column += (direction*4);
-        tracker.add(goesLeft ? "jw" : "je");
+        try {
+            board.movePeon(row, column, row, column + direction*4);
+            column += (direction*4);
+            tracker.add(goesLeft ? "jw" : "je");
+        }
+        catch (QuoridorException e) {
+            if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                column += (direction*4);
+                tracker.add(goesLeft ? "jw" : "je");
+                throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
+            }
+        }
     }
     public void jumpDiagonalRight(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        board.movePeon(row, column, row + 2*direction, column +2);
-        row += (direction*2);
-        column += 2;
-        tracker.add(goesUp ? "sw" : "nw");
+        try {
+            board.movePeon(row, column, row + 2*direction, column +2);
+            row += (direction*2);
+            column += 2;
+            tracker.add(goesUp ? "sw" : "nw");
+        }
+        catch (QuoridorException e) {
+            if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                row += (direction*2);
+                column += 2;
+                tracker.add(goesUp ? "sw" : "nw");
+                throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
+            }
+        }
     }
     public void jumpDiagonalLeft(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        board.movePeon(row, column, row + 2*direction, column - 2);
-        row += (direction*2);
-        column -= 2;
-        tracker.add(goesUp ? "se" : "ne");
+        try {
+            board.movePeon(row, column, row + 2*direction, column - 2);
+            row += (direction*2);
+            column -= 2;
+            tracker.add(goesUp ? "se" : "ne");
+        }
+        catch (QuoridorException e) {
+            if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                row += (direction*2);
+                column -= 2;
+                tracker.add(goesUp ? "se" : "ne");
+                throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
+            }
+        }
     }
 
     public void move(String direction) throws QuoridorException {
