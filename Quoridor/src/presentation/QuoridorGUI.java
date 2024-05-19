@@ -8,7 +8,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
-
 import src.domain.Quoridor;
 public class QuoridorGUI extends  JFrame {
     private Dimension screenSize;
@@ -56,6 +55,7 @@ public class QuoridorGUI extends  JFrame {
     private JPanel boardPanel;
     private JButton finishButton;
     private HashMap<String, JLabel> barrerasDisP1, barrerasDisP2;
+    private ArrayList<JLabel> casillasVisP1, casillasVisP2;
     private Color regresar = Color.green;
     private Color dobleturno = Color.pink;
     private JPanel colorTurn;
@@ -72,6 +72,8 @@ public class QuoridorGUI extends  JFrame {
         customsElements = new HashMap<>();
         barrerasDisP1 = new HashMap<>();
         barrerasDisP2 = new HashMap<>();
+        casillasVisP1 = new ArrayList<>();
+        casillasVisP2 = new ArrayList<>();
         buttonsMovements = new HashMap<>();
         boardSize = new JTextField();
         possibleMovements = new ArrayList<>();
@@ -543,7 +545,6 @@ public class QuoridorGUI extends  JFrame {
             JPanel infoPlayerPanel = infoPlayerGame();
             infoPlayerPanel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoPlayerPanel, BorderLayout.EAST);
-
             JPanel infoMachinePanel = infoMachine();
             infoMachinePanel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoMachinePanel, BorderLayout.WEST);
@@ -585,7 +586,7 @@ public class QuoridorGUI extends  JFrame {
         int tampanel = (int) (screenSize.height * 0.5);
         JPanel inf = new JPanel(new GridLayout(5, 1));
         JPanel infnombre = new JPanel(new FlowLayout());
-        JLabel jnombre = new JLabel(namePlayer2.getText().isEmpty() ? "Player 2: " : namePlayer2.getText());
+        JLabel jnombre = new JLabel(namePlayer1.getText().isEmpty() ? "Player 1: " : namePlayer1.getText());
         jnombre.setFont(gameFont20);
         JLabel nombre = new JLabel();
         if (!namePlayer1.getText().isEmpty()) {
@@ -605,7 +606,6 @@ public class QuoridorGUI extends  JFrame {
         infnombre.add(colorP1);
         JPanel barrerasdis = new JPanel(new GridLayout(4, 2));
         String[] key = {"Normal B:", "Temporal:", "Larga:", "Aliada:"};
-        System.out.println(customsElements.keySet());
         if (!(customsElements.get(key[1]) == null)) {
             for (int i = 0; i < key.length; i++) {
                 String llave = key[i];
@@ -646,9 +646,27 @@ public class QuoridorGUI extends  JFrame {
         barreraEsc.add(barrierTypePlayer1);
         inf.add(barreraEsc);
         inf.add(barrerasdis);
+        JPanel casillasDis = new JPanel(new GridLayout(5, 2));
+        casillasDis.add(new Label());
+        casillasDis.add(new Label());
+        String[] casillas = {"Normal C:", "Teletransportadora:", "Regresar:", "Turno Doble:"};
+        if (!(customsElements.get(casillas[0]) == null)) {
+            for (int i = 0; i < casillas.length; i++) {
+                String llave = casillas[i];
+                JLabel casilla = new JLabel(llave);
+                casilla.setFont(gameFont20);
+                casilla.setHorizontalAlignment(SwingConstants.CENTER);
+                JLabel cantb = new JLabel("0");
+                casillasVisP1.add(cantb);
+                cantb.setFont(gameFont20);
+                cantb.setHorizontalAlignment(SwingConstants.CENTER);
+                casillasDis.add(casilla);
+                casillasDis.add(cantb);
+            }
+        }
+        inf.add(casillasDis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
-
     }
     private JPanel infoMachine() {
         int tampanel = (int) (screenSize.height * 0.5);
@@ -707,6 +725,25 @@ public class QuoridorGUI extends  JFrame {
         barreraEsc.add(barrierTypePlayer2);
         inf.add(barreraEsc);
         inf.add(barrerasdis);
+        JPanel casillasDis = new JPanel(new GridLayout(5, 2));
+        casillasDis.add(new Label());
+        casillasDis.add(new Label());
+        String[] casillas = {"Normal C:", "Teletransportadora:", "Regresar:", "Turno Doble:"};
+        if (!(customsElements.get(casillas[0]) == null)) {
+            for (int i = 0; i < casillas.length; i++) {
+                String llave = casillas[i];
+                JLabel casilla = new JLabel(llave);
+                casilla.setFont(gameFont20);
+                casilla.setHorizontalAlignment(SwingConstants.CENTER);
+                JLabel cantb = new JLabel("0");
+                casillasVisP2.add(cantb);
+                cantb.setFont(gameFont20);
+                cantb.setHorizontalAlignment(SwingConstants.CENTER);
+                casillasDis.add(casilla);
+                casillasDis.add(cantb);
+            }
+        }
+        inf.add(casillasDis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
     }
@@ -736,14 +773,14 @@ public class QuoridorGUI extends  JFrame {
         JPanel barrerasdis = new JPanel(new GridLayout(4, 2));
         String[] key = {"Normal B:", "Temporal:", "Larga:", "Aliada:"};
         if (!(customsElements.get(key[1]) == null)) {
-            for (int i = 0; i < customsElements.size(); i++) {
+            for (int i = 0; i < 4; i++) {
                 String textField = customsElements.get(key[i]).getText();
                 String llaveMapa = String.valueOf(Character.toLowerCase(key[i].charAt(0)));
                 JLabel barrera = new JLabel(key[i]);
                 barrera.setFont(gameFont20);
                 barrera.setHorizontalAlignment(SwingConstants.CENTER);
                 JLabel cantb;
-                if (!textField.isEmpty()) {
+                if (!textField.equals("")) {
                     cantb = new JLabel(textField);
                 } else {
                     cantb = new JLabel("0");
@@ -774,6 +811,27 @@ public class QuoridorGUI extends  JFrame {
         barreraEsc.add(barrierTypePlayer2);
         inf.add(barreraEsc);
         inf.add(barrerasdis);
+        JPanel casillasDis = new JPanel(new GridLayout(5, 2));
+        casillasDis.add(new Label());
+        casillasDis.add(new Label());
+        String[] casillas = {"Normal C:", "Teletransportadora:", "Regresar:", "Turno Doble:"};
+        if (!(customsElements.get(casillas[0]) == null)) {
+            for (int i = 0; i <= casillas.length-1; i++) {
+                if(i <= 3) {
+                    String llave = casillas[i];
+                    JLabel casilla = new JLabel(llave);
+                    casilla.setFont(gameFont20);
+                    casilla.setHorizontalAlignment(SwingConstants.CENTER);
+                    JLabel cantb = new JLabel("0");
+                    casillasVisP2.add(cantb);
+                    cantb.setFont(gameFont20);
+                    cantb.setHorizontalAlignment(SwingConstants.CENTER);
+                    casillasDis.add(casilla);
+                    casillasDis.add(cantb);
+                }
+            }
+        }
+        inf.add(casillasDis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
     }
@@ -943,12 +1001,26 @@ public class QuoridorGUI extends  JFrame {
         int numero = quoridor.getNumberBarrier(judaor, type);
         cambio.setText(String.valueOf(numero));
     }
-
+    private void actualizarCasillasVisitadas(){
+        String[] key = {"N","T","R","S"};
+        playerTurno = (turns%2==0)?player1Color:player2Color;
+        if(!casillasVisP1.isEmpty()){
+            int count = 0;
+            ArrayList<JLabel> actualizar =  (turns%2==0)?casillasVisP1:casillasVisP2;
+            for(int i = 0; i < actualizar.size();i++){
+                if(count <=3) {
+                    JLabel l = actualizar.get(count);
+                    int numero = quoridor.squaresVisited(playerTurno, key[count]);
+                    l.setText(String.valueOf(numero));
+                    count += 1;
+                }
+            }
+        }
+    }
     private MouseAdapter movePlayer(Color colorPlayerPeon) {
         return new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-
                 ArrayList<String> validMovements;
                 if(colorPlayerPeon.equals(playerTurno)) {
                     int[][] ubicacioon = quoridor.getPeonsPositions();
@@ -959,7 +1031,6 @@ public class QuoridorGUI extends  JFrame {
             }
         };
     }
-
     private MouseAdapter movePeon(String direction) {
         return new MouseAdapter() {
             @Override
@@ -977,7 +1048,10 @@ public class QuoridorGUI extends  JFrame {
                         eliminarTemporal(ubicacion[0],ubicacion[1], horizontal);
                     }
                     else if(ex.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE) ||
-                            ex.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED)){
+                            ex.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED)){}
+                    else if(ex.getMessage().equals(QuoridorException.PEON_STEPPED_BACK)){
+                        ubicacioon = quoridor.getPeonsPositions();
+                        peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
                     }
                     else {
                         JOptionPane.showMessageDialog(null, ex.getMessage());
@@ -988,6 +1062,7 @@ public class QuoridorGUI extends  JFrame {
                     ubicacioon = quoridor.getPeonsPositions();
                     peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
                     agregarPeon(peon[0], peon[1], player);
+                    actualizarCasillasVisitadas();
                     actualizarTurnos();
                 }
             }
@@ -1019,8 +1094,6 @@ public class QuoridorGUI extends  JFrame {
         }
     }
 
-
-
     private void eliminarPeon(int row, int col){
         Color ant = board[row][col].getBackground();
         board[row][col].removeAll();
@@ -1032,13 +1105,11 @@ public class QuoridorGUI extends  JFrame {
         board[row][column].add(player);
         board[row][column].revalidate();
         board[row][column].repaint();
-
     }
     private void creteButtonsMovements(){
         String[] movements = {"s", "n", "w", "e", "jn", "jw","je","js", "ne","nw", "se", "sw"};
         int ancho = P1.getWidth();
         int altura = P1.getHeight();
-        System.out.println("ancho es " + ancho + "altura es " + altura);
         for(int i = 0; i < movements.length; i++){
             JButton move = new JButton();
             move.setPreferredSize(new Dimension(ancho, altura));
@@ -1061,7 +1132,6 @@ public class QuoridorGUI extends  JFrame {
         }
         possibleMovements.clear();
     }
-
     private void createvalidMovements(int row, int column, ArrayList<String> movements, Color playerColorP){
         possibleMovements.clear();
         for(String s : movements){
@@ -1088,7 +1158,6 @@ public class QuoridorGUI extends  JFrame {
                 board[row][column-2].revalidate();
                 board[row][column-2].repaint();
                 possibleMovements.add(board[row][column-2]);
-
             }
             else if(s.equals("js")){
                 board[row+4][column].add(buttonsMovements.get(s));
@@ -1139,7 +1208,6 @@ public class QuoridorGUI extends  JFrame {
                 possibleMovements.add(board[row+2][column-2]);
             }
         }
-
     }
     public boolean isCreateBarrier(int row, int col, boolean vert,  String type){
         int n = (type.charAt(0) == 'l') ? 4 : 2;
@@ -1179,7 +1247,6 @@ public class QuoridorGUI extends  JFrame {
     }
     public void changeColorBarrier(Color newColor, boolean vertical, String type, int row, int column) {
         int n = (type.charAt(0) == 'l') ? 4 : 2;
-        System.out.println(type);
         if(!isCreateBarrier(row,column,vertical, type))
         {
             if (vertical) {
@@ -1206,9 +1273,7 @@ public class QuoridorGUI extends  JFrame {
                 }
             }
         }
-
     }
-
     public void prepareStartGameWindowActions(){
         finishButton.addActionListener(new ActionListener(){
             @Override
@@ -1219,7 +1284,6 @@ public class QuoridorGUI extends  JFrame {
             }
         });
     }
-
     private JButton createButton(String text, Dimension size) {
         JButton button = new JButton(text);
         button.setPreferredSize(size);
@@ -1329,7 +1393,6 @@ public class QuoridorGUI extends  JFrame {
             }
         });
     }
-
     public static void main(String args[]){
         QuoridorGUI gui = new QuoridorGUI();
         gui.setVisible(true);

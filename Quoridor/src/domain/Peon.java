@@ -82,7 +82,7 @@ public class Peon extends Field{
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        tracker.add(goesLeft ? "w" : "e");
+        tracker.add(goesLeft ? "e" : "w");
         board.movePeon(row, column, row, column + direction * 2);
         column += (direction * 2);
     }
@@ -94,7 +94,7 @@ public class Peon extends Field{
     }
     public void jumpHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        tracker.add(goesLeft ? "jw" : "je");
+        tracker.add(goesLeft ? "je" : "jw");
         board.movePeon(row, column, row, column + direction*4);
         column += (direction*4);
     }
@@ -329,23 +329,14 @@ public class Peon extends Field{
     }
 
     public void stepBackMovements(int quantityMovements) throws QuoridorException {
-        System.out.println("tracker: " + tracker);
-        for (int i = tracker.size() - 1; i >= tracker.size() - quantityMovements; i--) {
-            System.out.println(tracker.get(i));
+        for (int i = tracker.size() - 1; ((i >= tracker.size() - quantityMovements) && (i >= 0)); i--) {
             if (getValidMovements().contains(tracker.get(i))){
                 move(tracker.get(i));
                 tracker.remove(i);
             }
             else {break;}
-            System.out.println("Devolviendo movimiento: " + (tracker.size() - i));
             board.printBoard();
         }
-    }
-
-    public void move(int row, int column) throws QuoridorException {
-        board.movePeon(this.row, this.column, row, column);
-        this.row = row;
-        this.column = column;
     }
 
     public void passThroughSquare(String type) {
@@ -365,5 +356,7 @@ public class Peon extends Field{
             default -> {return 0;}
         }
     }
+
+    public void printBoard(){board.printBoard();}
 
 }

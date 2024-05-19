@@ -147,8 +147,8 @@ public class Quoridor {
                 turns += 1;
                 throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
             }
-            else if (e.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED)) {
-                turns += 1;
+            else if (e.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED) || e.getMessage().equals(QuoridorException.PEON_STEPPED_BACK)) {
+                actualizeEachTurn();
                 throw new QuoridorException(QuoridorException.PEON_HAS_BEEN_TELEPORTED);
             }
             else {throw new QuoridorException(e.getMessage());}
@@ -237,11 +237,14 @@ public class Quoridor {
     public void stepBackPeon2(int numberSteps) throws QuoridorException {
         player2.getPeon().stepBackMovements(numberSteps);
     }
-    public void addTeleporterSquare(int row1, int column1, int row2, int column2) throws QuoridorException {
+    public void addTeleporterSquare(int row1, int column1, int row2, int column2) {
         board.addTeleporterSquare(row1, column1, row2, column2);
     }
     public void addSkipTurnSquare(int row, int column){
         board.addSkipTurnSquare(row, column);
+    }
+    public void addRewindSquare(int row, int column) {
+        board.addRewindSquare(row, column);
     }
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
 }

@@ -542,6 +542,23 @@ class QuoridorTest {
     }
 
     @Test
+    public void rewindShouldStepBack2StepsPeon1() {
+        try{
+            quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
+                    "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
+                    "Timed", "30",  "beginner");
+            quoridor.addRewindSquare(2, 2);
+            quoridor.movePeon(Color.BLUE, "n"); // turno 0
+            quoridor.movePeon(Color.red, "e"); // turno 1
+            quoridor.movePeon(Color.BLUE, "n"); // turno 2
+            fail("did not threw the exception of rewind");
+        }
+        catch(QuoridorException e){
+            assertEquals(QuoridorException.PEON_STEPPED_BACK, e.getMessage());
+        }
+    }
+
+    @Test
     public void teleporterShouldTranslateThePeon1AndWarn() {
         try{
             quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
