@@ -13,7 +13,7 @@ public class Rewind extends Square{
 
     @Override
     public void applySpecialAction() throws QuoridorException{
-        if(peon != null){
+        if(hasPeon()){
             peon.setPosition(row, column);
             peon.passThroughSquare("R");
             peon.stepBackMovements(2);

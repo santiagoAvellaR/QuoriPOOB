@@ -555,6 +555,7 @@ class QuoridorTest {
         }
         catch(QuoridorException e){
             assertEquals(QuoridorException.PEON_STEPPED_BACK, e.getMessage());
+            assertEquals("Peon1", quoridor.getTypeOfField(6, 2));
         }
     }
 

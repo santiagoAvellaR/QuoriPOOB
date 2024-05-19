@@ -148,9 +148,13 @@ public class Quoridor {
                 turns += 1;
                 throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
             }
-            else if (e.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED) || e.getMessage().equals(QuoridorException.PEON_STEPPED_BACK)) {
+            else if (e.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED)) {
                 actualizeEachTurn();
                 throw new QuoridorException(QuoridorException.PEON_HAS_BEEN_TELEPORTED);
+            }
+            else if (e.getMessage().equals(QuoridorException.PEON_STEPPED_BACK)) {
+                actualizeEachTurn();
+                throw new QuoridorException(QuoridorException.PEON_STEPPED_BACK);
             }
             else {throw new QuoridorException(e.getMessage());}
         }

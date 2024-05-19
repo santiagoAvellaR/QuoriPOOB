@@ -76,41 +76,42 @@ public class Peon extends Field{
 
     public void moveVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        tracker.add(goesUp ? "s" : "n");
-        board.movePeon(row, column, row + direction * 2, column);
         row += (direction * 2);
+        tracker.add(goesUp ? "s" : "n");
+        board.movePeon(row + direction*2*-1, column, row, column);
+
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        tracker.add(goesLeft ? "e" : "w");
-        board.movePeon(row, column, row, column + direction * 2);
         column += (direction * 2);
+        tracker.add(goesLeft ? "e" : "w");
+        board.movePeon(row, column + direction*2*-1, row, column);
     }
     public void jumpVertical(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        tracker.add(goesUp ? "js" : "jn");
-        board.movePeon(row, column, row + direction*4, column);
         row += (direction*4);
+        tracker.add(goesUp ? "js" : "jn");
+        board.movePeon(row + direction*4*-1, column, row, column);
     }
     public void jumpHorizontal(boolean goesLeft) throws QuoridorException {
         int direction = goesLeft ? -1 : 1;
-        tracker.add(goesLeft ? "je" : "jw");
-        board.movePeon(row, column, row, column + direction*4);
         column += (direction*4);
+        tracker.add(goesLeft ? "je" : "jw");
+        board.movePeon(row, column + direction*4*-1, row, column);
     }
     public void jumpDiagonalRight(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        tracker.add(goesUp ? "sw" : "nw");
-        board.movePeon(row, column, row + 2*direction, column +2);
         row += (direction*2);
         column += 2;
+        tracker.add(goesUp ? "sw" : "nw");
+        board.movePeon(row + 2*direction*-1, column - 2, row, column);
     }
     public void jumpDiagonalLeft(boolean goesUp) throws QuoridorException {
         int direction = goesUp ? -1 : 1;
-        tracker.add(goesUp ? "se" : "ne");
-        board.movePeon(row, column, row + 2*direction, column - 2);
         row += (direction*2);
         column -= 2;
+        tracker.add(goesUp ? "se" : "ne");
+        board.movePeon(row + 2*direction*-1, column + 2, row, column);
     }
 
     public void move(String direction) throws QuoridorException {
@@ -348,13 +349,13 @@ public class Peon extends Field{
         }
     }
     public int squaresVisited(String type){
-        switch (type) {
-            case "N" -> {return normalSquares;}
-            case "T" -> {return teleporterSquares;}
-            case "R" -> {return rewindSquares;}
-            case "S" -> {return skipTurnSquares;}
-            default -> {return 0;}
-        }
+        return switch (type) {
+            case "N" -> normalSquares;
+            case "T" -> teleporterSquares;
+            case "R" -> rewindSquares;
+            case "S" -> skipTurnSquares;
+            default -> 0;
+        };
     }
 
 }
