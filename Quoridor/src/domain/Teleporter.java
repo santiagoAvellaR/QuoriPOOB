@@ -19,6 +19,7 @@ public class Teleporter extends Square{
 
     @Override
     public void applySpecialAction() throws QuoridorException{
+        peon.passThroughSquare("T");
         if(hasPeon() && !otherTeleporter.hasPeon()) {
             otherTeleporter.setPeon(peon);
             peon.setPosition(otherTeleporter.getRow(), otherTeleporter.getColumn());

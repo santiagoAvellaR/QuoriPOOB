@@ -1,6 +1,7 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -228,6 +229,7 @@ public class Quoridor {
         return selectedPlayer.squaresVisited(type);
     }
 
+
     // TEST FUNCTIONS
     public String getTypeOfField(int row, int column){return board.getTypeField(row, column);}
     public void printBoard(){board.printBoard();}
@@ -247,4 +249,34 @@ public class Quoridor {
         board.addRewindSquare(row, column);
     }
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
+
+
+    // FILE FUNCTIONS
+    public static Quoridor open(File file) throws QuoridorException {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            String s = (String) in.readObject();
+            return (Quoridor) in.readObject();
+        } catch (FileNotFoundException e) {
+            throw new QuoridorException(QuoridorException.FILE_NOT_FOUND);
+        } catch (IOException e) {
+            throw new QuoridorException(QuoridorException.ERROR_DURING_PROCESSING);
+        } catch (ClassNotFoundException e) {
+            throw new QuoridorException(QuoridorException.CLASS_NOT_FOUND);
+        } catch (Exception e) {
+            throw new QuoridorException(QuoridorException.GENERAL_ERROR);
+        }
+    }
+
+    public void save(File file) throws QuoridorException {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file, true))) {
+            out.writeObject("Garden storage\n");
+            out.writeObject(this);
+        } catch (FileNotFoundException e) {
+            throw new QuoridorException(QuoridorException.FILE_NOT_FOUND);
+        } catch (IOException e) {
+            throw new QuoridorException(QuoridorException.ERROR_DURING_PROCESSING);
+        } catch (Exception e) {
+            throw new QuoridorException(QuoridorException.GENERAL_ERROR);
+        }
+    }
 }

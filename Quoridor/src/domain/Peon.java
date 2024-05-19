@@ -357,6 +357,4 @@ public class Peon extends Field{
         }
     }
 
-    public void printBoard(){board.printBoard();}
-
 }

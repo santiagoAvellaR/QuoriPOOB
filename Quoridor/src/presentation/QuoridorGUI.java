@@ -58,15 +58,8 @@ public class QuoridorGUI extends  JFrame {
     private ArrayList<JLabel> casillasVisP1, casillasVisP2;
     private Color regresar = Color.green;
     private Color dobleturno = Color.pink;
-    private JPanel colorTurn;
-    private JButton homeButton;
-    private JButton upButton;
-    private JButton downButton;
-    private JButton leftButton;
-    private JButton rightButton;
-    private JButton changeSizeButton;
-    private JButton reStartButton;
     private Color playerTurno;
+
     private QuoridorGUI() {
         super("Quoridor");
         customsElements = new HashMap<>();
@@ -131,29 +124,9 @@ public class QuoridorGUI extends  JFrame {
                 }
             }
         });
-        abrir.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser openFileChooser = new JFileChooser();
-                int result = openFileChooser.showOpenDialog(gui);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = openFileChooser.getSelectedFile();
-                    JOptionPane.showMessageDialog(gui, "Funcionalidad de abrir en construcción. Archivo seleccionado: " + selectedFile.getName(), "Abrir Juego", JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        });
-        guardar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int option = fileChooser.showSaveDialog(gui);
-                if (option == JFileChooser.APPROVE_OPTION) {
-                    java.io.File selectedFolder = fileChooser.getSelectedFile();
-                    JOptionPane.showMessageDialog(gui, "Funcionalidad de guardar en construcción. Carpeta seleccionada: " + selectedFolder.getName(), "Guardar Juego", JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        });
+
+        abrir.addActionListener(optionOpen());
+        guardar.addActionListener(optionSave());
     }
     private void prepareMainWindowElements() {
         mainPanel = new JPanel();
@@ -1393,6 +1366,57 @@ public class QuoridorGUI extends  JFrame {
             }
         });
     }
+
+    private ActionListener optionSave(){
+        return (event) -> {
+            // Crear un JFileChooser
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int option = fileChooser.showSaveDialog(this);
+            if(option == JFileChooser.APPROVE_OPTION) {
+                java.io.File selectedFolder = fileChooser.getSelectedFile();
+                JTextField nombreArchivoField = new JTextField();
+                int result = JOptionPane.showConfirmDialog(this, new Object[]{"Ingrese el nombre del archivo:", nombreArchivoField}, "Guardar jardin", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION && !nombreArchivoField.getText().isEmpty()) {
+                    try {
+                        String nombreArchivo = nombreArchivoField.getText() + ".dat";
+                        java.io.File archivo = new java.io.File(selectedFolder.getAbsolutePath() + java.io.File.separator + nombreArchivo);
+                        quoridor.save(archivo);
+                    }
+                    catch (QuoridorException e) {
+                        JOptionPane.showMessageDialog(this, e.getMessage(), "Guardar jardin", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "Nombre de archivo inválido", "Guardar jardin", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "Cancelado por el usuario", "Guardar jardin", JOptionPane.INFORMATION_MESSAGE);
+            }
+        };
+    }
+    private ActionListener optionOpen(){
+        return (event)->{
+            JFileChooser openFileChooser = new JFileChooser();
+            int result = openFileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = openFileChooser.getSelectedFile();
+                try {
+                    quoridor = Quoridor.open(selectedFile);
+                    repaint();
+                    revalidate();
+                }
+                catch (QuoridorException e){
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Abrir jardin", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Error al abrir archivo", "Abrir jardin", JOptionPane.INFORMATION_MESSAGE);
+            }
+        };
+    }
+
     public static void main(String args[]){
         QuoridorGUI gui = new QuoridorGUI();
         gui.setVisible(true);

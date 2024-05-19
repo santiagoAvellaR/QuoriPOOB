@@ -15,6 +15,7 @@ public class Rewind extends Square{
     public void applySpecialAction() throws QuoridorException{
         if(peon != null){
             peon.setPosition(row, column);
+            peon.passThroughSquare("R");
             peon.stepBackMovements(2);
             throw new QuoridorException(QuoridorException.PEON_STEPPED_BACK);
         }

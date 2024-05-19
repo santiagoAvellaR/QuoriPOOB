@@ -140,7 +140,6 @@ public class Board {
         if (hasSquare(newRow, newColumn)) {
             Square square = (Square)board[newRow][newColumn];
             square.setPeon(peon);
-            peon.passThroughSquare(getTypeField(newRow, newColumn).substring(0,0).toUpperCase());
             square.applySpecialAction();
         }
         else {

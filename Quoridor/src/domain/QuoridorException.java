@@ -1,6 +1,11 @@
 package src.domain;
 
 public class QuoridorException extends Exception{
+    // files
+    public static final String GENERAL_ERROR = "Error.";
+    public static final String FILE_NOT_FOUND = "El archivo no pudo ser encontrado.";
+    public static final String ERROR_DURING_PROCESSING = "Error durante el proceso.";
+    public static final String CLASS_NOT_FOUND = "Clase no encontrada.";
     // filtering and cleaning data
     public static final String INVLID_SIZE = "Invalid size, size must be only numbers and not empty";
     public static final String MAXIMUN_SIZE_EXCEEDED = "The size must be between x and y";
