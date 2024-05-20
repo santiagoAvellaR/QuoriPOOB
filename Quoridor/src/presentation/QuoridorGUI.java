@@ -1,5 +1,7 @@
 package src.presentation;
+
 import src.domain.*;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -9,7 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import src.domain.Quoridor;
-public class QuoridorGUI extends  JFrame {
+
+public class QuoridorGUI extends JFrame implements QuoridorObserver{
     private Dimension screenSize;
     private final Dimension buttonSize = new Dimension(250, 60);
     private final Font gameFont30 = new Font("Consolas", Font.BOLD, 30);
@@ -46,6 +49,8 @@ public class QuoridorGUI extends  JFrame {
     private JButton applyCustomsButton;
     // Game window
     private JPanel P1,P2;
+    private JLabel timeTurno;
+    private Timer tiempoDis;
     private Color barrierColor;
     private HashMap<String, JButton> buttonsMovements;
     private ArrayList<JPanel> possibleMovements;
@@ -130,31 +135,46 @@ public class QuoridorGUI extends  JFrame {
         guardar.addActionListener(optionSave());
     }
     private void prepareMainWindowElements() {
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(4, 1, 0, 10));
+        mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 0, 10, 0); // Espacio entre componentes
+        // Title label
         JLabel titleLabel = new JLabel("QUORIDOR");
         titleLabel.setFont(new Font("Consolas", Font.BOLD, 60));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        mainPanel.add(titleLabel);
-        // new game button
-        JPanel newGamePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        newGamePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0; //Use todo el espacio horizontal
+        gbc.weighty = 0.2;//20% del espacio vertical
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        mainPanel.add(titleLabel, gbc);
+        // Panel para los botones
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        // New game button
         newGameButton = createButton(" NEW GAME ", buttonSize);
         buttonPanel.add(newGameButton);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        // load game button
+        buttonPanel.add(Box.createVerticalStrut(10)); // Espacio entre botones
+        // Load game button
         loadGameButton = createButton(" LOAD GAME", buttonSize);
         buttonPanel.add(loadGameButton);
-        buttonPanel.add(Box.createVerticalGlue());
-        buttonPanel.add(Box.createVerticalStrut(10));
-        // exit button
+        buttonPanel.add(Box.createVerticalStrut(10)); // Espacio entre botones
+        // Exit button
         exitGameButton = createButton("   EXIT   ", buttonSize);
         buttonPanel.add(exitGameButton);
+        // Panel que centra los botones horizontalmente
+        JPanel newGamePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         newGamePanel.add(buttonPanel);
-        mainPanel.add(newGamePanel);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.8;
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(newGamePanel, gbc);
+
         add(mainPanel);
     }
     private void prepareMainWindowActions() {
@@ -166,8 +186,6 @@ public class QuoridorGUI extends  JFrame {
                 setContentPane(newGameOp);
                 revalidate();
                 repaint();
-                numberPlayersCB.setSelectedIndex(0);
-                numberPlayersCB.setSelectedIndex(1);
                 numberPlayersCB.setSelectedIndex(0);
             }
         });
@@ -185,20 +203,19 @@ public class QuoridorGUI extends  JFrame {
         });
     }
     public void prepareNewGameWindowElements() {
-        newGameOp = new JPanel();
-        newGameOp.setLayout(new GridLayout(4, 1, 0, 10));
+        newGameOp = new JPanel(new GridBagLayout());
         newGameOp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        JPanel titlePanel = new JPanel();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.2;
         JLabel titleLabel = new JLabel("NEW GAME");
         titleLabel.setFont(new Font("Consolas", Font.BOLD, 60));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titlePanel.setPreferredSize(new Dimension(screenSize.width, (int)(screenSize.height*0.2)));
-        titlePanel.add(titleLabel);
-        newGameOp.add(titlePanel);
-        startOptions = new JPanel();
+        newGameOp.add(titleLabel, gbc);
         infPlayer = new JPanel();
-        infPlayer.setPreferredSize(new Dimension(screenSize.width, (int)(screenSize.height*0.5)));
-        startOptions.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         // number players
         numberPlayersCB = new JComboBox<String>();
         numberPlayersCB.setPreferredSize(buttonSize);
@@ -209,7 +226,9 @@ public class QuoridorGUI extends  JFrame {
         numberPlayersCB.setFont(gameFont30);
         numberPlayersCB.setAlignmentX(Component.CENTER_ALIGNMENT);
         infPlayer.add(numberPlayersCB);
-        newGameOp.add(infPlayer);
+        gbc.gridy = 1;
+        gbc.weighty = 0.4;
+        newGameOp.add(infPlayer, gbc);
         //Inicio y ajustes
         startGameButton = createButton("START", buttonSize);
         settingsButton = createButton("SETTINGS", buttonSize);
@@ -225,37 +244,66 @@ public class QuoridorGUI extends  JFrame {
         difficulties.addItem("TIME TRIAL");
         difficulties.addItem("TIMED");
         difficulties.setPreferredSize(buttonSize);
-        startOptions.add(startGameButton);
-        startOptions.add(new Label());
-        startOptions.add(settingsButton);
-        startOptions.add(new Label());
-        startOptions.add(customizeButton);
-        startOptions.setPreferredSize(new Dimension(screenSize.width, (int)(screenSize.height*0.2)));
-        newGameOp.add(startOptions);
+        startOptions = new JPanel();
+        startOptions.setLayout(new GridBagLayout());
+        GridBagConstraints gbcOp = new GridBagConstraints();
+        gbcOp.gridx = 0;
+        gbcOp.gridy = 0;
+        gbcOp.gridwidth = 1;
+        startOptions.add(startGameButton,gbcOp);
+        gbcOp.gridx = 2;
+        startOptions.add(settingsButton,gbcOp);
+        gbcOp.gridx = 4;
+        startOptions.add(customizeButton,gbcOp);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.2;
+        newGameOp.add(startOptions, gbc);
     }
     public void prepareNewGameWindowActions() {
+
         numberPlayersCB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedOption = (String) numberPlayersCB.getSelectedItem();
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 1;
+                gbc.gridwidth = 1;
+                gbc.weightx = 1.0;
+                gbc.weighty = 0.4;
                 if (selectedOption.equals("1 PLAYER")) {
                     newGameOp.remove(startOptions);
-                    newGameOp.add(infoOnePlayerModality());
+                    newGameOp.add(infoOnePlayerModality(), gbc);
+                    boolean cambiar = false;
                     if(panelSegunds != null){
+                        gbc.gridy = 2;
+                        gbc.weighty = 0.1;
                         newGameOp.remove(panelSegunds);
-                        newGameOp.add(panelSegunds);
+                        newGameOp.add(panelSegunds, gbc);
+                        cambiar = true;
                     }
-                    newGameOp.add(startOptions);
+                    (gbc.gridy) = (cambiar)?3:2;
+                    gbc.weighty = 0.2;
+                    newGameOp.add(startOptions, gbc);
                     newGameOp.revalidate();
                     newGameOp.repaint();
                 } else if (selectedOption.equals("2 PLAYERS")) {
                     newGameOp.remove(startOptions);
-                    newGameOp.add(infoTwoPlayersModality());
+                    newGameOp.add(infoTwoPlayersModality(), gbc);
+                    boolean cambiar = false;
                     if(panelSegunds != null){
+                        gbc.gridy = 2;
+                        gbc.weighty = 0.1;
                         newGameOp.remove(panelSegunds);
-                        newGameOp.add(panelSegunds);
+                        newGameOp.add(panelSegunds, gbc);
+                        cambiar = true;
                     }
-                    newGameOp.add(startOptions);
+                    (gbc.gridy) = (cambiar)?3:2;
+                    gbc.weighty = 0.2;
+                    newGameOp.add(startOptions, gbc);
                     newGameOp.revalidate();
                     newGameOp.repaint();
                 }
@@ -303,14 +351,19 @@ public class QuoridorGUI extends  JFrame {
                         seconds.setPaintTicks(true);
                         seconds.setPaintLabels(true);
                         panelSegunds.add(seconds, gbc);
-                        newGameOp.add(panelSegunds);
-                        newGameOp.add(startOptions);
+                        GridBagConstraints gbcGame = new GridBagConstraints();
+                        gbcGame.gridx = 0;
+                        gbcGame.gridy = 2;
+                        newGameOp.add(panelSegunds, gbcGame);
+                        gbcGame.gridy = 3;
+                        newGameOp.add(startOptions, gbcGame);
                         newGameOp.revalidate();
                         newGameOp.repaint();
                     }
                 } else {
-                    if (seconds != null) {
+                    if (panelSegunds != null) {
                         newGameOp.remove(panelSegunds);
+                        panelSegunds = null;
                         seconds = null;
                         newGameOp.revalidate();
                         newGameOp.repaint();
@@ -365,6 +418,7 @@ public class QuoridorGUI extends  JFrame {
                     prepareStartGameWindowActions();
                     setContentPane(gamePanel);
                     creteButtonsMovements();
+
                     revalidate();
                     repaint();
                 } catch (QuoridorException ex) {
@@ -589,28 +643,79 @@ public class QuoridorGUI extends  JFrame {
             infoPlayer2Panel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
             gamePanel.add(infoPlayer2Panel, BorderLayout.WEST);
         }
-        JPanel options = new JPanel(new BorderLayout());
-        JPanel turnos = new JPanel(new BorderLayout());
+        JPanel options = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcOptions = new GridBagConstraints();
+        gbcOptions.gridx = 0;
+        gbcOptions.gridy = 0;
+        gbcOptions.weightx = 1;
+        JPanel turnos = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcTurnos = new GridBagConstraints();
+        gbcTurnos.gridx = 0;
+        gbcTurnos.gridy = 0;
         String playerName = turns % 2 == 0 ? namePlayer1.getText() : namePlayer2.getText();
         labelTurns = new JLabel("Turno :" + playerName);
         labelTurns.setFont(gameFont20);
+        labelTurns.setPreferredSize(new Dimension(200, 60));
         panelTurns = new JPanel();
         playerTurno = player1Color;
         panelTurns.setBackground(playerTurno);
         panelTurns.setPreferredSize(new Dimension(60,60));
         finishButton = createButton("Finish", buttonSize);
-        turnos.add(labelTurns, BorderLayout.WEST);
-        turnos.add(panelTurns, BorderLayout.CENTER);
-        options.add(turnos, BorderLayout.CENTER);
-        options.add(finishButton, BorderLayout.EAST);
-        options.add(new Label(), BorderLayout.SOUTH);
+        turnos.add(labelTurns,gbcTurnos);
+        gbcTurnos.gridx = 1;
+        turnos.add(panelTurns, gbcTurnos);
+        gbcOptions.anchor = GridBagConstraints.NORTHWEST;
+        options.add(turnos, gbcOptions);
+        gbcOptions.gridx = 1;
+        gbcOptions.anchor = GridBagConstraints.CENTER;
+        String gameMode = (String) difficulties.getSelectedItem();
+        if(!gameMode.equals("NORMAL")){
+            String time = String.valueOf(seconds.getValue());
+            timeTurno = new JLabel();
+            int segundos = quoridor.getTimePlayer(player1Color);
+            tiempoDis = createTimer(segundos, player1Color);
+            timeTurno.setFont(gameFont20);
+            tiempoDis.start();
+            options.add(timeTurno, gbcOptions);
+        }else{
+            options.add(new Label(), gbcOptions);}
+        gbcOptions.gridx = 2;
+        gbcOptions.anchor = GridBagConstraints.NORTHEAST;
+        options.add(finishButton, gbcOptions);
+
         gamePanel.add(options, BorderLayout.SOUTH);
     }
+
+    private Timer createTimer(int tiempo, Color Player) {
+        return new Timer(1000, new ActionListener() {
+            int time = tiempo;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(Player.equals(playerTurno)) {
+                    if (time > 0) {
+                        timeTurno.setText("Tiempo Disponible " + time);
+                        time--;
+                    } else {
+                        timeTurno.setText("Se acabo el tiempo ");
+                        ((Timer) e.getSource()).stop();
+                    }
+                }
+                else{
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+    }
+
     private void actualizarTurnos() {
         turns = quoridor.getTurns();
         playerTurno = (turns%2==0)?player1Color:player2Color;
-        String playerName = turns % 2 == 0 ? namePlayer1.getText() : namePlayer2.getText();
-        labelTurns.setText("Turno de: " + playerName + "             " +" Numero de turnos: " + turns);
+        labelTurns.setText("Turno de: " );
+        if(timeTurno!= null){
+            int segundos = quoridor.getTimePlayer(player1Color);
+            tiempoDis = createTimer(segundos, playerTurno);
+            tiempoDis.start();
+        }
         panelTurns.setBackground(playerTurno);
         panelTurns.revalidate();
         panelTurns.repaint();
@@ -1514,6 +1619,11 @@ public class QuoridorGUI extends  JFrame {
                 JOptionPane.showMessageDialog(this, "Error al abrir archivo", "Abrir jardin", JOptionPane.INFORMATION_MESSAGE);
             }
         };
+    }
+
+    @Override
+    public void timesUp(String message) {
+        JOptionPane.showMessageDialog(this, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
     }
 
     public static void main(String args[]){

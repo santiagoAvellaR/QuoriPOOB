@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public class Teleporter extends Square{
+public class Teleporter extends Square implements Serializable {
     private Teleporter otherTeleporter;
 
     public Teleporter(int row, int column, Color color) {

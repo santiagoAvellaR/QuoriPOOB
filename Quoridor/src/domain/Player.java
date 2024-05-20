@@ -1,10 +1,11 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public abstract class Player {
+public abstract class Player implements Serializable{
     protected String name;
     protected Color color;
     protected Peon peon;

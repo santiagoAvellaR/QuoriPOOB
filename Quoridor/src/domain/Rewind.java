@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public class Rewind extends Square{
+public class Rewind extends Square implements Serializable{
 
     public Rewind(int row, int column, Color color) {
         super(color, row, column);

@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public abstract class Square extends Field{
+public abstract class Square extends Field implements Serializable {
     protected int row;
     protected int column;
     protected Peon peon;

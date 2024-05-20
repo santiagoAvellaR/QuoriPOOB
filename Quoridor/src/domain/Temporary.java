@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Temporary extends Barrier{
+public class Temporary extends Barrier implements Serializable {
     private int remainingTurns;
     private int row;
     private int column;

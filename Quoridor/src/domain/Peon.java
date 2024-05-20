@@ -1,9 +1,10 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Peon extends Field{
+public class Peon extends Field implements Serializable {
     private int playerNumber;
     private int row;
     private int column;

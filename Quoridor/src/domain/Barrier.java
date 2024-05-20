@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public abstract class Barrier extends Field{
+public abstract class Barrier extends Field implements Serializable {
     protected int length;
     protected boolean horizontal;
 

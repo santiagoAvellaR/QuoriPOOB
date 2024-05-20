@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Allied extends Barrier{
+public class Allied extends Barrier implements Serializable {
     Color alliedColor;
 
     public Allied(Color color, boolean horizontal) {

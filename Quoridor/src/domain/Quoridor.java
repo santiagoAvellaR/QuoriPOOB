@@ -1,5 +1,7 @@
 package src.domain;
 
+import src.presentation.QuoridorObserver;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,20 +10,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.Timer;
 
-public class Quoridor {
+public class Quoridor implements Serializable{
     public Integer turns;
     private Board board;
     private Player  player1;
     private Player  player2;
     private String gameMode;
-    private boolean vsMachine;
+    private final boolean vsMachine;
     private HashMap<String, Integer> lengthBarriersTypes;
     private Timer timerPlayer1;
     private Timer timerPlayer2;
     private int timePlayer1;
     private int timePlayer2;
     private int totalTime;
-
+    private ArrayList<QuoridorObserver> observers = new ArrayList<>();
 
     public Quoridor(String size,
                     String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers,
@@ -44,7 +46,7 @@ public class Quoridor {
         validateStringNumberBarriers(normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers);
         validatePlayerData(sizeInt, playerOneColor, playerOneName, playerTwoColor, playerTwoName, normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers, machineMode);
         // time
-        initializeTimes(gameTime, gameMode);
+        initializeTimes(gameTime);
         //initialize containers
         initializeHashMaps();
     }
@@ -102,28 +104,29 @@ public class Quoridor {
         lengthBarriersTypes.put("t", 2);
         lengthBarriersTypes.put("l", 3);
     }
-    private void initializeTimes(int tiempoTotalPartida, String gameMode) {
-        totalTime = tiempoTotalPartida;
-        this.timePlayer1 = tiempoTotalPartida;
+    private void initializeTimes(int totalGameTime) {
+        totalTime = totalGameTime;
+        this.timePlayer1 = totalGameTime;
         this.timerPlayer1 = createTimer(timePlayer1, 1);
 
-        this.timePlayer2 = tiempoTotalPartida;
+        this.timePlayer2 = totalGameTime;
         this.timerPlayer2 = createTimer(timePlayer2, 2);
         timerPlayer1.restart();
     }
 
-    private Timer createTimer(int tiempo, int jugador) {
+    private Timer createTimer(int playerTime, int playerNumber) {
         return new Timer(1000, new ActionListener() {
-            int time = tiempo;
-
+            int time = playerTime;
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (time > 0) {
-                    System.out.println("Tiempo restante para " + jugador + ": " + time + " segundos");
+                    System.out.println("Tiempo restante para " + playerNumber + ": " + time + " segundos");
                     time--;
                 } else {
-                    System.out.println("¡Tiempo agotado para " + jugador + "! El juego ha terminado.");
+                    System.out.println("¡Tiempo agotado para " + playerNumber + "! El juego ha terminado.");
                     ((Timer) e.getSource()).stop();
+                    String message = playerNumber == 1 ? QuoridorException.TIMES_UP_PLAYER_ONE : QuoridorException.TIMES_UP_PLAYER_TWO;
+                    notifyObservers(message);
                 }
             }
         });
@@ -153,7 +156,9 @@ public class Quoridor {
             }
         }
     }
-
+    public int  getTimePlayer(Color playerColor){
+        return playerColor.equals(player1.getColor()) ? timePlayer1 : timePlayer2;
+    }
     public Integer getTurns(){
         return turns;
     }
@@ -270,26 +275,20 @@ public class Quoridor {
     }
 
 
-    // TEST FUNCTIONS
-    public String getTypeOfField(int row, int column){return board.getTypeField(row, column);}
-    public void printBoard(){board.printBoard();}
-    public void stepBackPeon1(int numberSteps) throws QuoridorException {
-        player1.getPeon().stepBackMovements(numberSteps);
+    // OBSERVER FUNCTIONS
+    public void addObserver(QuoridorObserver observer) {
+        observers.add(observer);
     }
-    public void stepBackPeon2(int numberSteps) throws QuoridorException {
-        player2.getPeon().stepBackMovements(numberSteps);
-    }
-    public void addTeleporterSquare(int row1, int column1, int row2, int column2) {
-        board.addTeleporterSquare(row1, column1, row2, column2);
-    }
-    public void addSkipTurnSquare(int row, int column){
-        board.addSkipTurnSquare(row, column);
-    }
-    public void addRewindSquare(int row, int column) {
-        board.addRewindSquare(row, column);
-    }
-    public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
 
+    public void removeObserver(QuoridorObserver observer) {
+        observers.remove(observer);
+    }
+
+    private void notifyObservers(String message) {
+        for (QuoridorObserver observer : observers) {
+            observer.timesUp(message);
+        }
+    }
 
     // FILE FUNCTIONS
     public static Quoridor open(File file) throws QuoridorException {
@@ -319,4 +318,25 @@ public class Quoridor {
             throw new QuoridorException(QuoridorException.GENERAL_ERROR);
         }
     }
+
+
+    // TEST FUNCTIONS
+    public String getTypeOfField(int row, int column){return board.getTypeField(row, column);}
+    public void printBoard(){board.printBoard();}
+    public void stepBackPeon1(int numberSteps) throws QuoridorException {
+        player1.getPeon().stepBackMovements(numberSteps);
+    }
+    public void stepBackPeon2(int numberSteps) throws QuoridorException {
+        player2.getPeon().stepBackMovements(numberSteps);
+    }
+    public void addTeleporterSquare(int row1, int column1, int row2, int column2) {
+        board.addTeleporterSquare(row1, column1, row2, column2);
+    }
+    public void addSkipTurnSquare(int row, int column){
+        board.addSkipTurnSquare(row, column);
+    }
+    public void addRewindSquare(int row, int column) {
+        board.addRewindSquare(row, column);
+    }
+    public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
 }

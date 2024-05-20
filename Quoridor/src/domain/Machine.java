@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public class Machine extends Player{
+public class Machine extends Player implements Serializable {
     String machineMode;
     Board board;
 

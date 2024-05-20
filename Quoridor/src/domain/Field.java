@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public abstract class Field {
+public abstract class Field implements Serializable {
     protected Color color;
 
     public Field(Color color) {

@@ -1,8 +1,9 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 
-public class SkipTurn extends Square{
+public class SkipTurn extends Square implements Serializable {
 
     public SkipTurn(int row, int column, Color color) {
         super(color, row, column);

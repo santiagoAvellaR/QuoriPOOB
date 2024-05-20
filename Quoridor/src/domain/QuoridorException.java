@@ -1,6 +1,8 @@
 package src.domain;
 
-public class QuoridorException extends Exception{
+import java.io.Serializable;
+
+public class QuoridorException extends Exception implements Serializable {
     // files
     public static final String GENERAL_ERROR = "Error.";
     public static final String FILE_NOT_FOUND = "El archivo no pudo ser encontrado.";

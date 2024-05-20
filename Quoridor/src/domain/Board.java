@@ -1,9 +1,10 @@
 package src.domain;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.Random;
 
-public class Board {
+public class Board implements Serializable{
     public final int size;
     private Field[][] board;
     private Temporary deletedTemporary;
