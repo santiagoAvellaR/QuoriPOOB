@@ -15,7 +15,6 @@ public class SkipTurn extends Square{
     @Override
     public void applySpecialAction() throws QuoridorException{
         if (hasPeon()){
-            peon.setPosition(row, column);
             peon.passThroughSquare("S");
             throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
         }

@@ -31,6 +31,8 @@ public class QuoridorGUI extends  JFrame {
     private JPanel infPlayer, startOptions;
     private JTextField namePlayer1;
     private JTextField namePlayer2;
+    private JSlider seconds;
+    private JPanel panelSegunds;
     //Ajustes
     private JPanel settingsPanel;
     private JButton boardColorButton, player1ColorButton, player2ColorButton, applySettingsButton;
@@ -124,7 +126,6 @@ public class QuoridorGUI extends  JFrame {
                 }
             }
         });
-
         abrir.addActionListener(optionOpen());
         guardar.addActionListener(optionSave());
     }
@@ -138,7 +139,7 @@ public class QuoridorGUI extends  JFrame {
         mainPanel.add(titleLabel);
         // new game button
         JPanel newGamePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        newGamePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        newGamePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         newGameButton = createButton(" NEW GAME ", buttonSize);
@@ -185,15 +186,18 @@ public class QuoridorGUI extends  JFrame {
     }
     public void prepareNewGameWindowElements() {
         newGameOp = new JPanel();
-        newGameOp.setLayout(new GridLayout(3, 1, 0, 10));
+        newGameOp.setLayout(new GridLayout(4, 1, 0, 10));
         newGameOp.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel titlePanel = new JPanel();
         JLabel titleLabel = new JLabel("NEW GAME");
         titleLabel.setFont(new Font("Consolas", Font.BOLD, 60));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        newGameOp.add(titleLabel);
+        titlePanel.setPreferredSize(new Dimension(screenSize.width, (int)(screenSize.height*0.2)));
+        titlePanel.add(titleLabel);
+        newGameOp.add(titlePanel);
         startOptions = new JPanel();
-        startOptions.setLayout(new FlowLayout(FlowLayout.CENTER, 80, 50));
         infPlayer = new JPanel();
+        infPlayer.setPreferredSize(new Dimension(screenSize.width, (int)(screenSize.height*0.5)));
         startOptions.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 10));
         // number players
         numberPlayersCB = new JComboBox<String>();
@@ -226,6 +230,7 @@ public class QuoridorGUI extends  JFrame {
         startOptions.add(settingsButton);
         startOptions.add(new Label());
         startOptions.add(customizeButton);
+        startOptions.setPreferredSize(new Dimension(screenSize.width, (int)(screenSize.height*0.2)));
         newGameOp.add(startOptions);
     }
     public void prepareNewGameWindowActions() {
@@ -236,12 +241,20 @@ public class QuoridorGUI extends  JFrame {
                 if (selectedOption.equals("1 PLAYER")) {
                     newGameOp.remove(startOptions);
                     newGameOp.add(infoOnePlayerModality());
+                    if(panelSegunds != null){
+                        newGameOp.remove(panelSegunds);
+                        newGameOp.add(panelSegunds);
+                    }
                     newGameOp.add(startOptions);
                     newGameOp.revalidate();
                     newGameOp.repaint();
                 } else if (selectedOption.equals("2 PLAYERS")) {
                     newGameOp.remove(startOptions);
                     newGameOp.add(infoTwoPlayersModality());
+                    if(panelSegunds != null){
+                        newGameOp.remove(panelSegunds);
+                        newGameOp.add(panelSegunds);
+                    }
                     newGameOp.add(startOptions);
                     newGameOp.revalidate();
                     newGameOp.repaint();
@@ -256,6 +269,53 @@ public class QuoridorGUI extends  JFrame {
                 setContentPane(settingsPanel);
                 revalidate();
                 repaint();
+            }
+        });
+        difficulties.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedOption = (String) difficulties.getSelectedItem();
+                if (!selectedOption.equals("NORMAL")) {
+                    boolean panelExists = false;
+                    for (Component component : newGameOp.getComponents()) {
+                        if (component == panelSegunds) {
+                            panelExists = true;
+                            break;
+                        }
+                    }
+                    if (!panelExists) {
+                        newGameOp.remove(startOptions);
+                        panelSegunds = new JPanel(new GridBagLayout());
+                        GridBagConstraints gbc = new GridBagConstraints();
+                        gbc.gridx = 0;
+                        gbc.gridy = 0;
+                        gbc.insets = new Insets(1, 1, 10, 10);
+                        gbc.anchor = GridBagConstraints.CENTER;
+                        JLabel title = new JLabel("TIEMPO EN SEGUNDOS");
+                        title.setFont(new Font("Consolas", Font.BOLD, 25));
+                        title.setHorizontalAlignment(SwingConstants.CENTER);
+                        title.setHorizontalTextPosition(SwingConstants.CENTER);
+                        panelSegunds.add(title, gbc);
+                        gbc.gridy = 1;
+                        seconds = new JSlider(JSlider.HORIZONTAL, 0, 720, 0);
+                        seconds.setPreferredSize(new Dimension(700, 40));
+                        seconds.setMajorTickSpacing(30);
+                        seconds.setPaintTicks(true);
+                        seconds.setPaintLabels(true);
+                        panelSegunds.add(seconds, gbc);
+                        newGameOp.add(panelSegunds);
+                        newGameOp.add(startOptions);
+                        newGameOp.revalidate();
+                        newGameOp.repaint();
+                    }
+                } else {
+                    if (seconds != null) {
+                        newGameOp.remove(panelSegunds);
+                        seconds = null;
+                        newGameOp.revalidate();
+                        newGameOp.repaint();
+                    }
+                }
             }
         });
         startGameButton.addActionListener(new ActionListener() {
@@ -286,8 +346,8 @@ public class QuoridorGUI extends  JFrame {
                             player2Name,
                             player2Color,
                             (String) difficulties.getSelectedItem(),
-                            "0",
-                            (String) modalities.getSelectedItem());
+                            (seconds != null) ? seconds.getValue() : 0,
+                            (String)modalities.getSelectedItem());
                     turns = quoridor.getTurns();
                     barrierTypePlayer1 = new JComboBox<String>();
                     barrierTypePlayer2 = new JComboBox<String>();
@@ -637,6 +697,17 @@ public class QuoridorGUI extends  JFrame {
                 casillasDis.add(cantb);
             }
         }
+        else{
+            JLabel casilla = new JLabel("Normal C");
+            casilla.setFont(gameFont20);
+            casilla.setHorizontalAlignment(SwingConstants.CENTER);
+            JLabel cantb = new JLabel("0");
+            casillasVisP1.add(cantb);
+            cantb.setFont(gameFont20);
+            cantb.setHorizontalAlignment(SwingConstants.CENTER);
+            casillasDis.add(casilla);
+            casillasDis.add(cantb);
+        }
         inf.add(casillasDis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
@@ -715,6 +786,17 @@ public class QuoridorGUI extends  JFrame {
                 casillasDis.add(casilla);
                 casillasDis.add(cantb);
             }
+        }
+        else{
+            JLabel casilla = new JLabel("Normal C");
+            casilla.setFont(gameFont20);
+            casilla.setHorizontalAlignment(SwingConstants.CENTER);
+            JLabel cantb = new JLabel("0");
+            casillasVisP2.add(cantb);
+            cantb.setFont(gameFont20);
+            cantb.setHorizontalAlignment(SwingConstants.CENTER);
+            casillasDis.add(casilla);
+            casillasDis.add(cantb);
         }
         inf.add(casillasDis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
@@ -803,6 +885,17 @@ public class QuoridorGUI extends  JFrame {
                     casillasDis.add(cantb);
                 }
             }
+        }
+        else{
+            JLabel casilla = new JLabel("Normal C");
+            casilla.setFont(gameFont20);
+            casilla.setHorizontalAlignment(SwingConstants.CENTER);
+            JLabel cantb = new JLabel("0");
+            casillasVisP2.add(cantb);
+            cantb.setFont(gameFont20);
+            cantb.setHorizontalAlignment(SwingConstants.CENTER);
+            casillasDis.add(casilla);
+            casillasDis.add(cantb);
         }
         inf.add(casillasDis);
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
@@ -977,7 +1070,7 @@ public class QuoridorGUI extends  JFrame {
     private void actualizarCasillasVisitadas(){
         String[] key = {"N","T","R","S"};
         playerTurno = (turns%2==0)?player1Color:player2Color;
-        if(!casillasVisP1.isEmpty()){
+        if(casillasVisP1.size() > 1){
             int count = 0;
             ArrayList<JLabel> actualizar =  (turns%2==0)?casillasVisP1:casillasVisP2;
             for(int i = 0; i < actualizar.size();i++){
@@ -988,6 +1081,12 @@ public class QuoridorGUI extends  JFrame {
                     count += 1;
                 }
             }
+        }
+        else{
+            JLabel actualizar = (turns%2==0)? casillasVisP1.get(0):casillasVisP2.get(0);
+            int numero = quoridor.squaresVisited(playerTurno, "N");
+            actualizar.setText(String.valueOf(numero));
+
         }
     }
     private MouseAdapter movePlayer(Color colorPlayerPeon) {
@@ -1060,7 +1159,7 @@ public class QuoridorGUI extends  JFrame {
                     board[i][col].setBackground(Color.GRAY);
                 }
             }else{
-                for (int i = row-2; i <= row; i--) {
+                for (int i = row-2; i <= row; i++) {
                     board[i][col].setBackground(Color.GRAY);
                 }
             }

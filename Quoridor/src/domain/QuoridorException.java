@@ -7,18 +7,21 @@ public class QuoridorException extends Exception{
     public static final String ERROR_DURING_PROCESSING = "Error durante el proceso.";
     public static final String CLASS_NOT_FOUND = "Clase no encontrada.";
     // filtering and cleaning data
-    public static final String INVLID_SIZE = "Invalid size, size must be only numbers and not empty";
-    public static final String MAXIMUN_SIZE_EXCEEDED = "The size must be between x and y";
+    public static final String INVALID_SIZE = "Invalid size, size must be only numbers and not empty";
+    public static final String MAXIMUM_SIZE_EXCEEDED = "The size must be between x and y";
     public static final String SIMILAR_PLAYER_COLORS = "The colors of both players are too similar";
     public static final String INVALID_NUMBER_SQUARES = "Invalid number barrier, number must be a only numbers and not empty";
-    public static final String MAXIMUN_NUMBER_SQUARES_EXCEEDED = "The sum of barriers must be maximun (board size + 1)";
+    public static final String MAXIMUM_NUMBER_SQUARES_EXCEEDED = "The sum of barriers must be maximum (board size + 1)";
     public static final String INVALID_NUMBER_BARRIERS = "Invalid number barrier, number must be a only numbers and not empty";
-    public static final String MAXIMUN_NUMBER_BARRIERS_EXCEEDED = "The sum of barriers must be maximun (board size + 1)";
-    public static final String INVALID_BARRIER_TYPE = "Invelid barrier type";
+    public static final String MAXIMUM_NUMBER_BARRIERS_EXCEEDED = "The sum of barriers must be maximum (board size + 1)";
+    public static final String INVALID_BARRIER_TYPE = "Invalid barrier type";
     // game
     public static final String PLAYER_ONE_WON = "Player one won!";
     public static final String PLAYER_TWO_WON = "Player two won!";
     public static final String PLAYER_NOT_TURN = "It's not your turn";
+    // time
+    public static final String TIMES_UP_PLAYER_ONE = "Player one ran out of time!";
+    public static final String TIMES_UP_PLAYER_TWO = "Player two ran out of time!";
     // barriers
     public static final String BARRIER_TRAP_PEON1 = "You can't place the barrier because it would trap the pawn 1.";
     public static final String BARRIER_TRAP_PEON2 = "You can't place the barrier because it would trap the pawn 2.";
