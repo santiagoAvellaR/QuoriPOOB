@@ -460,8 +460,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         modalities = new JComboBox<String>();
         modalities.setPreferredSize(buttonSize);
         modalities.setFont(gameFont30);
-        modalities.addItem("AMATEUR");
-        modalities.addItem("MEDIAN");
+        modalities.addItem("BEGINNER");
+        modalities.addItem("MEDIUM");
         modalities.addItem("ADVANCED");
         modalities.setPreferredSize(buttonSize);
         machineModes.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -1455,6 +1455,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         finishButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
+                casillasVisP1.clear();
+                casillasVisP2.clear();
                 setContentPane(newGameOp);
                 revalidate();
                 repaint();

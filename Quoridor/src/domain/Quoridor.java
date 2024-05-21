@@ -12,6 +12,7 @@ import javax.swing.Timer;
 
 public class Quoridor implements Serializable{
     public Integer turns;
+    public int delta;
     private Board board;
     private Player  player1;
     private Player  player2;
@@ -37,6 +38,7 @@ public class Quoridor implements Serializable{
         this.vsMachine = vsMachine;
         this.gameMode = gameMode;
         turns = 0;
+        delta = 1;
         // size
         int sizeInt = validateStringSize(size);
         // board
@@ -94,7 +96,7 @@ public class Quoridor implements Serializable{
         Peon peon1 = board.getPeon1InitialMoment();
         Peon peon2 = board.getPeon2InitialMoment();
         player1 = new Human(peon1, playerOneName, playerOneColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);
-        if (vsMachine){player2 = new Machine(peon2,"Machine", playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt, machineMode, board);}
+        if (vsMachine){player2 = new Machine(peon2,"Machine", playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt, machineMode, board, player1);}
         else{player2 = new Human(peon2, playerTwoName, playerTwoColor, normalBarriersInt, temporaryBarriersInt, largeBarriersInt, alliedBarriersInt);}
     }
     private void initializeHashMaps(){
@@ -127,6 +129,7 @@ public class Quoridor implements Serializable{
                     ((Timer) e.getSource()).stop();
                     String message = playerNumber == 1 ? QuoridorException.TIMES_UP_PLAYER_ONE : QuoridorException.TIMES_UP_PLAYER_TWO;
                     notifyObservers(message);
+                    delta = 2;
                 }
             }
         });
@@ -185,7 +188,7 @@ public class Quoridor implements Serializable{
         } catch (QuoridorException e) {
             if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
                 actualizeEachTurn(playerColor);
-                turns += 1;
+                turns += delta;
                 throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
             }
             else if (e.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED)) {
@@ -253,7 +256,7 @@ public class Quoridor implements Serializable{
 
     public void actualizeEachTurn(Color playerColor) throws QuoridorException {
         maintainTime(playerColor);
-        turns += 1;
+        turns += delta;
         System.out.println("tuno: " + turns);
         System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
         System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
