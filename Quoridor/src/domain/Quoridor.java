@@ -48,7 +48,7 @@ public class Quoridor implements Serializable{
         validateStringNumberBarriers(normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers);
         validatePlayerData(sizeInt, playerOneColor, playerOneName, playerTwoColor, playerTwoName, normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers, machineMode);
         // time
-        initializeTimes(gameTime);
+        if (gameMode.equals("TIME TRIAL") || gameMode.equals("TIMED")){initializeTimes(gameTime);}
         //initialize containers
         initializeHashMaps();
     }

@@ -16,6 +16,7 @@ public class SkipTurn extends Square implements Serializable {
     @Override
     public void applySpecialAction() throws QuoridorException{
         if (hasPeon()){
+            peon.setSquareType("SkipTurn");
             peon.passThroughSquare("S");
             throw new QuoridorException(QuoridorException.PLAYER_PLAYS_TWICE);
         }

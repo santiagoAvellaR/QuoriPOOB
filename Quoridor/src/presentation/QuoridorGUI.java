@@ -607,14 +607,19 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         applySettingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!boardColor.equals(player1Color) && !boardColor.equals(player2Color) && !player1Color.equals(player2Color)) {
-                    setContentPane(newGameOp);
-                    revalidate();
-                    repaint();
-                } else {
-                    JOptionPane.showMessageDialog(gui, "Choose again, each color must be different");
+                if(!coloresValidos()){
+                    if (!boardColor.equals(player1Color) && !boardColor.equals(player2Color) && !player1Color.equals(player2Color)) {
+                        setContentPane(newGameOp);
+                        revalidate();
+                        repaint();
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(gui, "Choose again, each color must be different");}
                 }
+                else{
+                    JOptionPane.showMessageDialog(gui, "Escoge otros colores que no sean azul, verde, negro, rosado y gris");}
             }
+
         });
     }
     public void prepareStartGameWindowElements() {
@@ -710,7 +715,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     private void actualizarTurnos() {
         turns = quoridor.getTurns();
         playerTurno = (turns%2==0)?player1Color:player2Color;
-        labelTurns.setText("Turno de: " );
+        System.out.println("#turnos " + turns + " color " + playerTurno);
+        labelTurns.setText("Turno de: "  );
         if(timeTurno!= null){
             int segundos = quoridor.getTimePlayer(player1Color);
             tiempoDis = createTimer(segundos, playerTurno);
@@ -1029,14 +1035,16 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         this.board[i][j].setBackground(color);}
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
                     if (i == 0 && j == midColumn) {
+                        this.board[i][j].setBackground(boardColor);
                         P2 = new JPanel();
-                        P2.setBackground(player2Color);
+                        P2 =  createFormPeon(P2, SQUARE_SIZE);
                         P2.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
                         P2.addMouseListener(movePlayer(player2Color));
                         this.board[i][midColumn].add(P2);
                     } else if (i == this.board.length - 1 && j == midColumn) {
+                        this.board[i][j].setBackground(boardColor);
                         P1 = new JPanel();
-                        P1.setBackground(player1Color);
+                        P1 = createFormPeon(P1, SQUARE_SIZE);
                         P1.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
                         P1.addMouseListener(movePlayer(player1Color));
                         this.board[this.board.length - 1][midColumn].add(P1);
@@ -1582,7 +1590,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             if(option == JFileChooser.APPROVE_OPTION) {
                 java.io.File selectedFolder = fileChooser.getSelectedFile();
                 JTextField nombreArchivoField = new JTextField();
-                int result = JOptionPane.showConfirmDialog(this, new Object[]{"Ingrese el nombre del archivo:", nombreArchivoField}, "Guardar jardin", JOptionPane.OK_CANCEL_OPTION);
+                int result = JOptionPane.showConfirmDialog(this, new Object[]{"Ingrese el nombre del archivo:", nombreArchivoField}, "Guardar quoridor", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION && !nombreArchivoField.getText().isEmpty()) {
                     try {
                         String nombreArchivo = nombreArchivoField.getText() + ".dat";
@@ -1590,15 +1598,15 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         quoridor.save(archivo);
                     }
                     catch (QuoridorException e) {
-                        JOptionPane.showMessageDialog(this, e.getMessage(), "Guardar jardin", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(this, e.getMessage(), "Guardar quoridor", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
                 else {
-                    JOptionPane.showMessageDialog(this, "Nombre de archivo inválido", "Guardar jardin", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Nombre de archivo inválido", "Guardar quoridor", JOptionPane.ERROR_MESSAGE);
                 }
             }
             else {
-                JOptionPane.showMessageDialog(this, "Cancelado por el usuario", "Guardar jardin", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Cancelado por el usuario", "Guardar quoridor", JOptionPane.INFORMATION_MESSAGE);
             }
         };
     }
@@ -1614,15 +1622,49 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     revalidate();
                 }
                 catch (QuoridorException e){
-                    JOptionPane.showMessageDialog(this, e.getMessage(), "Abrir jardin", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Abrir quoridor", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
             else{
-                JOptionPane.showMessageDialog(this, "Error al abrir archivo", "Abrir jardin", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error al abrir archivo", "Abrir quoridor", JOptionPane.INFORMATION_MESSAGE);
             }
         };
     }
-
+    public boolean coloresValidos(){
+        boolean cambiar = false;
+        if(player1Color.equals(Color.gray) || player2Color.equals(Color.gray) || boardColor.equals(Color.gray)){
+            cambiar = true;}
+        if(player1Color.equals(Color.blue)  || player2Color.equals(Color.blue)|| boardColor.equals(Color.blue)){
+            cambiar = true;
+        }
+        if(player1Color.equals(Color.black)  || player2Color.equals(Color.black)|| boardColor.equals(Color.black)){
+            cambiar = true;
+        }
+        if(player1Color.equals(Color.green)  || player2Color.equals(Color.green)|| boardColor.equals(Color.green)){
+            cambiar = true;
+        }
+        if(player1Color.equals(Color.pink)  || player2Color.equals(Color.pink)|| boardColor.equals(Color.pink)){
+            cambiar = true;
+        }
+        return cambiar;
+    }
+    public  JPanel createFormPeon(JPanel player, int font) {
+        Color colorP = (player.equals(P1)) ? player1Color : player2Color;
+        JPanel circlePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                int diameter = Math.min(getWidth(), getHeight());
+                int x = (getWidth() - diameter) / 2;
+                int y = (getHeight() - diameter) / 2;
+                g.setColor(colorP);
+                g.fillOval(x, y, diameter, diameter);
+            }
+        };
+        circlePanel.setPreferredSize(new Dimension(font, font));
+        circlePanel.setBackground(boardColor);
+        return circlePanel;
+    }
     @Override
     public void timesUp(String message) {
         JOptionPane.showMessageDialog(this, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);

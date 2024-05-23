@@ -9,23 +9,24 @@ public class Board implements Serializable{
     private Field[][] board;
     private Temporary deletedTemporary;
 
-    public Board(int size, Color player1Color, Color player2Color, int teletransporterSquares, int rewindSquares, int skipTurnSquares) {
+    public Board(int size, Color player1Color, Color player2Color, int transporterSquares, int rewindSquares, int skipTurnSquares) {
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         int midColumn = size % 2 == 0 ? size - 2 : size - 1;
         board[getBoardSize() - 1][midColumn] = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1);
         board[0][midColumn] = new Peon(0, midColumn, this, player2Color, 2);
-        fillTheBoard(teletransporterSquares, rewindSquares, skipTurnSquares);
+        fillTheBoard(transporterSquares, rewindSquares, skipTurnSquares);
         System.out.println("tablero inicial");
         printBoard();
     }
 
     private void fillTheBoard(int transporterSquares, int rewindSquares, int skipTurnSquares){
-        fillTheBoardTransporterSquares(transporterSquares);
+        //fillTheBoardTeleporterSquares(transporterSquares);
         fillTheBoardRewindSquares(rewindSquares);
         fillTheBoardSkipTurnSquares(skipTurnSquares);
+        fillTheBoardTransporterSquares(transporterSquares);
     }
-    private void fillTheBoardTransporterSquares(int transporterSquares){
+    private void fillTheBoardTeleporterSquares(int transporterSquares){
         while (transporterSquares > 0) {
             int row1 = evenNumberGenerator(getBoardSize()-1);
             int column1 = evenNumberGenerator(getBoardSize()-1);
@@ -55,6 +56,15 @@ public class Board implements Serializable{
             if (board[row][column] == null) {
                 addSkipTurnSquare(row, column);
                 skipTurnSquares--;
+            }
+        }
+    }private void fillTheBoardTransporterSquares(int transporterSquares){
+        while (transporterSquares > 0) {
+            int row = evenNumberGenerator(getBoardSize()-1);
+            int column = evenNumberGenerator(getBoardSize()-1);
+            if (board[row][column] == null) {
+                addTransporterSquare(row, column);
+                transporterSquares--;
             }
         }
     }
@@ -264,6 +274,7 @@ public class Board implements Serializable{
     }
     public boolean getOrientationDeletedTemporary(){return deletedTemporary.isHorizontal();}
 
+    // helpers fill the board and test functions
     public void addRewindSquare(int row, int column) {
         Color color = generateColor();
         board[row][column] = new Rewind(row, column, color);
@@ -280,6 +291,10 @@ public class Board implements Serializable{
     public void addSkipTurnSquare(int row, int column) {
         Color color = generateColor();
         board[row][column] = new SkipTurn(row, column, color);
+    }
+    public void addTransporterSquare(int row, int column){
+        Color color = generateColor();
+        board[row][column] = new Transporter(row, column, color);
     }
 
 }

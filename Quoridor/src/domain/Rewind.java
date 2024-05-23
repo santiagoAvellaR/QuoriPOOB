@@ -15,6 +15,7 @@ public class Rewind extends Square implements Serializable{
     @Override
     public void applySpecialAction() throws QuoridorException{
         if(hasPeon()){
+            peon.setSquareType("ReWind");
             peon.passThroughSquare("R");
             peon.stepBackMovements(2);
             throw new QuoridorException(QuoridorException.PEON_STEPPED_BACK);

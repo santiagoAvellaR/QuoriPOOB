@@ -21,6 +21,7 @@ public class Teleporter extends Square implements Serializable {
     @Override
     public void applySpecialAction() throws QuoridorException{
         if (hasPeon()) {
+            peon.setSquareType("Teleporter");
             peon.passThroughSquare("T");
             if (!otherTeleporter.hasPeon()) {
                 otherTeleporter.setPeon(peon);

@@ -15,6 +15,8 @@ public class Peon extends Field implements Serializable {
     private int skipTurnSquares;
     private int teleporterSquares;
     private int normalSquares;
+    private ArrayList<String> validMovements;
+    private String squareType;
 
     public Peon(int row, int column, Board board, Color color, int numberPlayer) {
         super(color);
@@ -28,6 +30,7 @@ public class Peon extends Field implements Serializable {
         skipTurnSquares = 0;
         teleporterSquares = 0;
         normalSquares = 1;
+        squareType = "Normal";
     }
     public int getRow() {
         return row;
@@ -40,6 +43,9 @@ public class Peon extends Field implements Serializable {
     public void setPosition(int row, int column) {
         this.row = row;
         this.column = column;
+    }
+    public void setSquareType(String squareType) {
+        this.squareType = squareType;
     }
     public void setColor(Color color) {
         this.color = color;
@@ -135,15 +141,30 @@ public class Peon extends Field implements Serializable {
         }
     }
 
-    public ArrayList<String> getValidMovements(){
-        ArrayList<String> validMovements = new ArrayList<String>();
-        validMovements = validateVertical(validMovements, true);
-        validMovements = validateVertical(validMovements, false);
-        validMovements = validateHorizontal(validMovements, true);
-        validMovements = validateHorizontal(validMovements, false);
-        return validMovements;
+    private ArrayList<String> calculateAllLateralMovements(ArrayList<String> movements){
+        if (row >= 1) {movements.add("n");}
+        if (row <= board.getBoardSize()-1-1) {movements.add("s");}
+        if (column <= board.getBoardSize()-1-1) {movements.add("e");}
+        if (column >= 1) {movements.add("w");}
+        if (row >= 1 && column <= board.getBoardSize()-1-1) {movements.add("ne");}
+        if (row >= 1 && column >= 1) {movements.add("nw");}
+        if (row <= board.getBoardSize()-1-1 && column <= board.getBoardSize()-1-1) {movements.add("se");}
+        if (row <= board.getBoardSize()-1-1 && column >= 1) {movements.add("sw");}
+        return movements;
     }
 
+    public ArrayList<String> getValidMovements(){
+        ArrayList<String> validMovements = new ArrayList<String>();
+        if (!squareType.equals("Transporter")) {
+            validMovements = validateVertical(validMovements, true);
+            validMovements = validateVertical(validMovements, false);
+            validMovements = validateHorizontal(validMovements, true);
+            return validateHorizontal(validMovements, false);
+        }
+        else{
+            return calculateAllLateralMovements(validMovements);
+        }
+    }
     private ArrayList<String> validateVertical(ArrayList<String> validMovementsCalculated, boolean goesUp){
         ArrayList<String> validVericalMovements = validMovementsCalculated;
         String directionString = null;
@@ -168,7 +189,7 @@ public class Peon extends Field implements Serializable {
         if (board.hasBarrier(row + 3*direction, column)) {
             Barrier barrier = (Barrier) board.getField(row + 3*direction, column);
             if (!barrier.isAllied(color)) {
-                return validateVerticalDiagonals(row, column, validVericalMovements, goesUp);
+                return validateVerticalDiagonals(validVericalMovements, goesUp);
             }
         }
         if (!board.hasPeon(row + 4*direction, column)) {
@@ -178,7 +199,7 @@ public class Peon extends Field implements Serializable {
         }
         return validVericalMovements;
     }
-    private ArrayList<String> validateVerticalDiagonals(int row, int column, ArrayList<String> validVerticalMovements, boolean goesUp){
+    private ArrayList<String> validateVerticalDiagonals(ArrayList<String> validVerticalMovements, boolean goesUp){
         int direction = goesUp ? -1 : 1;
         String directionString = goesUp ? "nw" : "sw";
         if (!board.hasBarrier(row + 2*direction, column - 1) && !validVerticalMovements.contains(directionString)){
@@ -190,7 +211,6 @@ public class Peon extends Field implements Serializable {
         }
         return validVerticalMovements;
     }
-
     public ArrayList<String> validateHorizontal(ArrayList<String> validMovementsCalculated, boolean goesLeft){
         ArrayList<String> validHorizontalMovements = validMovementsCalculated;
         String directionString = null;
@@ -215,7 +235,7 @@ public class Peon extends Field implements Serializable {
         if (board.hasBarrier(row, column + 3*direction)) {
             Barrier barrier = (Barrier) board.getField(row, column + 3*direction);
             if (!barrier.isAllied(color)) {
-                return validateHorizontalDiagonals(row, column, validHorizontalMovements, goesLeft);
+                return validateHorizontalDiagonals(validHorizontalMovements, goesLeft);
             }
         }
         if (!board.hasPeon(row, column + 4*direction)) {
@@ -225,7 +245,7 @@ public class Peon extends Field implements Serializable {
         }
         return validHorizontalMovements;
     }
-    private ArrayList<String> validateHorizontalDiagonals(int row, int column, ArrayList<String> validVerticalMovements, boolean goesLeft){
+    private ArrayList<String> validateHorizontalDiagonals(ArrayList<String> validVerticalMovements, boolean goesLeft){
         int direction = goesLeft ? -1 : 1;
         String directionString = goesLeft ? "nw" : "ne";
         if (!board.hasBarrier(row+1, column + 2*direction) && !validVerticalMovements.contains(directionString)){
@@ -237,6 +257,7 @@ public class Peon extends Field implements Serializable {
         }
         return validVerticalMovements;
     }
+
 
     // functions for validate that peon has an exit (way/path to win)
     public boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited){
@@ -261,6 +282,7 @@ public class Peon extends Field implements Serializable {
         movements = validateHorizontalExits(simulateRow, simulateColumn, movements, true);
         movements = validateHorizontalExits(simulateRow, simulateColumn, movements, false);
         return movements;
+
     }
     private ArrayList<String> validateVerticalExits(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesUp){
         ArrayList<String> validVericalMovements = validMovementsCalculated;
