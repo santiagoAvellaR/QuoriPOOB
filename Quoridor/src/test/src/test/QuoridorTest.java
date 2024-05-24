@@ -335,9 +335,9 @@ class QuoridorTest {
                     "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "NORMAL", 30, "beginner");
             quoridor.addBarrier(Color.blue, 0, 1,  false,  "n");
-            assertEquals("NORMAL", quoridor.getTypeOfField(0,1));
-            assertEquals("NORMAL", quoridor.getTypeOfField(1,1));
-            assertEquals("NORMAL", quoridor.getTypeOfField(2,1));
+            assertEquals("Normal", quoridor.getTypeOfField(0,1));
+            assertEquals("Normal", quoridor.getTypeOfField(1,1));
+            assertEquals("Normal", quoridor.getTypeOfField(2,1));
         }
         catch(Exception e){
             fail("threw the exception: " + e.getMessage());
@@ -366,9 +366,9 @@ class QuoridorTest {
                     "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "NORMAL", 30,  "beginner");
             quoridor.addBarrier(Color.blue, 1, 0, true,  "n");
-            assertEquals("NORMAL", quoridor.getTypeOfField(1,0));
-            assertEquals("NORMAL", quoridor.getTypeOfField(1,1));
-            assertEquals("NORMAL", quoridor.getTypeOfField(1,2));
+            assertEquals("Normal", quoridor.getTypeOfField(1,0));
+            assertEquals("Normal", quoridor.getTypeOfField(1,1));
+            assertEquals("Normal", quoridor.getTypeOfField(1,2));
         }
         catch(Exception e){
             fail("threw the exception: " + e.getMessage());
@@ -398,7 +398,7 @@ class QuoridorTest {
                     "NORMAL", 30,  "beginner");
             assertTrue(quoridor.peonsHasAnExit());
         }
-        catch(Exception e){
+        catch(QuoridorException e){
             fail("threw the exception: " + e.getMessage());
         }
     }
@@ -444,9 +444,9 @@ class QuoridorTest {
                     "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "NORMAL", 30,  "beginner");
             quoridor.addBarrier(Color.blue, 6,1,false,"n");
-            assertEquals("NORMAL", quoridor.getTypeOfField(6,1));
-            assertEquals("NORMAL", quoridor.getTypeOfField(5,1));
-            assertEquals("NORMAL", quoridor.getTypeOfField(4,1));
+            assertEquals("Normal", quoridor.getTypeOfField(6,1));
+            assertEquals("Normal", quoridor.getTypeOfField(5,1));
+            assertEquals("Normal", quoridor.getTypeOfField(4,1));
         }
         catch(Exception e){
             fail("threw the exception: " + e.getMessage());
@@ -460,9 +460,9 @@ class QuoridorTest {
                     "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "NORMAL", 30,  "beginner");
             quoridor.addBarrier(Color.blue, 1,6,true,"n");
-            assertEquals("NORMAL", quoridor.getTypeOfField(1,6));
-            assertEquals("NORMAL", quoridor.getTypeOfField(1,5));
-            assertEquals("NORMAL", quoridor.getTypeOfField(1,4));
+            assertEquals("Normal", quoridor.getTypeOfField(1,6));
+            assertEquals("Normal", quoridor.getTypeOfField(1,5));
+            assertEquals("Normal", quoridor.getTypeOfField(1,4));
         }
         catch(Exception e){
             fail("threw the exception: " + e.getMessage());

@@ -17,7 +17,7 @@ public class Allied extends Barrier implements Serializable {
     }
 
     @Override
-    public boolean isAllied(Color color){
+    public boolean peonCanPassThrough(Color color){
         return alliedColor.equals(color);
     }
 

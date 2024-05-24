@@ -154,6 +154,7 @@ public class Board implements Serializable{
             square.applySpecialAction();
         }
         else {
+            peon.setSquareType("Normal");
             peon.passThroughSquare("N");
             board[newRow][newColumn] = peon;
         }

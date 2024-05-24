@@ -165,6 +165,10 @@ public class Quoridor implements Serializable{
     public Integer getTurns(){
         return turns;
     }
+    public String getGameMode(){return gameMode;}
+    public boolean getVsMachine(){
+        return vsMachine;
+    }
 
     public ArrayList<String> getPeonValidMovements(Color playerColor){
         Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
@@ -272,6 +276,15 @@ public class Quoridor implements Serializable{
         return board.getFieldColor(row, column);
     }
 
+    public Color getColorPlayer(int number){
+        Color colorPlayer = (number == 0) ? player1.getColor():player2.getColor();
+        return colorPlayer;
+    }
+    public int getBoardSize(){return board.getBoardSize();}
+    public String getPlayerName(int player){
+        return (player == 1) ? player1.getName() : player2.getName();
+    }
+
     public int squaresVisited(Color playerColor, String type){
         Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
         return selectedPlayer.squaresVisited(type);
@@ -311,7 +324,7 @@ public class Quoridor implements Serializable{
 
     public void save(File file) throws QuoridorException {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file, true))) {
-            out.writeObject("Garden storage\n");
+            out.writeObject("Quoridor storage\n");
             out.writeObject(this);
         } catch (FileNotFoundException e) {
             throw new QuoridorException(QuoridorException.FILE_NOT_FOUND);

@@ -12,7 +12,7 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
         }
         else {
             movementType = "movePeon";
-            ArrayList<String> validMovements = peon.getValidMovements();
+            ArrayList<String> validMovements = peon.getValidMovements(peon.getRow(), peon.getColumn());
             direction = validMovements.get(generateRandomNumber(validMovements.size()));
 
         }

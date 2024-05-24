@@ -16,7 +16,7 @@ public abstract class Barrier extends Field implements Serializable {
     public int getLength() {return length;}
     public boolean isHorizontal() {return horizontal;}
 
-    public boolean isAllied(Color color){return false;}
+    public boolean peonCanPassThrough(Color color){return false;}
 
     @Override
     public boolean hasSquare() {return false;}

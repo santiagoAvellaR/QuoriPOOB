@@ -15,6 +15,7 @@ public class Transporter extends Square{
     public void applySpecialAction() {
         if (hasPeon()) {
             peon.setSquareType("Transporter");
+            peon.passThroughSquare("TR");
         }
     }
 
