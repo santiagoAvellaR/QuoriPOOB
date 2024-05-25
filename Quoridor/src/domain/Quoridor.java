@@ -355,4 +355,11 @@ public class Quoridor implements Serializable{
         board.addRewindSquare(row, column);
     }
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
+    public void shortestPahtPeon(int numberPeon){
+        if (numberPeon == 1) {
+            player1.peonShortestPath();
+        } else {
+            player2.peonShortestPath();
+        }
+    }
 }

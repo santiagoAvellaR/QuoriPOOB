@@ -616,4 +616,17 @@ class QuoridorTest {
         }
     }
 
+    // -------------------------------------     TEST FOR MACHINE MOVEMENTS      -----------------------------------------------------------
+    @Test
+    public void shouldCalculateTheShortestPathOfAPeon() {
+        try{
+            quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
+                    "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
+                    "NORMAL", 30,  "beginner");
+            quoridor.shortestPahtPeon(1);
+        }
+        catch(Exception e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
 }

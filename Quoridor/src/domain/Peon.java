@@ -3,6 +3,7 @@ package src.domain;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Peon extends Field implements Serializable {
     private final int playerNumber;
@@ -16,6 +17,7 @@ public class Peon extends Field implements Serializable {
     private int normalSquares;
     private int transporterSquares;
     private String squareType;
+    private HashMap<String, String> oppositeMovements;
 
     public Peon(int row, int column, Board board, Color color, int numberPlayer) {
         super(color);
@@ -30,6 +32,25 @@ public class Peon extends Field implements Serializable {
         transporterSquares = 0;
         normalSquares = 1;
         squareType = "Normal";
+        initializeHashOppositeMovements();
+    }
+    private void initializeHashOppositeMovements(){
+        oppositeMovements = new HashMap<>();
+        // ortogonals
+        oppositeMovements.put("n", "s");
+        oppositeMovements.put("s", "n");
+        oppositeMovements.put("w", "e");
+        oppositeMovements.put("e", "w");
+        // jumps
+        oppositeMovements.put("jn", "js");
+        oppositeMovements.put("js", "jn");
+        oppositeMovements.put("jw", "je");
+        oppositeMovements.put("je", "jw");
+        // diagonals
+        oppositeMovements.put("ne", "sw");
+        oppositeMovements.put("nw", "se");
+        oppositeMovements.put("sw", "ne");
+        oppositeMovements.put("se", "nw");
     }
     public int getRow() {
         return row;
@@ -196,7 +217,7 @@ public class Peon extends Field implements Serializable {
                 return;
             }
         }
-        if (!board.hasPeon(row + 4*direction, column)) {
+        if (!board.hasPeon(row + 4*direction, column) && !board.getFieldColor(row + 2*direction, column).equals(color)) {
             directionString = goesUp ? "jn" : "js";
             validMovementsCalculated.add(directionString);
         }
@@ -239,7 +260,7 @@ public class Peon extends Field implements Serializable {
                 return;
             }
         }
-        if (!board.hasPeon(row, column + 4*direction)) {
+        if (!board.hasPeon(row, column + 4*direction) && !board.getFieldColor(row, column + 2*direction).equals(color)) {
             directionString = goesLeft ? "jw" : "je";
             validMovementsCalculated.add(directionString);
         }
@@ -256,7 +277,7 @@ public class Peon extends Field implements Serializable {
         }
     }
 
-    private void printMatrix(Boolean[][] matrix){
+    private void printMatrix(Object[][] matrix){
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 System.out.print(matrix[i][j] + " ");
@@ -384,14 +405,26 @@ public class Peon extends Field implements Serializable {
     }
 
     // shortest path
-    public int shortestPath(int simulateRow, int simulateColumn, Integer[][][] positionsVisited){
-        if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return 0;}
-        if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return Integer.MAX_VALUE;}
+    public void shortestPath(int simulateRow, int simulateColumn, String[][] path, Integer[][] costs, String lastMovement){
+        long startTime = System.currentTimeMillis();
+        if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return;}
+        if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return;}
         ArrayList<String> validDirections = getValidMovements(simulateRow, simulateColumn);
+        validDirections.remove(lastMovement);
+        int cost = board.getTypeField(simulateRow, simulateColumn).equals("SkipTurn") ? 0 : 1;
         for (String direction : validDirections){
             int[] newPosition = getTheNewPositionAccordingDirection(simulateRow, simulateColumn, direction);
+            int newRow = newPosition[0];
+            int newColumn = newPosition[1];
+            if (costs[simulateRow/2][simulateColumn/2] + cost < costs[newRow/2][newColumn/2]){
+                costs[newRow/2][newColumn/2] = costs[simulateRow/2][simulateColumn/2] + cost;
+                path[newRow/2][newColumn/2] = oppositeMovements.get(direction);
+                shortestPath(newPosition[0], newPosition[1], path, costs, oppositeMovements.get(direction));
+            }
         }
-        return 1;
+        System.out.println(((System.currentTimeMillis()-startTime)) + " miliseconds");
+        printMatrix(path);
+        printMatrix(costs);
     }
 
 }

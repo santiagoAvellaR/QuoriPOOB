@@ -84,6 +84,15 @@ public abstract class Player implements Serializable{
         return peon.hasAnExit(peon.getRow(), peon.getColumn(), visited);
     }
 
+    public void peonShortestPath(){
+        Integer[][] costs = new Integer[peon.getBoardSize()/2 + 1][peon.getBoardSize()/2 + 1];
+        for (Integer[] ints : costs) {
+            Arrays.fill(ints, Integer.MAX_VALUE);
+        }
+        costs[peon.getRow()/2][peon.getColumn()/2] = 0;
+        peon.shortestPath(peon.getRow(), peon.getColumn(), new String[peon.getBoardSize()/2 + 1][peon.getBoardSize()/2 + 1], costs, "");
+    }
+
     public String getName(){return name;}
     public Color getColor() {return color;}
     public Peon getPeon() {return peon;}
