@@ -464,4 +464,7 @@ public class Peon extends Field implements Serializable {
         return path;
     }
 
+    public String getContraryMovement(String movement){
+        return oppositeMovements.get(movement);
+    }
 }

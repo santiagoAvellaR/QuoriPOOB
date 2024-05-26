@@ -8,6 +8,7 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
     @Override
     public void makeMove(Board board, Peon peon, Player otherPlayer, int normalBarriers, int temporaryBarriers, int longBarriers, int alliedBarriers) throws QuoridorException {
         if (generateRandomNumber(2) == 0 && (normalBarriers > 0 || temporaryBarriers > 0 || longBarriers > 0 || alliedBarriers > 0)){
+            System.out.println("añade barrera");
             movementType = "addBarrier";
             isHorizontal = generateRandomNumber(2) == 0;
             barrierType = selectBarrierType(normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);
@@ -39,6 +40,7 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
             movementType = "movePeon";
             ArrayList<String> validMovements = peon.getValidMovements(peon.getRow(), peon.getColumn());
             direction = validMovements.get(generateRandomNumber(validMovements.size()));
+            System.out.println("maquina mueve peon en direction: " + direction);
             throw new QuoridorException(QuoridorException.MACHINE_MOVE_PEON);
         }
     }

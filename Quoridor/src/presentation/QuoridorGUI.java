@@ -394,7 +394,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                             customsElements.containsKey("Teletransportadora:") && !customsElements.get("Teletransportadora:").getText().isEmpty() ? customsElements.get("Teletransportadora:").getText().trim() : "0",
                             customsElements.containsKey("Regresar:") && !customsElements.get("Regresar:").getText().isEmpty() ? customsElements.get("Regresar:").getText().trim() : "0",
                             customsElements.containsKey("Turno Doble:") && !customsElements.get("Turno Doble:").getText().isEmpty() ? customsElements.get("Turno Doble:").getText().trim() : "0",
-                            (numberPlayersCB.getSelectedItem().equals("1 PLAYERS")),
+                            (numberPlayersCB.getSelectedItem().equals("1 PLAYER")),
                             player1Name,
                             player1Color,
                             player2Name,
@@ -1770,7 +1770,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     }
 
     @Override
-    public void machineMovePeon(String message) {
+    public void machineMovePeon(String message, String direction) {
         JOptionPane.showMessageDialog(this, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
     }
 

@@ -646,4 +646,27 @@ class QuoridorTest {
             fail("threw the exception: " + e.getMessage());
         }
     }
+
+    @Test
+    public void shouldCalculateTheShortestPathOfAPeon3() {
+        try{
+            quoridor = new Quoridor("9", "5", "0", "4", "0", "0",
+                    "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
+                    "NORMAL", 30,  "beginner");
+            quoridor.shortestPahtPeon(1);
+            quoridor.addBarrier(Color.blue, 0,1,false,"n");
+            quoridor.addBarrier(Color.red, 5, 6, true, "l");
+            quoridor.addBarrier(Color.blue, 0, 7, false, "n");
+            quoridor.addBarrier(Color.red, 12, 5, false, "l");
+            quoridor.addBarrier(Color.blue, 9, 2, true, "n");
+            quoridor.addBarrier(Color.red, 13, 8, true, "l");
+            quoridor.addBarrier(Color.blue, 3, 10, true, "n");
+            String[] shortestPath = quoridor.reconstructShortestPath(1).toArray(new String[0]);
+            quoridor.printBoard();
+
+        }
+        catch(Exception e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
 }

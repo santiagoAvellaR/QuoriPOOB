@@ -184,10 +184,11 @@ public class Quoridor implements Serializable{
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         try {
-            if (!vsMachine || selectedPlayer.equals(player1)) {
-                selectedPlayer.movePeon(direction);
-                maintainTime(playerColor);
-                actualizeEachTurn(playerColor);
+            selectedPlayer.movePeon(direction);
+            maintainTime(playerColor);
+            actualizeEachTurn(playerColor);
+            if (vsMachine && selectedPlayer.equals(player1)) {
+                machineTurn();
             }
         } catch (QuoridorException e) {
             if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
@@ -211,21 +212,22 @@ public class Quoridor implements Serializable{
         Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
-        if (!vsMachine || selectedPlayer.equals(player1)) {
-            if (!selectedPlayer.stillHasBarrierType(playerColor, type)) {
-                throw new QuoridorException(QuoridorException.DONT_HAVE_BARRIERS_LEFT);
-            }
-            board.addBarrier(playerColor, row, column, lengthBarriersTypes.get(type), horizontal, type);
-            if (!player1.peonHasAnExit()){
-                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal, null);
-                throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON1);
-            }
-            if (!player2.peonHasAnExit()){
-                board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal, null);
-                throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON2);
-            }
-            selectedPlayer.reduceNumberBarriers(playerColor, type);
-            actualizeEachTurn(playerColor);
+        if (!selectedPlayer.stillHasBarrierType(playerColor, type)) {
+            throw new QuoridorException(QuoridorException.DONT_HAVE_BARRIERS_LEFT);
+        }
+        board.addBarrier(playerColor, row, column, lengthBarriersTypes.get(type), horizontal, type);
+        if (!player1.peonHasAnExit()){
+            board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal, null);
+            throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON1);
+        }
+        if (!player2.peonHasAnExit()){
+            board.deleteBarrier(row, column, lengthBarriersTypes.get(type), horizontal, null);
+            throw new QuoridorException(QuoridorException.BARRIER_TRAP_PEON2);
+        }
+        selectedPlayer.reduceNumberBarriers(playerColor, type);
+        actualizeEachTurn(playerColor);
+        if (vsMachine && selectedPlayer.equals(player1)) {
+            machineTurn();
         }
     }
 
@@ -239,17 +241,26 @@ public class Quoridor implements Serializable{
             Machine machine = (Machine) player2;
             try {
                 machine.play();
-                actualizeEachTurn(machine.getColor());
             }
             catch (QuoridorException e) {
                 if (e.getMessage().equals(QuoridorException.MACHINE_ADD_A_BARRIER)){
-                    addBarrier(machine.getColor(), machine.getRow(), machine.getColumn(), machine.isHorizontal(), machine.getBarrierType());
-                    notifyMachineAddBarrierObservers(QuoridorException.MACHINE_ADD_A_BARRIER, machine.getRow(), machine.getColumn(), machine.getBarrierType(), machine.isHorizontal());
+                    try {
+                        System.out.println("añadiendo barrera al tablero");
+                        addBarrier(machine.getColor(), machine.getRow(), machine.getColumn(), machine.isHorizontal(), machine.getBarrierType());
+                        actualizeEachTurn(machine.getColor());
+                        notifyMachineAddBarrierObservers(QuoridorException.MACHINE_ADD_A_BARRIER, machine.getRow(), machine.getColumn(), machine.getBarrierType(), machine.isHorizontal());
+                    } catch (QuoridorException e1) {
+                        if (e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON1) || e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON2)){
+                            machineTurn();
+                        }
+                    }
                 } else if (e.getMessage().equals(QuoridorException.MACHINE_MOVE_PEON)) {
+                    System.out.println("moviendo peon en el tablero");
+                    System.out.println(player2.getColor().toString() + " " + machine.getColor().toString());
                     movePeon(machine.getColor(), machine.getDirection());
-                    notifyMachineMovePeonObservers(QuoridorException.MACHINE_MOVE_PEON);
-                }
-                else {
+                    actualizeEachTurn(machine.getColor());
+                    notifyMachineMovePeonObservers(QuoridorException.MACHINE_MOVE_PEON, machine.getPeon().getContraryMovement(machine.getDirection()));
+                } else {
                     throw new QuoridorException(e.getMessage());
                 }
             }
@@ -320,9 +331,9 @@ public class Quoridor implements Serializable{
         }
 
     }
-    private void notifyMachineMovePeonObservers(String message) {
+    private void notifyMachineMovePeonObservers(String message, String direction) {
         for (QuoridorObserver observer : observers) {
-            observer.machineMovePeon(message);
+            observer.machineMovePeon(message, direction);
         }
     }
     private void notifyMachineAddBarrierObservers(String message, int row, int column, String type, boolean isHorizontal) {
