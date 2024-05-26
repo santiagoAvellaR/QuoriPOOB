@@ -128,7 +128,7 @@ public class Quoridor implements Serializable{
                     System.out.println("¡Tiempo agotado para " + playerNumber + "! El juego ha terminado.");
                     ((Timer) e.getSource()).stop();
                     String message = playerNumber == 1 ? QuoridorException.TIMES_UP_PLAYER_ONE : QuoridorException.TIMES_UP_PLAYER_TWO;
-                    notifyObservers(message);
+                    notifyTimesUpObservers(message);
                     delta = 2;
                 }
             }
@@ -237,8 +237,22 @@ public class Quoridor implements Serializable{
     public void machineTurn() throws QuoridorException {
         if (vsMachine){
             Machine machine = (Machine) player2;
-            machine.play();
-            actualizeEachTurn(machine.getColor());
+            try {
+                machine.play();
+                actualizeEachTurn(machine.getColor());
+            }
+            catch (QuoridorException e) {
+                if (e.getMessage().equals(QuoridorException.MACHINE_ADD_A_BARRIER)){
+                    addBarrier(machine.getColor(), machine.getRow(), machine.getColumn(), machine.isHorizontal(), machine.getBarrierType());
+                    notifyMachineAddBarrierObservers(QuoridorException.MACHINE_ADD_A_BARRIER, machine.getRow(), machine.getColumn(), machine.getBarrierType(), machine.isHorizontal());
+                } else if (e.getMessage().equals(QuoridorException.MACHINE_MOVE_PEON)) {
+                    movePeon(machine.getColor(), machine.getDirection());
+                    notifyMachineMovePeonObservers(QuoridorException.MACHINE_MOVE_PEON);
+                }
+                else {
+                    throw new QuoridorException(e.getMessage());
+                }
+            }
         }
     }
 
@@ -300,9 +314,20 @@ public class Quoridor implements Serializable{
         observers.remove(observer);
     }
 
-    private void notifyObservers(String message) {
+    private void notifyTimesUpObservers(String message) {
         for (QuoridorObserver observer : observers) {
             observer.timesUp(message);
+        }
+
+    }
+    private void notifyMachineMovePeonObservers(String message) {
+        for (QuoridorObserver observer : observers) {
+            observer.machineMovePeon(message);
+        }
+    }
+    private void notifyMachineAddBarrierObservers(String message, int row, int column, String type, boolean isHorizontal) {
+        for (QuoridorObserver observer : observers) {
+            observer.machineAddBarrier(message, row, column, type, isHorizontal);
         }
     }
 
@@ -360,6 +385,13 @@ public class Quoridor implements Serializable{
             player1.peonShortestPath();
         } else {
             player2.peonShortestPath();
+        }
+    }
+    public ArrayList<String> reconstructShortestPath(int numberPeon){
+        if (numberPeon == 1) {
+            return player1.getPeon().reconstructShortestPath();
+        } else {
+            return player2.getPeon().reconstructShortestPath();
         }
     }
 }

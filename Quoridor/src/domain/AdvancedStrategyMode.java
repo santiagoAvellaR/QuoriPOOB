@@ -1,9 +1,9 @@
 package src.domain;
 
-public class AdvancedStrategyMode implements MachineStrategy{
+public class AdvancedStrategyMode extends StrategyMode implements MachineStrategy{
 
     @Override
-    public void makeMove(Board board, Peon peon, Player otherPlayer){
+    public void makeMove(Board board, Peon peon, Player otherPlayer, int normalBarriers, int temporaryBarriers, int longBarriers, int alliedBarriers){
 
     }
 }

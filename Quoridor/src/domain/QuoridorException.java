@@ -35,6 +35,9 @@ public class QuoridorException extends Exception implements Serializable {
     public static final String PEON_HAS_BEEN_TELEPORTED = "The peon has been teleported to another position";
     public static final String PEON_STEPPED_BACK = "The peon has been teleported to another position";
     public static final String PLAYER_PLAYS_TWICE = "Player plays twice";
+    // machine
+    public static final String MACHINE_ADD_A_BARRIER = "Machine adds a barrier";
+    public static final String MACHINE_MOVE_PEON = "Machine move peon";
 
     public QuoridorException(String message){
         super(message);

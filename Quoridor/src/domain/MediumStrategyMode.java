@@ -1,8 +1,8 @@
 package src.domain;
 
-public class MediumStrategyMode implements MachineStrategy{
+public class MediumStrategyMode extends StrategyMode implements MachineStrategy{
     @Override
-    public void makeMove(Board board, Peon peon, Player otherPlayer){
+    public void makeMove(Board board, Peon peon, Player otherPlayer, int normalBarriers, int temporaryBarriers, int longBarriers, int alliedBarriers){
 
     }
 }

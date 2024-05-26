@@ -298,4 +298,31 @@ public class Board implements Serializable{
         board[row][column] = new Transporter(row, column, color);
     }
 
+    public boolean barrierCanBePlace(int row, int column, int length, boolean isHorizontal) {
+        if (!isHorizontal){
+            for (int i = row; i < length*2 - 1; i++) {
+                try {
+                    if (board[i][column] != null) {
+                        return false;
+                    }
+                } catch (IndexOutOfBoundsException e){
+                    return false;
+                }
+            }
+        }
+        else {
+            for (int j = column; j < length*2 - 1; j++) {
+                try {
+                    if (board[row][j] != null) {
+                        return false;
+                    }
+                } catch (IndexOutOfBoundsException e){
+                    return false;
+                }
+
+            }
+        }
+        return true;
+    }
+
 }

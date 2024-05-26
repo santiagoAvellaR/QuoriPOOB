@@ -662,7 +662,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         labelTurns.setFont(gameFont20);
         labelTurns.setPreferredSize(new Dimension(200, 60));
         panelTurns = new JPanel();
-        playerTurno = player1Color;
+        turns = quoridor.getTurns();
+        playerTurno = (turns%2==0)?player1Color:player2Color;
         panelTurns.setBackground(playerTurno);
         panelTurns.setPreferredSize(new Dimension(60,60));
         finishButton = createButton("Finish", buttonSize);
@@ -673,12 +674,12 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         options.add(turnos, gbcOptions);
         gbcOptions.gridx = 1;
         gbcOptions.anchor = GridBagConstraints.CENTER;
-        String gameMode = (String) difficulties.getSelectedItem();
+        String gameMode =  quoridor.getGameMode();
         if(!gameMode.equals("NORMAL")){
-            String time = String.valueOf(seconds.getValue());
             timeTurno = new JLabel();
-            int segundos = quoridor.getTimePlayer(player1Color);
-            tiempoDis = createTimer(segundos, player1Color);
+            turns = quoridor.getTurns();
+            int segundos = quoridor.getTimePlayer(playerTurno);
+            tiempoDis = createTimer(segundos, playerTurno);
             timeTurno.setFont(gameFont20);
             tiempoDis.start();
             options.add(timeTurno, gbcOptions);
@@ -698,6 +699,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             public void actionPerformed(ActionEvent e) {
                 if(Player.equals(playerTurno)) {
                     if (time > 0) {
+
                         timeTurno.setText("Tiempo Disponible " + time);
                         time--;
                     } else {
@@ -1526,6 +1528,9 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             public void actionPerformed(ActionEvent e) {
                 casillasVisP1.clear();
                 casillasVisP2.clear();
+                if(!quoridor.getGameMode().equals("NORMAL")){
+                    tiempoDis.stop();
+                }
                 newGameButton.doClick();
                 revalidate();
                 repaint();
@@ -1654,6 +1659,9 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 int result = JOptionPane.showConfirmDialog(this, new Object[]{"Ingrese el nombre del archivo:", nombreArchivoField}, "Guardar quoridor", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION && !nombreArchivoField.getText().isEmpty()) {
                     try {
+                        if(!quoridor.getGameMode().equals("NORMAL")){
+                            tiempoDis.stop();
+                        }
                         String nombreArchivo = nombreArchivoField.getText() + ".dat";
                         java.io.File archivo = new java.io.File(selectedFolder.getAbsolutePath() + java.io.File.separator + nombreArchivo);
                         quoridor.save(archivo);
@@ -1673,6 +1681,11 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     }
     private ActionListener optionOpen(){
         return (event)->{
+            if(quoridor != null){
+                if(!quoridor.getGameMode().equals("NORMAL")){
+                    tiempoDis.stop();
+                }
+            }
             JFileChooser openFileChooser = new JFileChooser();
             int result = openFileChooser.showOpenDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
@@ -1680,6 +1693,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 try {
                     quoridor = Quoridor.open(selectedFile);
                     turns = quoridor.getTurns();
+                    player1Color = quoridor.getColorPlayer(0);
+                    player2Color = quoridor.getColorPlayer(1);
                     barrierTypePlayer1 = new JComboBox<String>();
                     barrierTypePlayer2 = new JComboBox<String>();
                     barrierTypePlayer1.addItem("Normales");
@@ -1699,8 +1714,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     prepareStartGameWindowElements();
                     prepareStartGameWindowActions();
                     setContentPane(gamePanel);
-                    player1Color = quoridor.getColorPlayer(0);
-                    player2Color = quoridor.getColorPlayer(1);
+
 
                     actualizarTurnos();
                     repaint();
@@ -1754,6 +1768,17 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     public void timesUp(String message) {
         JOptionPane.showMessageDialog(this, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
     }
+
+    @Override
+    public void machineMovePeon(String message) {
+        JOptionPane.showMessageDialog(this, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
+    }
+
+    @Override
+    public void machineAddBarrier(String message, int row, int column, String type, boolean isHorizontal) {
+        JOptionPane.showMessageDialog(this, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
+    }
+
 
     public static void main(String args[]){
         QuoridorGUI gui = new QuoridorGUI();

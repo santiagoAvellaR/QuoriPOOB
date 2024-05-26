@@ -3,6 +3,7 @@ package src.domain;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Peon extends Field implements Serializable {
@@ -18,6 +19,9 @@ public class Peon extends Field implements Serializable {
     private int transporterSquares;
     private String squareType;
     private HashMap<String, String> oppositeMovements;
+    private Integer[][] costsMatrix;
+    private String[][] directionsMatrix;
+    private ArrayList<String> shortestPath;
 
     public Peon(int row, int column, Board board, Color color, int numberPlayer) {
         super(color);
@@ -33,6 +37,7 @@ public class Peon extends Field implements Serializable {
         normalSquares = 1;
         squareType = "Normal";
         initializeHashOppositeMovements();
+
     }
     private void initializeHashOppositeMovements(){
         oppositeMovements = new HashMap<>();
@@ -425,6 +430,38 @@ public class Peon extends Field implements Serializable {
         System.out.println(((System.currentTimeMillis()-startTime)) + " miliseconds");
         printMatrix(path);
         printMatrix(costs);
+        directionsMatrix = path;
+        costsMatrix = costs;
+    }
+    public ArrayList<String> reconstructShortestPath(){
+        Integer[][] costs = new Integer[board.getBoardSize()/2 + 1][board.getBoardSize()/2 + 1];
+        for (Integer[] ints : costs) {
+            Arrays.fill(ints, Integer.MAX_VALUE);
+        }
+        costs[getRow()/2][getColumn()/2] = 0;
+        shortestPath(this.row, this.column, new String[getBoardSize()/2 + 1][getBoardSize()/2 + 1], costs, "");
+        int min, row, column;
+        column = 0;
+        min = Integer.MAX_VALUE;
+        row = playerNumber == 1 ? 0 : costsMatrix.length-1;
+        Integer[] significantRow= playerNumber == 1 ? costsMatrix[0] : costsMatrix[costsMatrix.length-1];
+        for (int i = 0; i < costsMatrix.length; i++){
+            if (significantRow[i] < min){
+                min = significantRow[i];
+                column = i;
+            }
+        }
+        System.out.println("minimo: " + costsMatrix[row][column]);
+        column = column*2;
+        ArrayList<String> path = new ArrayList<>();
+        while ((row != this.row) || (column != this.column)){
+            path.addFirst(oppositeMovements.get(directionsMatrix[row/2][column/2]));
+            int[] newPosition = getTheNewPositionAccordingDirection(row, column, directionsMatrix[row/2][column/2]);
+            row = newPosition[0];
+            column = newPosition[1];
+        }
+        System.out.println(path.toString());
+        return path;
     }
 
 }

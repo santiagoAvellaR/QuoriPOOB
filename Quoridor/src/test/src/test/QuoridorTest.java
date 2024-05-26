@@ -618,12 +618,29 @@ class QuoridorTest {
 
     // -------------------------------------     TEST FOR MACHINE MOVEMENTS      -----------------------------------------------------------
     @Test
-    public void shouldCalculateTheShortestPathOfAPeon() {
+    public void shouldCalculateTheShortestPathOfAPeon1() {
         try{
             quoridor = new Quoridor("4", "2", "0", "1", "1", "0",
                     "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "NORMAL", 30,  "beginner");
             quoridor.shortestPahtPeon(1);
+            String[] shortestPath = quoridor.reconstructShortestPath(1).toArray(new String[0]);
+
+        }
+        catch(Exception e){
+            fail("threw the exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldCalculateTheShortestPathOfAPeon2() {
+        try{
+            quoridor = new Quoridor("9", "2", "0", "1", "1", "0",
+                    "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
+                    "NORMAL", 30,  "beginner");
+            quoridor.shortestPahtPeon(1);
+            String[] shortestPath = quoridor.reconstructShortestPath(1).toArray(new String[0]);
+
         }
         catch(Exception e){
             fail("threw the exception: " + e.getMessage());
