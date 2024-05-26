@@ -46,11 +46,9 @@ public class Machine extends Player implements Serializable {
         return strategy.getMovementType();
     }
     public String getDirection() {
-        System.out.println(strategy.getDirection());
         return strategy.getDirection();
     }
     public String getBarrierType() {
-        System.out.println(strategy.getBarrierType());
         return strategy.getBarrierType();
     }
     public int getRow() {

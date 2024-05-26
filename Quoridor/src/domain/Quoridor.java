@@ -180,6 +180,7 @@ public class Quoridor implements Serializable{
     }
 
     public void movePeon(Color playerColor, String direction) throws QuoridorException {
+        System.out.println(turns + " " + playerColor);
         Player selectedPlayer = player1.getColor().equals(playerColor) ? player1 : player2;
         Player playerWhoIsSupposedToMove = turns%2 == 0 ? player1 : player2;
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
@@ -250,13 +251,13 @@ public class Quoridor implements Serializable{
                         actualizeEachTurn(machine.getColor());
                         notifyMachineAddBarrierObservers(QuoridorException.MACHINE_ADD_A_BARRIER, machine.getRow(), machine.getColumn(), machine.getBarrierType(), machine.isHorizontal());
                     } catch (QuoridorException e1) {
-                        if (e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON1) || e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON2)){
+                        if (e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON1) || e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON2) ||
+                                e1.getMessage().equals(QuoridorException.BARRIER_ALREADY_CREATED) || e1.getMessage().equals(QuoridorException.BARRIER_OVERLAP)){
                             machineTurn();
                         }
                     }
                 } else if (e.getMessage().equals(QuoridorException.MACHINE_MOVE_PEON)) {
                     System.out.println("moviendo peon en el tablero");
-                    System.out.println(player2.getColor().toString() + " " + machine.getColor().toString());
                     movePeon(machine.getColor(), machine.getDirection());
                     actualizeEachTurn(machine.getColor());
                     notifyMachineMovePeonObservers(QuoridorException.MACHINE_MOVE_PEON, machine.getPeon().getContraryMovement(machine.getDirection()));
@@ -284,13 +285,20 @@ public class Quoridor implements Serializable{
     }
 
     public void actualizeEachTurn(Color playerColor) throws QuoridorException {
-        maintainTime(playerColor);
-        turns += delta;
-        System.out.println("tuno: " + turns);
-        System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
-        System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
-        printBoard();
-        board.fieldActEachTurn();
+        Color playerColorTurn = turns%2 == 0 ? player1.getColor() : player2.getColor();
+        if (playerColorTurn.equals(playerColor)) {
+            if (gameMode.equals("TIMED") || gameMode.equals("TIME TRIAL")) {
+                maintainTime(playerColor);
+            }
+            turns += delta;
+            System.out.println("tuno: " + turns);
+            System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
+            System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
+            printBoard();
+            player1.getPeon().actualizeInformationToWin();
+            player2.getPeon().actualizeInformationToWin();
+            board.fieldActEachTurn();
+        }
     }
 
     public int[][] getPeonsPositions(){

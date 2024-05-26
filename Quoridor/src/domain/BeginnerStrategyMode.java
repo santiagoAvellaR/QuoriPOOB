@@ -13,9 +13,12 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
             isHorizontal = generateRandomNumber(2) == 0;
             barrierType = selectBarrierType(normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);
             int barrierLength = barrierType.equals("l") ? 3 : 2;
+            System.out.println(oddNumberGenerator(barrierLength == 3 ? board.getBoardSize()-4 : board.getBoardSize()-2));
+            System.out.println(oddNumberGenerator(barrierLength == 3 ? board.getBoardSize()-4 : board.getBoardSize()-2));
+            System.out.println(oddNumberGenerator(barrierLength == 3 ? board.getBoardSize()-4 : board.getBoardSize()-2));
             if (isHorizontal){
-                int row = oddNumberGenerator(board.getBoardSize());
-                int column = evenNumberGenerator(board.getBoardSize());
+                int row = oddNumberGenerator(barrierLength == 3 ? board.getBoardSize()-4 : board.getBoardSize()-2);
+                int column = evenNumberGenerator(barrierLength == 3 ? board.getBoardSize()-4 : board.getBoardSize()-2);
                 if (board.barrierCanBePlace(row, column, barrierLength, isHorizontal)){
                     this.row = row;
                     this.column = column;
@@ -25,11 +28,12 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
                 }
             }
             else {
-                int row = evenNumberGenerator(board.getBoardSize());
-                int column = oddNumberGenerator(board.getBoardSize());
+                int row = evenNumberGenerator(barrierLength == 3 ? board.getBoardSize()-4 : board.getBoardSize()-2);
+                int column = oddNumberGenerator(barrierLength == 3 ? board.getBoardSize()-4 : board.getBoardSize()-2);
                 if (board.barrierCanBePlace(row, column, barrierLength, isHorizontal)){
                     this.row = row;
                     this.column = column;
+                    System.out.println("barrera: " + row + " " + column + " " + barrierLength + " " + isHorizontal + " " + barrierType);
                     throw new QuoridorException(QuoridorException.MACHINE_ADD_A_BARRIER);
                 } else {
                     makeMove(board, peon, otherPlayer, normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);
@@ -77,7 +81,7 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
     }
     private static int oddNumberGenerator(int limit) {
         Random random = new Random();
-        return random.nextInt((limit / 2) + 1) * 2 + 1;
+        return random.nextInt((limit / 2)) * 2 + 1;
     }
 
 }

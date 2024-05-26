@@ -22,6 +22,7 @@ public class Peon extends Field implements Serializable {
     private Integer[][] costsMatrix;
     private String[][] directionsMatrix;
     private ArrayList<String> shortestPath;
+    private int minimumNumberMovementsToWin;
 
     public Peon(int row, int column, Board board, Color color, int numberPlayer) {
         super(color);
@@ -37,7 +38,6 @@ public class Peon extends Field implements Serializable {
         normalSquares = 1;
         squareType = "Normal";
         initializeHashOppositeMovements();
-
     }
     private void initializeHashOppositeMovements(){
         oppositeMovements = new HashMap<>();
@@ -112,6 +112,7 @@ public class Peon extends Field implements Serializable {
         row += (direction * 2);
         tracker.add(goesUp ? "s" : "n");
         board.movePeon(row + direction*2*-1, column, row, column);
+
 
     }
     public void moveHorizontal(boolean goesLeft) throws QuoridorException {
@@ -427,9 +428,6 @@ public class Peon extends Field implements Serializable {
                 shortestPath(newPosition[0], newPosition[1], path, costs, oppositeMovements.get(direction));
             }
         }
-        System.out.println(((System.currentTimeMillis()-startTime)) + " miliseconds");
-        printMatrix(path);
-        printMatrix(costs);
         directionsMatrix = path;
         costsMatrix = costs;
     }
@@ -451,7 +449,7 @@ public class Peon extends Field implements Serializable {
                 column = i;
             }
         }
-        System.out.println("minimo: " + costsMatrix[row][column]);
+        minimumNumberMovementsToWin = min;
         column = column*2;
         ArrayList<String> path = new ArrayList<>();
         while ((row != this.row) || (column != this.column)){
@@ -460,9 +458,24 @@ public class Peon extends Field implements Serializable {
             row = newPosition[0];
             column = newPosition[1];
         }
-        System.out.println(path.toString());
+        shortestPath = path;
         return path;
     }
+
+    public void actualizeInformationToWin(){
+        Integer[][] costs = new Integer[getBoardSize()/2 + 1][getBoardSize()/2 + 1];
+        for (Integer[] ints : costs) {
+            Arrays.fill(ints, Integer.MAX_VALUE);
+        }
+        costs[getRow()/2][getColumn()/2] = 0;
+        shortestPath(getRow(), getColumn(), new String[getBoardSize()/2 + 1][getBoardSize()/2 + 1], costs, "");
+        reconstructShortestPath();
+        System.out.println("Peon" + playerNumber + ": minimo numero de pasos para ganar: " + minimumNumberMovementsToWin);
+        printMatrix(costsMatrix);
+        printMatrix(directionsMatrix);
+        System.out.println(shortestPath.toString());
+    }
+
 
     public String getContraryMovement(String movement){
         return oppositeMovements.get(movement);

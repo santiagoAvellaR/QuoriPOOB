@@ -299,27 +299,20 @@ public class Board implements Serializable{
     }
 
     public boolean barrierCanBePlace(int row, int column, int length, boolean isHorizontal) {
+        if (row + (length*2)-1 >= getBoardSize() && !isHorizontal) {return false;}
+        if (column + (length*2)-1 >= getBoardSize() && isHorizontal) {return false;}
         if (!isHorizontal){
             for (int i = row; i < length*2 - 1; i++) {
-                try {
-                    if (board[i][column] != null) {
-                        return false;
-                    }
-                } catch (IndexOutOfBoundsException e){
+                if (board[i][column] != null) {
                     return false;
                 }
             }
         }
         else {
             for (int j = column; j < length*2 - 1; j++) {
-                try {
-                    if (board[row][j] != null) {
-                        return false;
-                    }
-                } catch (IndexOutOfBoundsException e){
+                if (board[row][j] != null) {
                     return false;
                 }
-
             }
         }
         return true;
