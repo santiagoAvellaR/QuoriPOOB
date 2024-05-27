@@ -399,8 +399,10 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                             (numberPlayersCB.getSelectedItem().equals("1 PLAYER")),
                             player1Name,
                             player1Color,
+                            "FORMA PEON1",
                             player2Name,
                             player2Color,
+                            "FORMA PEON2",
                             (String) difficulties.getSelectedItem(),
                             (seconds != null) ? seconds.getValue() : 0,
                             (String)modalities.getSelectedItem());
@@ -1028,66 +1030,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         inf.setPreferredSize(new Dimension(tampanel, tampanel));
         return inf;
     }
-    private JPanel createBoard(Color boardColor) {
-        boardPanel = new JPanel(new GridBagLayout());
-        int tamBoard = screenSize.height;
-        int numero = boardSize.getText().isEmpty() ? 9 : Integer.parseInt(boardSize.getText().trim());
-        int SQUARE_SIZE = (int) ((tamBoard) / (2 * numero - 1));
-        int BARRIER_WIDTH = (int) ((float) (tamBoard * 0.15) / numero); // Ancho de la barrera ajustado para ser proporcional al tamaño de la celda
-        this.board = new JPanel[2 * numero - 1][2 * numero - 1];
-        GridBagConstraints gbc = new GridBagConstraints();
-        for (int i = 0; i < 2 * numero - 1; i++) {
-            for (int j = 0; j < 2 * numero - 1; j++) {
-                gbc.gridx = j;
-                gbc.gridy = i;
-                int midColumn = numero % 2 == 0 ? numero - 2 : numero - 1;
-                if (i % 2 == 0 && j % 2 == 0) {
-                    String type = quoridor.getTypeOfField(i, j);
-                    this.board[i][j] = new JPanel(new FlowLayout());
-                    if(type.equals("Empty")){this.board[i][j].setBackground(boardColor);}
-                    else if(type.equals("ReWind")){this.board[i][j].setBackground(regresar);}
-                    else if(type.equals("SkipTurn")){this.board[i][j].setBackground(dobleturno);}
-                    else if(type.equals("Transporter")){ this.board[i][j].setBackground(transporter);}
-                    this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
-                    if (i == 0 && j == midColumn) {
-                        this.board[i][j].setBackground(boardColor);
-                        P2 = new JPanel();
-                        P2 =  createFormPeon(P2, SQUARE_SIZE);
-                        P2.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
-                        P2.addMouseListener(movePlayer(player2Color));
-                        this.board[i][midColumn].add(P2);
-                    } else if (i == this.board.length - 1 && j == midColumn) {
-                        this.board[i][j].setBackground(boardColor);
-                        P1 = new JPanel();
-                        P1 = createFormPeon(P1, SQUARE_SIZE);
-                        P1.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
-                        P1.addMouseListener(movePlayer(player1Color));
-                        this.board[this.board.length - 1][midColumn].add(P1);
-                    }
-                } else if (i % 2 == 0 && j % 2 == 1) { // verticales
-                    this.board[i][j] = createBarrier(Color.GRAY, BARRIER_WIDTH, SQUARE_SIZE);
-                    int barrierX = (int) ((j + 1) * SQUARE_SIZE + j * BARRIER_WIDTH);
-                    int barrierY = (int) (i * SQUARE_SIZE + i * BARRIER_WIDTH);
-                    this.board[i][j].setBounds(barrierX, barrierY, BARRIER_WIDTH, SQUARE_SIZE);
-                    this.board[i][j].addMouseListener(createBarrierMouseListener(this.board[i][j], i, j, true));
-                } else if (i % 2 == 1 && j % 2 == 0) {// horizontales
-                    this.board[i][j] = createBarrier(Color.GRAY, SQUARE_SIZE, BARRIER_WIDTH); // Cambia el orden de SQUARE_SIZE y BAR_WIDTH
-                    int barrierX = (int) (j * SQUARE_SIZE + j * BARRIER_WIDTH);
-                    int barrierY = (int) ((i + 1) * SQUARE_SIZE + i * BARRIER_WIDTH);
-                    this.board[i][j].setBounds(barrierX, barrierY, SQUARE_SIZE, BARRIER_WIDTH);
-                    this.board[i][j].addMouseListener(createBarrierMouseListener(this.board[i][j], i, j, false));
-                } else {
-                    JPanel espacio = new JPanel();// espacio vacío
-                    espacio.setPreferredSize(new Dimension(BARRIER_WIDTH, BARRIER_WIDTH));
-                    espacio.setBackground(Color.GRAY);
-                    this.board[i][j] = espacio; // Cambia el orden de SQUARE_SIZE y BARRIER_WIDTH
-                }
-                boardPanel.add(this.board[i][j], gbc);
-            }
-        }
-        boardPanel.setPreferredSize(new Dimension(tamBoard, tamBoard));
-        return boardPanel;
-    }
+
     private JPanel createBarrier(Color color, int width, int height) {
         JPanel barrierPanel = new JPanel();
         barrierPanel.setBackground(color);
@@ -1229,14 +1172,14 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 if (i % 2 == 0 && j % 2 == 0) {
                     this.board[i][j] = new JPanel(new FlowLayout());
                     if(type.equals("Empty")){this.board[i][j].setBackground(boardColor);}
-                    else if(type.equals("Rewind")){this.board[i][j].setBackground(regresar);}
+                    else if(type.equals("ReWind")){this.board[i][j].setBackground(regresar);}
                     else if(type.equals("SkipTurn")){this.board[i][j].setBackground(dobleturno);}
                     else if(type.equals("Transporter")){ this.board[i][j].setBackground(transporter);}
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
                     if(type.equals("Peon2")){
                         this.board[i][j].setBackground(boardColor);
                         P2 = new JPanel();
-                        P2 = createFormPeon(P2, SQUARE_SIZE);
+                        P2 = createFormPeon(P2, SQUARE_SIZE,"f");
                         P2.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
                         player2Color = quoridor.getColorPlayer(1);
                         P2.addMouseListener(movePlayer(player2Color));
@@ -1245,7 +1188,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     else if (type.equals("Peon1")){
                         this.board[i][j].setBackground(boardColor);
                         P1 = new JPanel();
-                        P1 = createFormPeon(P1, SQUARE_SIZE);
+                        P1 = createFormPeon(P1, SQUARE_SIZE,"c");
                         P1.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
                         player2Color = quoridor.getColorPlayer(0);
                         P1.addMouseListener(movePlayer(player1Color));
@@ -1791,23 +1734,72 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         }
         return cambiar;
     }
-    public  JPanel createFormPeon(JPanel player, int font) {
+    public JPanel createFormPeon(JPanel player, int font, String forma) {
         Color colorP = (player.equals(P1)) ? player1Color : player2Color;
-        JPanel circlePanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                int diameter = Math.min(getWidth(), getHeight());
-                int x = (getWidth() - diameter) / 2;
-                int y = (getHeight() - diameter) / 2;
-                g.setColor(colorP);
-                g.fillOval(x, y, diameter, diameter);
-            }
-        };
-        circlePanel.setOpaque(false);
-        circlePanel.setPreferredSize(new Dimension(font, font));
-        return circlePanel;
+
+        if (forma.equals("c")) {
+            JPanel circlePanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    int diameter = Math.min(getWidth(), getHeight());
+                    int x = (getWidth() - diameter) / 2;
+                    int y = (getHeight() - diameter) / 2;
+                    g.setColor(colorP);
+                    g.fillOval(x, y, diameter, diameter);
+                }
+            };
+            circlePanel.setOpaque(false);
+            circlePanel.setPreferredSize(new Dimension(font, font));
+            return circlePanel;
+        } else if (forma.equals("t")) {
+            JPanel trianglePanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    int width = getWidth();
+                    int height = getHeight();
+                    int[] xPoints = {width / 2, 0, width};
+                    int[] yPoints = {0, height, height};
+                    g.setColor(colorP);
+                    g.fillPolygon(xPoints, yPoints, 3);
+                }
+            };
+            trianglePanel.setOpaque(false);
+            trianglePanel.setPreferredSize(new Dimension(font, font));
+            return trianglePanel;
+        } else if (forma.equals("f")) {
+            JPanel flowerPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+
+                    int[][] deltas = {
+                            {font / 4, 0},
+                            {0, font / 8},
+                            {2 * font / 4, font / 8},
+                            {0, 3 * font / 8},
+                            {2 * font / 4, 3 * font / 8},
+                            {font / 4, 2 * font / 4}
+                    };
+                    g.setColor(colorP);
+                    // Dibujar los pétalos
+                    for (int[] delta : deltas) {
+                        g.fillOval(delta[0], delta[1], font / 4, font / 4);
+                    }
+                    // Dibujar el centro de la flor
+                    g.setColor(colorP); // Asegúrate de cambiar el color al del centro
+                    g.fillOval(font / 4, font / 4, font / 4, font / 4);
+                }
+            };
+            flowerPanel.setOpaque(false);
+            flowerPanel.setPreferredSize(new Dimension(font, font));
+            return flowerPanel;
+        } else {
+            return player;
+        }
     }
+
     public void posicionesEliminar(int row, int column, String direction){
         System.out.println("se elimina en " + direction);
         if(direction.equals("s")){

@@ -2,7 +2,6 @@ package src.domain;
 
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Board implements Serializable{
@@ -10,13 +9,13 @@ public class Board implements Serializable{
     private Field[][] board;
     private Temporary deletedTemporary;
 
-    public Board(int size, Color player1Color, Color player2Color, int transporterSquares, int rewindSquares, int skipTurnSquares) {
+    public Board(int size, Color player1Color, String shapePeon1, Color player2Color, String shapePeon2, int transporterSquares, int rewindSquares, int skipTurnSquares) {
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         int midColumn = size % 2 == 0 ? size - 2 : size - 1;
-        Peon peon1 = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1);
+        Peon peon1 = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1, shapePeon1);
         board[getBoardSize() - 1][midColumn] = peon1;
-        Peon peon2 = new Peon(0, midColumn, this, player2Color, 2);
+        Peon peon2 = new Peon(0, midColumn, this, player2Color, 2, shapePeon2);
         board[0][midColumn] = peon2;
         fillTheBoard(transporterSquares, rewindSquares, skipTurnSquares, peon1, peon2);
         System.out.println("tablero inicial");
@@ -49,7 +48,7 @@ public class Board implements Serializable{
             if (board[row][column] == null) {
                 addRewindSquare(row, column);
                 rewindSquares--;
-                if (!peon1.hasAnExitPrincipal(peon1.getRow(), peon1.getColumn()) || !peon2.hasAnExitPrincipal(peon2.getRow(), peon2.getColumn())) {
+                if (!peon1.hasAnExitMainMethod(peon1.getRow(), peon1.getColumn()) || !peon2.hasAnExitMainMethod(peon2.getRow(), peon2.getColumn())) {
                     board[row][column] = null;
                     rewindSquares ++;
                 }

@@ -10,7 +10,7 @@ import java.util.logging.Level;
  */
 public class Log{
     public static String name = "Project";
-    public static String logFilePath = "C:\\Users\\ADMIN\\Desktop\\Quoridor\\Quoridor\\" + name + ".log";
+    public static String logFilePath = "C:\\Users\\Asus\\Documents\\Escuela\\Sistemas\\2024-1 POOB\\proyectoFinal Quoridor\\Log errores\\" + name + ".log";
 
     public static void record(Exception e){
         try{

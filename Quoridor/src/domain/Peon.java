@@ -7,7 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class Peon extends Field implements Serializable {
-    private final int playerNumber;
+    private int playerNumber = 0;
+    private String shape;
     private int row;
     private int column;
     private final Board board;
@@ -24,13 +25,14 @@ public class Peon extends Field implements Serializable {
     private ArrayList<String> shortestPath;
     private int minimumNumberMovementsToWin;
 
-    public Peon(int row, int column, Board board, Color color, int numberPlayer) {
+    public Peon(int row, int column, Board board, Color color, int numberPlayer, String shape) {
         super(color);
         this.row = row;
         this.column = column;
         this.board = board;
         tracker = new ArrayList<String>();
         this.playerNumber = numberPlayer;
+        this.shape = shape;
         rewindSquares = 0;
         skipTurnSquares = 0;
         teleporterSquares = 0;
@@ -286,7 +288,25 @@ public class Peon extends Field implements Serializable {
     private void printMatrix(Object[][] matrix){
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j] + " ");
+                String espacio = " ";
+                if (matrix[i][j] == null) {
+                    System.out.print("I" + "  ");
+                }
+                else if (matrix[i][j] instanceof Integer) {
+                    int integer = (int)matrix[i][j];
+                    if (integer == Integer.MAX_VALUE){
+                        System.out.print("I" + "  ");
+                    }
+                    else {
+                        if (integer < 10){espacio = "  ";}
+                        System.out.print(integer + espacio);
+                    }
+                }
+                else if (matrix[i][j] instanceof String) {
+                    String string = (String)matrix[i][j];
+                    if (string.length() <= 1){espacio = "  ";}
+                    System.out.print(string + espacio);
+                }
             }
             System.out.println();
         }
@@ -294,7 +314,7 @@ public class Peon extends Field implements Serializable {
     }
 
     // functions for validate that peon has an exit (way/path to win)
-    public boolean hasAnExitPrincipal(int simulateRow, int simulateColumn){
+    public boolean hasAnExitMainMethod(int simulateRow, int simulateColumn){
         Boolean[][] visited = new Boolean[getBoardSize()/2+1][getBoardSize()/2+1];
         for (Boolean[] booleans : visited) {
             Arrays.fill(booleans, false);
@@ -437,7 +457,6 @@ public class Peon extends Field implements Serializable {
         long startTime = System.currentTimeMillis();
         if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return;}
         if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return;}
-        System.out.println("simulateRow: " + simulateRow + " simulateColumn: " + simulateColumn);
         ArrayList<String> validDirections = getValidMovements(simulateRow, simulateColumn);
         validDirections.remove(lastMovement);
         int cost = board.getTypeField(simulateRow, simulateColumn).equals("SkipTurn") ? 0 : 1;
@@ -454,18 +473,14 @@ public class Peon extends Field implements Serializable {
         directionsMatrix = path;
         costsMatrix = costs;
     }
-    public ArrayList<String> reconstructShortestPath(){
-        Integer[][] costs = new Integer[board.getBoardSize()/2 + 1][board.getBoardSize()/2 + 1];
-        for (Integer[] ints : costs) {
-            Arrays.fill(ints, Integer.MAX_VALUE);
-        }
-        costs[getRow()/2][getColumn()/2] = 0;
-        shortestPath(this.row, this.column, new String[getBoardSize()/2 + 1][getBoardSize()/2 + 1], costs, "");
+    public void reconstructShortestPath(){
+        printMatrix(directionsMatrix);
+        printMatrix(costsMatrix);
         int min, row, column;
         column = 0;
         min = Integer.MAX_VALUE;
         row = playerNumber == 1 ? 0 : costsMatrix.length-1;
-        Integer[] significantRow= playerNumber == 1 ? costsMatrix[0] : costsMatrix[costsMatrix.length-1];
+        Integer[] significantRow= costsMatrix[row];
         for (int i = 0; i < costsMatrix.length; i++){
             if (significantRow[i] < min){
                 min = significantRow[i];
@@ -474,17 +489,28 @@ public class Peon extends Field implements Serializable {
         }
         minimumNumberMovementsToWin = min;
         column = column*2;
+        row = row*2;
         ArrayList<String> path = new ArrayList<>();
+        int cont = 0;
         while ((row != this.row) || (column != this.column)){
             path.addFirst(oppositeMovements.get(directionsMatrix[row/2][column/2]));
-            printMatrix(directionsMatrix);
-            System.out.println(directionsMatrix[row/2][column/2]);
             int[] newPosition = getTheNewPositionAccordingDirection(row, column, directionsMatrix[row/2][column/2]);
             row = newPosition[0];
             column = newPosition[1];
+            cont+=1;
         }
         shortestPath = path;
-        return path;
+        System.out.println(shortestPath.toString());
+    }
+
+    public void actualizeStrategyInformation(){
+        Integer[][] costs = new Integer[board.getBoardSize()/2 + 1][board.getBoardSize()/2 + 1];
+        for (Integer[] ints : costs) {
+            Arrays.fill(ints, Integer.MAX_VALUE);
+        }
+        costs[row/2][column/2] = 0;
+        shortestPath(row, column, new String[board.getBoardSize()/2 + 1][board.getBoardSize()/2 + 1], costs, "");
+        reconstructShortestPath();
     }
 
     public String getContraryMovement(String movement){

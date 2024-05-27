@@ -30,8 +30,8 @@ public class Quoridor implements Serializable{
                     String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers,
                     String teleporterSquares, String rewindSquares, String skipTurnSquares,
                     boolean vsMachine,
-                    String playerOneName, Color playerOneColor,
-                    String playerTwoName, Color playerTwoColor,
+                    String playerOneName, Color playerOneColor, String shapePeon1,
+                    String playerTwoName, Color playerTwoColor, String shapePeon2,
                     String gameMode, int gameTime,
                     String machineMode) throws QuoridorException {
         // initialize variables
@@ -43,7 +43,7 @@ public class Quoridor implements Serializable{
         int sizeInt = validateStringSize(size);
         // board
         if (areSimilarColors(playerOneColor, playerTwoColor)) {throw new QuoridorException(QuoridorException.SIMILAR_PLAYER_COLORS);}
-        validateBoardData(sizeInt, playerOneColor, playerTwoColor, teleporterSquares, rewindSquares, skipTurnSquares);
+        validateBoardData(sizeInt, playerOneColor, shapePeon1, playerTwoColor, shapePeon2, teleporterSquares, rewindSquares, skipTurnSquares);
         // players
         validateStringNumberBarriers(normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers);
         validatePlayerData(sizeInt, playerOneColor, playerOneName, playerTwoColor, playerTwoName, normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers, machineMode);
@@ -62,7 +62,7 @@ public class Quoridor implements Serializable{
         }
         return sizeInt;
     }
-    private void validateBoardData(int size, Color playerOneColor, Color playerTwoColor, String teleporterSquares, String rewindSquares, String skipTurnSquares) throws QuoridorException {
+    private void validateBoardData(int size, Color playerOneColor, String shapePeon1, Color playerTwoColor, String shapePeon2, String teleporterSquares, String rewindSquares, String skipTurnSquares) throws QuoridorException {
         if(!(teleporterSquares.matches("[0-9]+") && !teleporterSquares.isEmpty()) ||
                 !(rewindSquares.matches("[0-9]+") && !rewindSquares.isEmpty()) ||
                 !(skipTurnSquares.matches("[0-9]+") && !skipTurnSquares.isEmpty())){
@@ -78,7 +78,7 @@ public class Quoridor implements Serializable{
         if (rewindSquaresInt > (int)(((float)(Math.pow(size, 2)))*0.75)){
             throw new QuoridorException("amount of rewind squares: " + rewindSquaresInt + QuoridorException.MAXIMUM_NUMBER_REWIND_EXCEEDED);
         }
-        board = new Board(size, playerOneColor, playerTwoColor, teleporterSquaresInt, rewindSquaresInt, skipTurnSquaresInt);
+        board = new Board(size, playerOneColor, shapePeon1, playerTwoColor, shapePeon2, teleporterSquaresInt, rewindSquaresInt, skipTurnSquaresInt);
     }
     private void validateStringNumberBarriers(String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers) throws QuoridorException {
         if(!(temporaryBarriers.matches("[0-9]+") && !temporaryBarriers.isEmpty()) ||
@@ -204,8 +204,10 @@ public class Quoridor implements Serializable{
             else if (e.getMessage().equals(QuoridorException.PEON_STEPPED_BACK)) {
                 actualizeEachTurn(playerColor);
                 throw new QuoridorException(QuoridorException.PEON_STEPPED_BACK);
+            } else {
+                Log.record(e);
+                throw new QuoridorException(e.getMessage());
             }
-            else {throw new QuoridorException(e.getMessage());}
         }
     }
 
@@ -252,6 +254,9 @@ public class Quoridor implements Serializable{
                                 e1.getMessage().equals(QuoridorException.BARRIER_ALREADY_CREATED) || e1.getMessage().equals(QuoridorException.BARRIER_OVERLAP)){
                             machineTurn();
                         }
+                        else{
+                            Log.record(e1);
+                        }
                     }
                 } else if (e.getMessage().equals(QuoridorException.MACHINE_MOVE_PEON)) {
                     System.out.println("moviendo peon en el tablero");
@@ -259,6 +264,7 @@ public class Quoridor implements Serializable{
                     actualizeEachTurn(machine.getColor());
                     notifyMachineMovePeonObservers(QuoridorException.MACHINE_MOVE_PEON, machine.getPeon().getContraryMovement(machine.getDirection()));
                 } else {
+                    Log.record(e);
                     throw new QuoridorException(e.getMessage());
                 }
             }
@@ -292,6 +298,7 @@ public class Quoridor implements Serializable{
             System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
             System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
             printBoard();
+            //peonActualizeStrategyInformation();
             board.fieldActEachTurn();
         }
     }
@@ -357,6 +364,7 @@ public class Quoridor implements Serializable{
         } catch (ClassNotFoundException e) {
             throw new QuoridorException(QuoridorException.CLASS_NOT_FOUND);
         } catch (Exception e) {
+            Log.record(e);
             throw new QuoridorException(QuoridorException.GENERAL_ERROR);
         }
     }
@@ -370,6 +378,7 @@ public class Quoridor implements Serializable{
         } catch (IOException e) {
             throw new QuoridorException(QuoridorException.ERROR_DURING_PROCESSING);
         } catch (Exception e) {
+            Log.record(e);
             throw new QuoridorException(QuoridorException.GENERAL_ERROR);
         }
     }
@@ -401,11 +410,8 @@ public class Quoridor implements Serializable{
             player2.peonShortestPath();
         }
     }
-    public ArrayList<String> reconstructShortestPath(int numberPeon){
-        if (numberPeon == 1) {
-            return player1.getPeon().reconstructShortestPath();
-        } else {
-            return player2.getPeon().reconstructShortestPath();
-        }
+    public void peonActualizeStrategyInformation(){
+        player1.getPeon().actualizeStrategyInformation();
+        player2.getPeon().actualizeStrategyInformation();
     }
 }
