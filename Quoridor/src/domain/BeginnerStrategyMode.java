@@ -44,6 +44,7 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
             movementType = "movePeon";
             ArrayList<String> validMovements = peon.getValidMovements(peon.getRow(), peon.getColumn());
             direction = validMovements.get(generateRandomNumber(validMovements.size()));
+            System.out.println("direccion seleccionada por machine: " + direction);
             System.out.println("maquina mueve peon en direction: " + direction);
             throw new QuoridorException(QuoridorException.MACHINE_MOVE_PEON);
         }

@@ -10,7 +10,7 @@ public class Rewind extends Square implements Serializable{
     }
 
     @Override
-    public String getType(){return hasPeon() ? "ReWindPeon" : "Rewind";}
+    public String getType(){return hasPeon() ? "ReWindPeon" : "ReWind";}
 
     @Override
     public void applySpecialAction() throws QuoridorException{

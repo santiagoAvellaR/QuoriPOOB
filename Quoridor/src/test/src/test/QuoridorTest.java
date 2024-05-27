@@ -624,7 +624,9 @@ class QuoridorTest {
                     "0", "0", false, "Player1", Color.BLUE, "Player2", Color.red,
                     "NORMAL", 30,  "beginner");
             quoridor.shortestPahtPeon(1);
-            String[] shortestPath = quoridor.reconstructShortestPath(1).toArray(new String[0]);
+            String[] shortestPath1 = quoridor.reconstructShortestPath(1).toArray(new String[0]);
+            quoridor.shortestPahtPeon(2);
+            String[] shortestPath2 = quoridor.reconstructShortestPath(2).toArray(new String[0]);
 
         }
         catch(Exception e){

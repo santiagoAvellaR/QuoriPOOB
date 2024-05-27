@@ -378,8 +378,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 try {
                     String player2Name = "Second player";
                     boolean vsMachine =  numberPlayersCB.getSelectedItem().equals("1 PLAYERS");
-                    player1Color = player1Color.equals(Color.WHITE) ? Color.YELLOW : player1Color;
-                    player2Color = player2Color.equals(Color.WHITE) ? Color.RED : player2Color;
+                    player1Color = player1Color.equals(Color.WHITE) || coloresValidos() ? Color.YELLOW : player1Color;
+                    player2Color = player2Color.equals(Color.WHITE)   || coloresValidos() ? Color.RED : player2Color;
                     String player1Name = namePlayer1.getText().isEmpty() ? "Player 1" : namePlayer1.getText();
                     if ((numberPlayersCB.getSelectedItem().equals("2 PLAYERS"))){
                         player2Name = namePlayer2.getText().isEmpty() ? "Player 2" : namePlayer2.getText();
@@ -729,6 +729,22 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             tiempoDis.start();
         }
         panelTurns.setBackground(playerTurno);
+        if(turns%2==1 && quoridor.getVsMachine()) {
+            int[][] ubicaciones = quoridor.getPeonsPositions();
+            int [] peon = ubicaciones[1];
+            try {
+                quoridor.machineTurn();
+            }catch (QuoridorException ex) {
+                if(ex.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
+                    eliminarPeon(peon[0], peon[1]);
+                    ubicaciones = quoridor.getPeonsPositions();
+                    peon = ubicaciones[1];
+                    agregarPeon(peon[0], peon[1], P2);
+                    turns = quoridor.getTurns();
+                    actualizarTurnos();
+                }
+            }
+        }
         panelTurns.revalidate();
         panelTurns.repaint();
     }
@@ -1011,7 +1027,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     String type = quoridor.getTypeOfField(i, j);
                     this.board[i][j] = new JPanel(new FlowLayout());
                     if(type.equals("Empty")){this.board[i][j].setBackground(boardColor);}
-                    else if(type.equals("Rewind")){this.board[i][j].setBackground(regresar);}
+                    else if(type.equals("ReWind")){this.board[i][j].setBackground(regresar);}
                     else if(type.equals("SkipTurn")){this.board[i][j].setBackground(dobleturno);}
                     else if(type.equals("Transporter")){ this.board[i][j].setBackground(transporter);}
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
@@ -1194,7 +1210,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 if (i % 2 == 0 && j % 2 == 0) {
                     this.board[i][j] = new JPanel(new FlowLayout());
                     if(type.equals("Empty")){this.board[i][j].setBackground(boardColor);}
-                    else if(type.equals("Rewind")){this.board[i][j].setBackground(regresar);}
+                    else if(type.equals("ReWind")){this.board[i][j].setBackground(regresar);}
                     else if(type.equals("SkipTurn")){this.board[i][j].setBackground(dobleturno);}
                     else if(type.equals("Transporter")){ this.board[i][j].setBackground(transporter);}
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
@@ -1745,6 +1761,12 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         if(player1Color.equals(Color.pink)  || player2Color.equals(Color.pink)|| boardColor.equals(Color.pink)){
             cambiar = true;
         }
+        if(player1Color.equals(Color.orange)  || player2Color.equals(Color.orange)|| boardColor.equals(Color.orange)){
+            cambiar = true;
+        }
+        if(player1Color.equals(player2Color)  || player2Color.equals(boardColor)|| boardColor.equals(player1Color)){
+            cambiar = true;
+        }
         return cambiar;
     }
     public  JPanel createFormPeon(JPanel player, int font) {
@@ -1765,6 +1787,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         return circlePanel;
     }
     public void posicionesEliminar(int row, int column, String direction){
+        System.out.println("se elimina en " + direction);
         if(direction.equals("s")){
             board[row+2][column].remove(P2);
             board[row+2][column].revalidate();
@@ -1826,6 +1849,11 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             board[row+2][column-2].repaint();
         }
     }
+    private  void actualizarPosPeones(String direction){
+        int[][] ubicaciones = quoridor.getPeonsPositions();
+        agregarPeon(ubicaciones[1][0], ubicaciones[1][1], P2);
+        posicionesEliminar(ubicaciones[1][0], ubicaciones[1][1], direction);
+    }
     @Override
     public void timesUp(String message) {
         JOptionPane.showMessageDialog(gui, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
@@ -1835,7 +1863,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     public void machineMovePeon(String message, String direction) {
         int[][] ubicaciones = quoridor.getPeonsPositions();
         agregarPeon(ubicaciones[1][0], ubicaciones[1][1], P2);
-        posicionesEliminar(ubicaciones[1][0], ubicaciones[1][1], direction);
+        actualizarPosPeones(direction);
         actualizarCasillasVisitadas();
         actualizarTurnos();
 

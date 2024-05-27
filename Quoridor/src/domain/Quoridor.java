@@ -188,9 +188,6 @@ public class Quoridor implements Serializable{
             selectedPlayer.movePeon(direction);
             maintainTime(playerColor);
             actualizeEachTurn(playerColor);
-            if (vsMachine && selectedPlayer.equals(player1)) {
-                machineTurn();
-            }
         } catch (QuoridorException e) {
             if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
                 actualizeEachTurn(playerColor);
@@ -227,9 +224,6 @@ public class Quoridor implements Serializable{
         }
         selectedPlayer.reduceNumberBarriers(playerColor, type);
         actualizeEachTurn(playerColor);
-        if (vsMachine && selectedPlayer.equals(player1)) {
-            machineTurn();
-        }
     }
 
     public int getNumberBarrier(Color playerColor, String type){
@@ -295,8 +289,6 @@ public class Quoridor implements Serializable{
             System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
             System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
             printBoard();
-            player1.getPeon().actualizeInformationToWin();
-            player2.getPeon().actualizeInformationToWin();
             board.fieldActEachTurn();
         }
     }

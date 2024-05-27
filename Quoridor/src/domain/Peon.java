@@ -294,6 +294,14 @@ public class Peon extends Field implements Serializable {
     }
 
     // functions for validate that peon has an exit (way/path to win)
+    public boolean hasAnExitPrincipal(int simulateRow, int simulateColumn){
+        Boolean[][] visited = new Boolean[getBoardSize()/2+1][getBoardSize()/2+1];
+        for (Boolean[] booleans : visited) {
+            Arrays.fill(booleans, false);
+        }
+        visited[simulateRow/2][simulateColumn/2] = true;
+        return hasAnExit(simulateRow, simulateColumn, visited);
+    }
     public boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited){
         if ((simulateRow == 0  && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return true;}
         if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return false;}
@@ -376,6 +384,10 @@ public class Peon extends Field implements Serializable {
             case "js" -> new int[]{row + 4, column};
             case "jw" -> new int[]{row, column - 4};
             case "je" -> new int[]{row, column + 4};
+            case "ne" -> new int[]{row - 2, column + 2};
+            case "nw" -> new int[]{row - 2, column - 2};
+            case "se" -> new int[]{row + 2, column + 2};
+            case "sw" -> new int[]{row + 2, column - 2};
             default -> new int[]{};
         };
     }
@@ -415,6 +427,7 @@ public class Peon extends Field implements Serializable {
         long startTime = System.currentTimeMillis();
         if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return;}
         if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return;}
+        System.out.println("simulateRow: " + simulateRow + " simulateColumn: " + simulateColumn);
         ArrayList<String> validDirections = getValidMovements(simulateRow, simulateColumn);
         validDirections.remove(lastMovement);
         int cost = board.getTypeField(simulateRow, simulateColumn).equals("SkipTurn") ? 0 : 1;
@@ -454,6 +467,8 @@ public class Peon extends Field implements Serializable {
         ArrayList<String> path = new ArrayList<>();
         while ((row != this.row) || (column != this.column)){
             path.addFirst(oppositeMovements.get(directionsMatrix[row/2][column/2]));
+            printMatrix(directionsMatrix);
+            System.out.println(directionsMatrix[row/2][column/2]);
             int[] newPosition = getTheNewPositionAccordingDirection(row, column, directionsMatrix[row/2][column/2]);
             row = newPosition[0];
             column = newPosition[1];
@@ -461,21 +476,6 @@ public class Peon extends Field implements Serializable {
         shortestPath = path;
         return path;
     }
-
-    public void actualizeInformationToWin(){
-        Integer[][] costs = new Integer[getBoardSize()/2 + 1][getBoardSize()/2 + 1];
-        for (Integer[] ints : costs) {
-            Arrays.fill(ints, Integer.MAX_VALUE);
-        }
-        costs[getRow()/2][getColumn()/2] = 0;
-        shortestPath(getRow(), getColumn(), new String[getBoardSize()/2 + 1][getBoardSize()/2 + 1], costs, "");
-        reconstructShortestPath();
-        System.out.println("Peon" + playerNumber + ": minimo numero de pasos para ganar: " + minimumNumberMovementsToWin);
-        printMatrix(costsMatrix);
-        printMatrix(directionsMatrix);
-        System.out.println(shortestPath.toString());
-    }
-
 
     public String getContraryMovement(String movement){
         return oppositeMovements.get(movement);

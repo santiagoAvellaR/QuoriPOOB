@@ -2,6 +2,7 @@ package src.domain;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Board implements Serializable{
@@ -13,16 +14,18 @@ public class Board implements Serializable{
         this.size = size;
         board = new Field[2 * size - 1][2 * size - 1];
         int midColumn = size % 2 == 0 ? size - 2 : size - 1;
-        board[getBoardSize() - 1][midColumn] = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1);
-        board[0][midColumn] = new Peon(0, midColumn, this, player2Color, 2);
-        fillTheBoard(transporterSquares, rewindSquares, skipTurnSquares);
+        Peon peon1 = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1);
+        board[getBoardSize() - 1][midColumn] = peon1;
+        Peon peon2 = new Peon(0, midColumn, this, player2Color, 2);
+        board[0][midColumn] = peon2;
+        fillTheBoard(transporterSquares, rewindSquares, skipTurnSquares, peon1, peon2);
         System.out.println("tablero inicial");
         printBoard();
     }
 
-    private void fillTheBoard(int transporterSquares, int rewindSquares, int skipTurnSquares){
+    private void fillTheBoard(int transporterSquares, int rewindSquares, int skipTurnSquares, Peon peon1, Peon peon2){
         //fillTheBoardTeleporterSquares(transporterSquares);
-        fillTheBoardRewindSquares(rewindSquares);
+        fillTheBoardRewindSquares(rewindSquares, peon1, peon2);
         fillTheBoardSkipTurnSquares(skipTurnSquares);
         fillTheBoardTransporterSquares(transporterSquares);
     }
@@ -39,13 +42,17 @@ public class Board implements Serializable{
             }
         }
     }
-    private void fillTheBoardRewindSquares(int rewindSquares){
+    private void fillTheBoardRewindSquares(int rewindSquares, Peon peon1, Peon peon2){
         while (rewindSquares > 0) {
             int row = evenNumberGenerator(getBoardSize()-1);
             int column = evenNumberGenerator(getBoardSize()-1);
             if (board[row][column] == null) {
                 addRewindSquare(row, column);
                 rewindSquares--;
+                if (!peon1.hasAnExitPrincipal(peon1.getRow(), peon1.getColumn()) || !peon2.hasAnExitPrincipal(peon2.getRow(), peon2.getColumn())) {
+                    board[row][column] = null;
+                    rewindSquares ++;
+                }
             }
         }
     }
