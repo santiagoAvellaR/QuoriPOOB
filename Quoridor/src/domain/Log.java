@@ -1,5 +1,6 @@
 package src.domain;
 
+import java.io.Serializable;
 import java.util.logging.Logger;
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
@@ -8,7 +9,7 @@ import java.util.logging.Level;
 /**
  *
  */
-public class Log{
+public class Log implements Serializable {
     public static String name = "Project";
     public static String logFilePath = "C:\\Users\\Asus\\Documents\\Escuela\\Sistemas\\2024-1 POOB\\proyectoFinal Quoridor\\Log errores\\" + name + ".log";
 

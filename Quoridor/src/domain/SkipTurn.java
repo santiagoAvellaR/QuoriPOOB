@@ -11,7 +11,7 @@ public class SkipTurn extends Square implements Serializable {
 
 
     @Override
-    public String getType(){return hasPeon() ? "SkipTurnPeon" : "SkipTurn";}
+    public String getType(){return hasPeon() ? "SkipTurnPeon" + peon.getPlayerNumber() : "SkipTurn";}
 
     @Override
     public void applySpecialAction() throws QuoridorException{

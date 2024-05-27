@@ -12,6 +12,7 @@ public abstract class StrategyMode implements MachineStrategy{
     protected int column;
     protected boolean isHorizontal;
 
+
     public String getMovementType() {
         return movementType;
     }

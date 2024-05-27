@@ -298,7 +298,7 @@ public class Quoridor implements Serializable{
             System.out.println("movimientos peon1: " + player1.getPeonValidMovements());
             System.out.println("movimientos peon2: " + player2.getPeonValidMovements());
             printBoard();
-            //peonActualizeStrategyInformation();
+            peonActualizeStrategyInformation();
             board.fieldActEachTurn();
         }
     }
@@ -309,6 +309,16 @@ public class Quoridor implements Serializable{
 
     public Color getFieldColor(int row, int column){
         return board.getFieldColor(row, column);
+    }
+
+    public String getPlayerShape(int numberPeon){
+        if (numberPeon == 1){
+            return player1.getPeon().getShape();
+        }
+        else if (numberPeon == 2){
+            return player2.getPeon().getShape();
+        }
+        return null;
     }
 
     public Color getColorPlayer(int number){

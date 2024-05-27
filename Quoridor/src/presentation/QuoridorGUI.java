@@ -21,7 +21,6 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     private final QuoridorGUI gui = this;
     private Integer turns;
     Quoridor quoridor;
-    private Log log;
     // Menu
     private JMenuItem nuevo, abrir, guardar, cerrar;
     // Principal
@@ -44,6 +43,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     private Color boardColor = Color.WHITE;
     private Color player1Color = Color.WHITE;
     private Color player2Color = Color.WHITE;
+    private JComboBox formaP1, formaP2;
     // Customize window;
     private JPanel customPanel;
     private JTextField boardSize;
@@ -386,6 +386,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     if ((numberPlayersCB.getSelectedItem().equals("2 PLAYERS"))){
                         player2Name = namePlayer2.getText().isEmpty() ? "Player 2" : namePlayer2.getText();
                     }
+                    String forP1 =(formaP1 == null)?"Circular": (String) formaP1.getSelectedItem();
+                    String forP2 = (formaP2 == null)?"Circular": (String) formaP2.getSelectedItem();
                     player2Name = vsMachine ? "Machine" : player2Name;
                     quoridor = new Quoridor(
                             (boardSize.getText().isEmpty() ? "9" : boardSize.getText()),
@@ -399,10 +401,10 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                             (numberPlayersCB.getSelectedItem().equals("1 PLAYER")),
                             player1Name,
                             player1Color,
-                            "FORMA PEON1",
+                            forP1,
                             player2Name,
                             player2Color,
-                            "FORMA PEON2",
+                            forP2,
                             (String) difficulties.getSelectedItem(),
                             (seconds != null) ? seconds.getValue() : 0,
                             (String)modalities.getSelectedItem());
@@ -428,7 +430,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     repaint();
                 } catch (QuoridorException ex) {
                     JOptionPane.showMessageDialog(gui, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                    log.record(ex);
+
                 }
             }
         });
@@ -534,45 +536,127 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     public void prepareSettingsWindowElements() {
         settingsPanel = new JPanel();
         settingsPanel.setLayout(new GridBagLayout());
-        GridBagConstraints titleConstraints = new GridBagConstraints(); // Restricciones para el título
-        titleConstraints.gridx = 0;
-        titleConstraints.gridy = 0;
-        titleConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        titleConstraints.insets = new Insets(0, 0, 20, 0);
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        // Restricciones para el título
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.insets = new Insets(0, 0, 20, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
         JLabel titleLabel = new JLabel("SETTINGS");
         titleLabel.setFont(new Font("Consolas", Font.BOLD, 60));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        settingsPanel.add(titleLabel, titleConstraints);
-        GridBagConstraints buttonConstraints = new GridBagConstraints();  // Restricciones para los botones
-        buttonConstraints.gridx = 0;
-        buttonConstraints.gridy = 1;
-        buttonConstraints.anchor = GridBagConstraints.CENTER;
-        buttonConstraints.insets = new Insets(10, 0, 10, 0);
-        JPanel buttons = new JPanel(new GridLayout(0, 2, 0, 10));
+        settingsPanel.add(titleLabel, gbc);
+
+        // Restricciones para los botones
+        gbc.gridy = 1;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.insets = new Insets(10, 0, 10, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        JPanel buttons = new JPanel(new GridBagLayout());
+        GridBagConstraints buttonGbc = new GridBagConstraints();
+        buttonGbc.insets = new Insets(10, 10, 10, 10);
+        buttonGbc.fill = GridBagConstraints.HORIZONTAL;
+
+        Dimension buttonSize = new Dimension(150, 50);
+
         boardColorButton = createButton("", buttonSize);
         JLabel colorB = new JLabel("COLOR BOARD ");
         colorB.setFont(gameFont30);
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 0;
+        buttons.add(colorB, buttonGbc);
+        buttonGbc.gridx = 1;
+        buttons.add(boardColorButton, buttonGbc);
+
         player1ColorButton = createButton("", buttonSize);
         JLabel colorPe1 = new JLabel("COLOR P1 ");
         colorPe1.setFont(gameFont30);
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 1;
+        buttons.add(colorPe1, buttonGbc);
+        buttonGbc.gridx = 1;
+        buttons.add(player1ColorButton, buttonGbc);
+
         player2ColorButton = createButton("", buttonSize);
         JLabel colorPe2 = new JLabel("COLOR P2 ");
         colorPe2.setFont(gameFont30);
-        buttons.add(colorB);
-        buttons.add(boardColorButton);
-        buttons.add(colorPe1);
-        buttons.add(player1ColorButton);
-        buttons.add(colorPe2);
-        buttons.add(player2ColorButton);
-        settingsPanel.add(buttons, buttonConstraints);
-        GridBagConstraints applyConstraints = new GridBagConstraints(); // Restricciones para el botón de aplicar
-        applyConstraints.gridx = 0;
-        applyConstraints.gridy = 2;
-        applyConstraints.anchor = GridBagConstraints.SOUTHEAST; // Alineación en la esquina inferior derecha
-        applyConstraints.insets = new Insets(300, (screenSize.width) - 250, 0, 0); // Espacio entre los botones y el borde inferior
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 2;
+        buttons.add(colorPe2, buttonGbc);
+        buttonGbc.gridx = 1;
+        buttons.add(player2ColorButton, buttonGbc);
+
+        formaP1 = new JComboBox<String>();
+        formaP1.addItem("Circular");
+        formaP1.addItem("Triangular");
+        formaP1.addItem("Flor");
+        formaP1.setFont(gameFont20);
+        JLabel player1 = new JLabel("FORMA P1");
+        player1.setFont(gameFont30);
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 3;
+        buttons.add(player1, buttonGbc);
+        buttonGbc.gridx = 1;
+        buttons.add(formaP1, buttonGbc);
+
+        formaP2 = new JComboBox<String>();
+        formaP2.addItem("Circular");
+        formaP2.addItem("Triangular");
+        formaP2.addItem("Flor");
+        formaP2.setFont(gameFont20);
+        JLabel player2 = new JLabel("FORMA P2");
+        player2.setFont(gameFont30);
+        buttonGbc.gridx = 0;
+        buttonGbc.gridy = 4;
+        buttons.add(player2, buttonGbc);
+        buttonGbc.gridx = 1;
+        buttons.add(formaP2, buttonGbc);
+
+        settingsPanel.add(buttons, gbc);
+
+        // Configuración del panel de formas
+        gbc.gridy = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.insets = new Insets(20, 0, 20, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        JPanel formas = new JPanel(new GridBagLayout());
+        GridBagConstraints shapeGbc = new GridBagConstraints();
+        shapeGbc.insets = new Insets(10, 10, 10, 10);
+
+        Dimension shapeSize = new Dimension(100, 100);
+
+        JPanel circulo = createFormPeon(new JPanel(), 60, "Circular", Color.red);
+        circulo.setPreferredSize(shapeSize);
+        shapeGbc.gridx = 0;
+        formas.add(circulo, shapeGbc);
+
+        JPanel triangulo = createFormPeon(new JPanel(), 60, "Triangular", Color.red);
+        triangulo.setPreferredSize(shapeSize);
+        shapeGbc.gridx = 1;
+        formas.add(triangulo, shapeGbc);
+
+        JPanel flor = createFormPeon(new JPanel(), 120, "Flor", Color.red);
+        flor.setPreferredSize(shapeSize);
+        shapeGbc.gridx = 2;
+        formas.add(flor, shapeGbc);
+
+        settingsPanel.add(formas, gbc);
+
+        // Restricciones para el botón de aplicar
+        gbc.gridy = 3;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.anchor = GridBagConstraints.SOUTHEAST;
+        gbc.insets = new Insets(30, 0, 30, 20);
+
         applySettingsButton = createButton("APPLY", buttonSize);
-        settingsPanel.add(applySettingsButton, applyConstraints);
+        settingsPanel.add(applySettingsButton, gbc);
     }
+
+
     public void prepareSettingsWindowActions() {
         boardColorButton.addActionListener(new ActionListener() {
             @Override
@@ -752,7 +836,6 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     peon = ubicaciones[1];
                 }
                 else {
-                    log.record(ex);
                     JOptionPane.showMessageDialog(null, ex.getMessage());
                 }
             }finally {
@@ -1127,7 +1210,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         actualizarTurnos();
                     }
                     else{
-                        log.record(ex);
+
                         JOptionPane.showMessageDialog(null, ex.getMessage());
                     }
                 }
@@ -1171,26 +1254,34 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 String type = quoridor.getTypeOfField(i, j);
                 if (i % 2 == 0 && j % 2 == 0) {
                     this.board[i][j] = new JPanel(new FlowLayout());
-                    if(type.equals("Empty")){this.board[i][j].setBackground(boardColor);}
-                    else if(type.equals("ReWind")){this.board[i][j].setBackground(regresar);}
+                    this.board[i][j].setBackground(boardColor);
+                    if(type.equals("ReWind")){this.board[i][j].setBackground(regresar);}
                     else if(type.equals("SkipTurn")){this.board[i][j].setBackground(dobleturno);}
                     else if(type.equals("Transporter")){ this.board[i][j].setBackground(transporter);}
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
-                    if(type.equals("Peon2")){
-                        this.board[i][j].setBackground(boardColor);
-                        P2 = new JPanel();
-                        P2 = createFormPeon(P2, SQUARE_SIZE,"f");
-                        P2.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
+                    if(type.equals("Peon2") || type.equals("SkipTurnPeon2") || type.equals("TransporterPeon2")){
                         player2Color = quoridor.getColorPlayer(1);
+                        if(type.equals("SkipTurnPeon2")){
+                            this.board[i][j].setBackground(dobleturno);
+                        }else if(type.equals("TransporterPeon2")){
+                            this.board[i][j].setBackground(transporter);
+                        }
+                        P2 = new JPanel();
+                        P2 = createFormPeon(P2, SQUARE_SIZE,quoridor.getPlayerShape(2), player2Color);
+                        P2.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
                         P2.addMouseListener(movePlayer(player2Color));
                         this.board[i][j].add(P2);
                     }
-                    else if (type.equals("Peon1")){
-                        this.board[i][j].setBackground(boardColor);
+                    else if (type.equals("Peon1") ||  type.equals("SkipTurnPeon1") || type.equals("TransporterPeon1")){
+                        player1Color = quoridor.getColorPlayer(0);
+                        if(type.equals("SkipTurnPeon1")){
+                            this.board[i][j].setBackground(dobleturno);
+                        }else if(type.equals("TransporterPeon1")){
+                            this.board[i][j].setBackground(transporter);
+                        }
                         P1 = new JPanel();
-                        P1 = createFormPeon(P1, SQUARE_SIZE,"c");
+                        P1 = createFormPeon(P1, SQUARE_SIZE,quoridor.getPlayerShape(1), player1Color);
                         P1.setPreferredSize(new Dimension((int) (SQUARE_SIZE * 0.8), (int) (SQUARE_SIZE * 0.8))); // Reduce size
-                        player2Color = quoridor.getColorPlayer(0);
                         P1.addMouseListener(movePlayer(player1Color));
                         this.board[i][j].add(P1);
                     }
@@ -1279,7 +1370,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
                     }
                     else {
-                        log.record(ex);
+
                         JOptionPane.showMessageDialog(null, ex.getMessage());
                     }
                 }finally {
@@ -1534,6 +1625,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gbc.gridx = 0;
         gbc.gridy = 0;
+
         gbc.gridwidth = 3; // Ocupar tres columnas
         customPanel.add(titleLabel, gbc);
         // Panel para el tamaño del tablero
@@ -1734,10 +1826,10 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         }
         return cambiar;
     }
-    public JPanel createFormPeon(JPanel player, int font, String forma) {
-        Color colorP = (player.equals(P1)) ? player1Color : player2Color;
+    public JPanel  createFormPeon(JPanel player, int font, String forma, Color colorP) {
+        //Color colorP = (player.equals(P1)) ? player1Color : player2Color;
 
-        if (forma.equals("c")) {
+        if (forma.equals("Circular")) {
             JPanel circlePanel = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {
@@ -1752,7 +1844,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             circlePanel.setOpaque(false);
             circlePanel.setPreferredSize(new Dimension(font, font));
             return circlePanel;
-        } else if (forma.equals("t")) {
+        } else if (forma.equals("Triangular")) {
             JPanel trianglePanel = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {
@@ -1768,7 +1860,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             trianglePanel.setOpaque(false);
             trianglePanel.setPreferredSize(new Dimension(font, font));
             return trianglePanel;
-        } else if (forma.equals("f")) {
+        } else if (forma.equals("Flor")) {
             JPanel flowerPanel = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {

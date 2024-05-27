@@ -69,6 +69,10 @@ public class Peon extends Field implements Serializable {
         return playerNumber;
     }
 
+    public String getShape(){
+        return shape;
+    }
+
     public void setPosition(int row, int column) {
         this.row = row;
         this.column = column;
@@ -215,7 +219,7 @@ public class Peon extends Field implements Serializable {
             validMovementsCalculated.add(directionString);
             return;
         }
-        if (row <= 2 && goesUp){return;}
+        if (row <= 2 && goesUp || column <= 0 || column >= board.getBoardSize()-1){return;}
         if (row >= board.getBoardSize()-3 && !goesUp){return;}
         // verificar salto Doble
         if (board.hasBarrier(row + 3*direction, column)) {
@@ -258,7 +262,7 @@ public class Peon extends Field implements Serializable {
             validMovementsCalculated.add(directionString);
             return;
         }
-        if (column <= 2 && goesLeft){return;}
+        if (column <= 2 && goesLeft || row <= 0 || row >= board.getBoardSize()-1){return;}
         if (column >= board.getBoardSize()-3 && !goesLeft){return;}
         // verificar salto Doble
         if (board.hasBarrier(row, column + 3*direction)) {
@@ -474,8 +478,6 @@ public class Peon extends Field implements Serializable {
         costsMatrix = costs;
     }
     public void reconstructShortestPath(){
-        printMatrix(directionsMatrix);
-        printMatrix(costsMatrix);
         int min, row, column;
         column = 0;
         min = Integer.MAX_VALUE;
@@ -500,7 +502,10 @@ public class Peon extends Field implements Serializable {
             cont+=1;
         }
         shortestPath = path;
-        System.out.println(shortestPath.toString());
+        System.out.println("peon numero " + playerNumber);
+        System.out.println("minimo numero de pasos: " + minimumNumberMovementsToWin + "camino: " + shortestPath.toString());
+        printMatrix(directionsMatrix);
+        printMatrix(costsMatrix);
     }
 
     public void actualizeStrategyInformation(){
@@ -511,6 +516,14 @@ public class Peon extends Field implements Serializable {
         costs[row/2][column/2] = 0;
         shortestPath(row, column, new String[board.getBoardSize()/2 + 1][board.getBoardSize()/2 + 1], costs, "");
         reconstructShortestPath();
+    }
+
+    public int getMinimumNumberMovementsToWin(){
+        return minimumNumberMovementsToWin;
+    }
+
+    public String getBestPeonMovement(){
+        return shortestPath.getFirst();
     }
 
     public String getContraryMovement(String movement){
