@@ -300,22 +300,32 @@ public class Peon extends Field implements Serializable {
             Arrays.fill(booleans, false);
         }
         visited[simulateRow/2][simulateColumn/2] = true;
-        return hasAnExit(simulateRow, simulateColumn, visited);
+        return hasAnExit(simulateRow, simulateColumn, visited, "");
     }
-    public boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited){
-        if ((simulateRow == 0  && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return true;}
-        if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return false;}
-        positionsVisited[simulateRow/2][simulateColumn/2] = true;
+    public boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited, String lastMovement) {
+        if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize() - 1 && playerNumber == 2)) {return true;}
+        if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")) {return false;}
+        positionsVisited[simulateRow / 2][simulateColumn / 2] = true;
         ArrayList<String> validDirections = getValidMovementsExits(simulateRow, simulateColumn);
-        for (String direction : validDirections){
+        validDirections.remove(oppositeMovements.get(lastMovement));
+        for (String direction : validDirections) {
             int[] newPosition = getTheNewPositionAccordingDirection(simulateRow, simulateColumn, direction);
-            if (!positionsVisited[newPosition[0]/2][newPosition[1]/2]) {
-                if (hasAnExit(newPosition[0], newPosition[1], positionsVisited)) {
+            if (!positionsVisited[newPosition[0] / 2][newPosition[1] / 2]) {
+                Boolean[][] newPositionsVisited = copyPositionsVisited(positionsVisited);
+                if (hasAnExit(newPosition[0], newPosition[1], newPositionsVisited, direction)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private Boolean[][] copyPositionsVisited(Boolean[][] original) {
+        Boolean[][] copy = new Boolean[original.length][];
+        for (int i = 0; i < original.length; i++) {
+            copy[i] = original[i].clone();
+        }
+        return copy;
     }
     private ArrayList<String> getValidMovementsExits(int simulateRow, int simulateColumn){
         ArrayList<String> movements = new ArrayList<String>();

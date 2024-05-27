@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import src.domain.Quoridor;
 
+
 public class QuoridorGUI extends JFrame implements QuoridorObserver{
     private Dimension screenSize;
     private final Dimension buttonSize = new Dimension(250, 60);
@@ -20,6 +21,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     private final QuoridorGUI gui = this;
     private Integer turns;
     Quoridor quoridor;
+    private Log log;
     // Menu
     private JMenuItem nuevo, abrir, guardar, cerrar;
     // Principal
@@ -424,6 +426,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                     repaint();
                 } catch (QuoridorException ex) {
                     JOptionPane.showMessageDialog(gui, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    log.record(ex);
                 }
             }
         });
@@ -735,14 +738,29 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             try {
                 quoridor.machineTurn();
             }catch (QuoridorException ex) {
-                if(ex.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
-                    eliminarPeon(peon[0], peon[1]);
+                if(ex.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER)){
+                    boolean horizontal = quoridor.getOrientationDeletedTemporary();
+                    int[] ubicacion = quoridor.getPositionDeletedTemporary();
+                    eliminarTemporal(ubicacion[0],ubicacion[1], horizontal);
+                }
+                else if(ex.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE) ||
+                        ex.getMessage().equals(QuoridorException.PEON_HAS_BEEN_TELEPORTED)){}
+                else if(ex.getMessage().equals(QuoridorException.PEON_STEPPED_BACK)){
                     ubicaciones = quoridor.getPeonsPositions();
                     peon = ubicaciones[1];
-                    agregarPeon(peon[0], peon[1], P2);
-                    turns = quoridor.getTurns();
-                    actualizarTurnos();
                 }
+                else {
+                    log.record(ex);
+                    JOptionPane.showMessageDialog(null, ex.getMessage());
+                }
+            }finally {
+                eliminarOpciones();
+                eliminarPeon(peon[0], peon[1]);
+                ubicaciones = quoridor.getPeonsPositions();
+                peon = ubicaciones[1];
+                agregarPeon(peon[0], peon[1], P2);
+                actualizarCasillasVisitadas();
+                actualizarTurnos();
             }
         }
         panelTurns.revalidate();
@@ -1166,6 +1184,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         actualizarTurnos();
                     }
                     else{
+                        log.record(ex);
                         JOptionPane.showMessageDialog(null, ex.getMessage());
                     }
                 }
@@ -1210,7 +1229,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 if (i % 2 == 0 && j % 2 == 0) {
                     this.board[i][j] = new JPanel(new FlowLayout());
                     if(type.equals("Empty")){this.board[i][j].setBackground(boardColor);}
-                    else if(type.equals("ReWind")){this.board[i][j].setBackground(regresar);}
+                    else if(type.equals("Rewind")){this.board[i][j].setBackground(regresar);}
                     else if(type.equals("SkipTurn")){this.board[i][j].setBackground(dobleturno);}
                     else if(type.equals("Transporter")){ this.board[i][j].setBackground(transporter);}
                     this.board[i][j].setPreferredSize(new Dimension(SQUARE_SIZE, SQUARE_SIZE));
@@ -1317,6 +1336,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         peon = (turns%2==0)?ubicacioon[0]:ubicacioon[1];
                     }
                     else {
+                        log.record(ex);
                         JOptionPane.showMessageDialog(null, ex.getMessage());
                     }
                 }finally {
@@ -1683,6 +1703,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         quoridor.save(archivo);
                     }
                     catch (QuoridorException e) {
+
                         JOptionPane.showMessageDialog(this, e.getMessage(), "Guardar quoridor", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
@@ -1741,6 +1762,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 }
             }
             else{
+
                 JOptionPane.showMessageDialog(this, "Error al abrir archivo", "Abrir quoridor", JOptionPane.INFORMATION_MESSAGE);
             }
         };

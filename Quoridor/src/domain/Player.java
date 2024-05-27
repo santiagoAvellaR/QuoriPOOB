@@ -81,7 +81,7 @@ public abstract class Player implements Serializable{
             Arrays.fill(booleans, false);
         }
         visited[peon.getRow()/2][peon.getColumn()/2] = true;
-        return peon.hasAnExit(peon.getRow(), peon.getColumn(), visited);
+        return peon.hasAnExit(peon.getRow(), peon.getColumn(), visited, "");
     }
 
     public void peonShortestPath(){

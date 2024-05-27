@@ -75,6 +75,9 @@ public class Quoridor implements Serializable{
         if (totalSpecialSquares > Math.pow(size, 2)-2){
             throw new QuoridorException(QuoridorException.MAXIMUM_NUMBER_SQUARES_EXCEEDED);
         }
+        if (rewindSquaresInt > (int)(((float)(Math.pow(size, 2)))*0.75)){
+            throw new QuoridorException("amount of rewind squares: " + rewindSquaresInt + QuoridorException.MAXIMUM_NUMBER_REWIND_EXCEEDED);
+        }
         board = new Board(size, playerOneColor, playerTwoColor, teleporterSquaresInt, rewindSquaresInt, skipTurnSquaresInt);
     }
     private void validateStringNumberBarriers(String normalBarriers, String temporaryBarriers, String largeBarriers, String alliedBarriers) throws QuoridorException {
