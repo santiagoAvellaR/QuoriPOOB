@@ -169,7 +169,10 @@ public class Quoridor implements Serializable{
                 actualizeEachTurn(playerColor);
                 throw new QuoridorException(QuoridorException.PEON_STEPPED_BACK);
             } else {
-                Log.record(e);
+                if (!(e.getMessage().equals(QuoridorException.PLAYER_ONE_WON) || e.getMessage().equals(QuoridorException.PLAYER_TWO_WON)
+                || e.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER))) {
+                    Log.record(e);
+                }
                 throw new QuoridorException(e.getMessage());
             }
         }

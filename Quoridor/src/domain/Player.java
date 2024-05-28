@@ -34,7 +34,7 @@ public abstract class Player implements Serializable{
     }
 
     public ArrayList<String> getPeonValidMovements() {
-        return peon.getValidMovements(peon.getRow(), peon.getColumn());
+        return peon.getValidMovements(peon.getRow(), peon.getColumn(), false);
     }
     public int numberBarrier(Color playerColor, String type){
         if (color.equals(playerColor)){

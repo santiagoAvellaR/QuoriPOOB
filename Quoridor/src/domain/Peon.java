@@ -175,12 +175,12 @@ public class Peon extends Field implements Serializable {
         }
     }
 
-    public ArrayList<String> getValidMovements(int row, int column){
+    public ArrayList<String> getValidMovements(int row, int column, boolean isAsimulation){
         ArrayList<String> validMovements = new ArrayList<String>();
-        validateVertical(row, column, validMovements, true);
-        validateVertical(row, column, validMovements, false);
-        validateHorizontal(row, column, validMovements, true);
-        validateHorizontal(row, column, validMovements, false);
+        validateVertical(row, column, validMovements, true, isAsimulation);
+        validateVertical(row, column, validMovements, false, isAsimulation);
+        validateHorizontal(row, column, validMovements, true, isAsimulation);
+        validateHorizontal(row, column, validMovements, false, isAsimulation);
         if (!squareType.equals("Transporter")){return validMovements;}
         return joinArrayList(calculateAllLateralMovements(row, column, new ArrayList<String>()), validMovements);
     }
@@ -203,7 +203,7 @@ public class Peon extends Field implements Serializable {
         }
         return list1;
     }
-    private void validateVertical(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesUp){
+    private void validateVertical(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesUp, boolean isAsimulation){
         String directionString;
         if (row == 0 && goesUp) {return;}
         if (row == board.getBoardSize()-1 && !goesUp) {return;}
@@ -215,7 +215,8 @@ public class Peon extends Field implements Serializable {
                 return;
             }
         }
-        if (!board.hasPeon(row + 2*direction, column) || (board.hasPeon(row + 2*direction, column) && board.getFieldColor(row + 2*direction, column).equals(color))){
+        if (!board.hasPeon(row + 2*direction, column) || (board.hasPeon(row + 2*direction, column) && board.getFieldColor(row + 2*direction, column).equals(color))
+        || (isAsimulation && board.hasPeon(row + 2*direction, column))){
             directionString = goesUp ? "n" : "s";
             validMovementsCalculated.add(directionString);
             return;
@@ -250,7 +251,7 @@ public class Peon extends Field implements Serializable {
             }
         }
     }
-    public void validateHorizontal(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesLeft){
+    public void validateHorizontal(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesLeft, boolean isAsimulation){
         String directionString;
         if (column == 0 && goesLeft) {return;}
         if (column == board.getBoardSize()-1 && !goesLeft) {return;}
@@ -262,7 +263,8 @@ public class Peon extends Field implements Serializable {
                 return;
             }
         }
-        if (!board.hasPeon(row, column + 2*direction) || (board.hasPeon(row, column + 2*direction) && board.getFieldColor(row, column + 2*direction).equals(color))) {
+        if (!board.hasPeon(row, column + 2*direction) || (board.hasPeon(row, column + 2*direction) && board.getFieldColor(row, column + 2*direction).equals(color))
+        || (isAsimulation && board.hasPeon(row, column + 2*direction))) {
             directionString = goesLeft ? "w" : "e";
             validMovementsCalculated.add(directionString);
             return;
@@ -380,7 +382,7 @@ public class Peon extends Field implements Serializable {
         if (board.hasBarrier(row + direction, column)) {
             return;
         }
-        if (!board.hasPeon(row + 2*direction, column) || (board.hasPeon(row + 2*direction, column) && board.getFieldColor(row + 2*direction, column).equals(color))){
+        if (board.hasPeon(row + 2*direction, column) || !board.hasPeon(row + 2*direction, column) || (board.hasPeon(row + 2*direction, column) && board.getFieldColor(row + 2*direction, column).equals(color))){
             directionString = goesUp ? "n" : "s";
             validMovementsCalculated.add(directionString);
             return;
@@ -421,7 +423,7 @@ public class Peon extends Field implements Serializable {
         if (board.hasBarrier(row, column + direction)) {
             return;
         }
-        if (!board.hasPeon(row, column + 2*direction) || (board.hasPeon(row, column + 2*direction) && board.getFieldColor(row, column + 2*direction).equals(color))) {
+        if (board.hasPeon(row, column + 2*direction) || !board.hasPeon(row, column + 2*direction) || (board.hasPeon(row, column + 2*direction) && board.getFieldColor(row, column + 2*direction).equals(color))) {
             directionString = goesLeft ? "w" : "e";
             validMovementsCalculated.add(directionString);
             return;
@@ -472,7 +474,7 @@ public class Peon extends Field implements Serializable {
     }
     public void stepBackMovements(int quantityMovements) throws QuoridorException {
         for (int i = tracker.size() - 1; ((i >= tracker.size() - quantityMovements) && (i >= 0)); i--) {
-            if (getValidMovements(row, column).contains(tracker.get(i))){
+            if (getValidMovements(row, column, false).contains(tracker.get(i))){
                 move(tracker.get(i));
                 tracker.remove(i);
             }
@@ -506,7 +508,7 @@ public class Peon extends Field implements Serializable {
         long startTime = System.currentTimeMillis();
         if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return;}
         if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return;}
-        ArrayList<String> validDirections = getValidMovements(simulateRow, simulateColumn);
+        ArrayList<String> validDirections = getValidMovements(simulateRow, simulateColumn, true);
         validDirections.remove(lastMovement);
         int cost = board.getTypeField(simulateRow, simulateColumn).equals("SkipTurn") ? 0 : 1;
         for (String direction : validDirections){
