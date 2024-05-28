@@ -60,6 +60,9 @@ public class Machine extends Player implements Serializable {
     public boolean isHorizontal() {
         return strategy.isHorizontal();
     }
+    public String getMachineMode(){
+        return machineMode;
+    }
 
     public void play() throws QuoridorException {
         strategy.makeMove(board, peon, otherPlayer, normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);

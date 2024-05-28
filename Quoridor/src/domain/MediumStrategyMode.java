@@ -5,48 +5,28 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class MediumStrategyMode extends StrategyMode implements MachineStrategy, Serializable {
-    private int rowHorizontalBarrier = 0;
-    private int columnHorizontalBarrier = 0;
-    private String horizontalBarrierType = "";
-    private int oponentStepsHorizontalBarrier = 0;
-    private int machineStepsHorizontalBarrier = 0;
-
-    private int rowVerticalBarrier = 0;
-    private int columnVerticalBarrier = 0;
-    private String verticalBarrierType = "";
-    private int oponentStepsVerticalBarrier = 0;
-    private int machineStepsVerticalBarrier = 0;
 
     @Override
     public void makeMove(Board board, Peon peon, Player otherPlayer, int normalBarriers, int temporaryBarriers, int longBarriers, int alliedBarriers) throws QuoridorException {
         peon.actualizeStrategyInformation();
         otherPlayer.getPeon().actualizeStrategyInformation();
+        System.out.println(peon.getMinimumNumberMovementsToWin() + " <= " + otherPlayer.getPeon().getMinimumNumberMovementsToWin());
         if (peon.getMinimumNumberMovementsToWin() <= otherPlayer.getPeon().getMinimumNumberMovementsToWin() || (normalBarriers <= 0 && temporaryBarriers <= 0
                 && alliedBarriers <= 0 && longBarriers <= 0)){
+            System.out.println("maquina decide mover peon");
             this.movementType = "movePeon";
             this.direction = peon.getBestPeonMovement();
             throw new QuoridorException(QuoridorException.MACHINE_MOVE_PEON);
         }
         else{
             this.movementType = "addBarrier";
+            System.out.println("maquina decide añadir barrera");
             String otherPlayerBestMovement = otherPlayer.getPeon().getBestPeonMovement();
             ArrayList<String> availableBarriers = getAvailableBarriers(normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);
-            bestHorizontalBarrier(board, peon.getMinimumNumberMovementsToWin(), otherPlayer.getPeon().getMinimumNumberMovementsToWin(), availableBarriers,
-                    peon, otherPlayer);
-            bestVerticalBarrier(board, peon.getMinimumNumberMovementsToWin(), otherPlayer.getPeon().getMinimumNumberMovementsToWin(), availableBarriers,
-                    peon, otherPlayer);
-            if (oponentStepsHorizontalBarrier < oponentStepsVerticalBarrier){
-                this.row = rowHorizontalBarrier;
-                this.column = columnHorizontalBarrier;
-                this.barrierType = horizontalBarrierType;
-                this.isHorizontal = true;
-            }
-            else {
-                this.row = rowVerticalBarrier;
-                this.column = columnVerticalBarrier;
-                this.barrierType = verticalBarrierType;
-                this.isHorizontal = false;
-            }
+            System.out.println("validando posibilidades");
+            bestHorizontalBarrier(board, peon.getSumObjectiveRow(), otherPlayer.getPeon().getSumObjectiveRow(), peon.getMinimumNumberMovementsToWin(),
+                    otherPlayer.getPeon().getMinimumNumberMovementsToWin(), availableBarriers, peon, otherPlayer);
+            System.out.println("mandando respuesta, notificando...");
             throw new QuoridorException(QuoridorException.MACHINE_ADD_A_BARRIER);
         }
     }
@@ -71,69 +51,56 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
         return availableBarriers;
     }
 
-    private void bestHorizontalBarrier(Board board, int minimumNumberMovementsMe, int minimumNumberMovementsOponent, ArrayList<String> availableBarriers,
+    private void bestHorizontalBarrier(Board board, int sumMovementsME, int sumMovementOP, int meMNMTW, int otherPMNMTW, ArrayList<String> availableBarriers,
                                        Peon peon, Player otherPlayer) throws QuoridorException {
-        for (String barrier : availableBarriers){
-            int lenght = barrier.equals("l") ? 3 : 2;
-            for (int i = 1; i < board.getBoardSize(); i+=2){
-                for (int j = 0; j < board.getBoardSize(); j+=2){
-                    if (board.getTypeField(i, j).equals("Empty") && board.barrierCanBePlace(i, j, lenght, true)){
-                        try{
-                            board.addBarrier(Color.WHITE, i, j, lenght, true, barrier);
-                            peon.actualizeStrategyInformation();
-                            otherPlayer.getPeon().actualizeStrategyInformation();
-                            board.deleteBarrier(i, j, lenght, true, null);
-                            if (peon.getMinimumNumberMovementsToWin() <= minimumNumberMovementsMe && otherPlayer.getPeon().getMinimumNumberMovementsToWin() > minimumNumberMovementsOponent){
-                                rowHorizontalBarrier = i;
-                                columnHorizontalBarrier = j;
-                                horizontalBarrierType = barrier;
-                            }
-                        }
-                        catch (QuoridorException e){
-                            if (e.getMessage().equals(QuoridorException.BARRIER_ALREADY_CREATED) || e.getMessage().equals(QuoridorException.BARRIER_OVERLAP)) {
-                            }
-                            else {
-                                throw new QuoridorException(e.getMessage());
+        peon.printCostMatrix();
+        otherPlayer.getPeon().printCostMatrix();
+        for (String barrier : availableBarriers) {
+            int length = barrier.equals("l") ? 3 : 2;
+            for (int i = 0; i < board.getBoardSize(); i++) {
+                for (int j = 0; j < board.getBoardSize(); j++) {
+                    if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0)) {
+                        boolean isHorizontalCal = (i % 2 != 0 && j % 2 == 0);
+                        boolean isEmpty = board.getTypeField(i, j).equals("Empty");
+                        boolean canBePlaced = board.barrierCanBePlace(i, j, length, isHorizontalCal, peon, otherPlayer.getPeon());
+                        System.out.println("esta vacia: " + isEmpty + " puede ponerse: " + canBePlaced);
+                        if (isEmpty && canBePlaced) {
+                            try {
+                                System.out.println("validando caso: " + i + ", " + j + " orientacion: " + isHorizontalCal);
+                                board.addBarrier(Color.WHITE, i, j, length, isHorizontalCal, barrier);
+                                peon.actualizeStrategyInformation();
+                                otherPlayer.getPeon().actualizeStrategyInformation();
+                                //System.out.println("numero de pasos para ganar(maquina): " + peon.getMinimumNumberMovementsToWin());
+                                //System.out.println("numero de pasos para ganar(jugador): " + otherPlayer.getPeon().getMinimumNumberMovementsToWin());
+                                // ensayo (peon.getSumObjectiveRow() < sumMovementsME && otherPlayer.getPeon().getSumObjectiveRow() > sumMovementOP)
+                                if ((peon.getMinimumNumberMovementsToWin() <= meMNMTW && otherPlayer.getPeon().getMinimumNumberMovementsToWin() >= otherPMNMTW) && !(i > otherPlayer.getPeon().getRow()) ) {
+                                    row = i;
+                                    column = j;
+                                    barrierType = barrier;
+                                    isHorizontal = isHorizontalCal;
+                                    System.out.println("                        posible: " + row + ", " + column + " orientacion " + isHorizontalCal);
+                                    sumMovementsME = peon.getSumObjectiveRow();
+                                    sumMovementOP = otherPlayer.getPeon().getSumObjectiveRow();
+                                    meMNMTW = peon.getMinimumNumberMovementsToWin();
+                                    otherPMNMTW = otherPlayer.getPeon().getMinimumNumberMovementsToWin();
+                                }
+                                board.deleteBarrier(i, j, length, isHorizontalCal, null);
+                            } catch (QuoridorException e) {
+                                if (e.getMessage().equals(QuoridorException.BARRIER_ALREADY_CREATED) || e.getMessage().equals(QuoridorException.BARRIER_OVERLAP)) {
+                                    System.out.println("primer if: " + e.getMessage());
+                                    continue;
+                                } else {
+                                    // Para otras excepciones, vuelve a lanzar la excepción
+                                    System.out.println("arrojo excepcion en el else del ciclo: " + e.getMessage());
+                                    throw new QuoridorException(e.getMessage());
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        oponentStepsHorizontalBarrier = minimumNumberMovementsMe;
-        machineStepsHorizontalBarrier = minimumNumberMovementsOponent;
+        System.out.println(row + ", " + column + " tipo: " + barrierType);
     }
 
-    private void bestVerticalBarrier(Board board, int minimumNumberMovementsMe, int minimumNumberMovementsOponent, ArrayList<String> availableBarriers,
-                                       Peon peon, Player otherPlayer) throws QuoridorException {
-        for (String barrier : availableBarriers){
-            int lenght = barrier.equals("l") ? 3 : 2;
-            for (int i = 0; i < board.getBoardSize(); i+=2){
-                for (int j = 1; j < board.getBoardSize(); j+=2){
-                    if (board.getTypeField(i, j).equals("Empty") && board.barrierCanBePlace(i, j, lenght, true)){
-                        try{
-                            board.addBarrier(Color.WHITE, i, j, lenght, true, barrier);
-                            peon.actualizeStrategyInformation();
-                            otherPlayer.getPeon().actualizeStrategyInformation();
-                            board.deleteBarrier(i, j, lenght, true, null);
-                            if (peon.getMinimumNumberMovementsToWin() <= minimumNumberMovementsMe && otherPlayer.getPeon().getMinimumNumberMovementsToWin() > minimumNumberMovementsOponent){
-                                rowVerticalBarrier = i;
-                                columnVerticalBarrier = j;
-                                verticalBarrierType = barrier;
-                            }
-                        }
-                        catch (QuoridorException e){
-                            if (e.getMessage().equals(QuoridorException.BARRIER_ALREADY_CREATED) || e.getMessage().equals(QuoridorException.BARRIER_OVERLAP)) {
-                            }
-                            else {
-                                throw new QuoridorException(e.getMessage());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        oponentStepsVerticalBarrier = minimumNumberMovementsMe;
-        machineStepsVerticalBarrier = minimumNumberMovementsOponent;
-    }
 }

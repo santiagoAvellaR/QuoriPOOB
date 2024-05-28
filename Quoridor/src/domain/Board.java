@@ -178,8 +178,6 @@ public class Board implements Serializable{
                 board[row + i][column] = null;
             }
         }
-        System.out.println("barrera eliminada");
-        printBoard();
     }
 
     public void addBarrier(Color playerColor, int row, int column, int length, boolean horizontal, String type) throws QuoridorException {
@@ -322,6 +320,26 @@ public class Board implements Serializable{
             }
         }
         return true;
+    }
+
+    public boolean barrierCanBePlace(int row, int column, int length, boolean isHorizontal, Peon peon1, Peon peon2) {
+        if (row + ((length*2)-2) >= getBoardSize() && !isHorizontal) {return false;}
+        if (column + ((length*2)-2) >= getBoardSize() && isHorizontal) {return false;}
+        if (!isHorizontal){
+            for (int i = row; i < length*2 - 1; i++) {
+                if (board[i][column] != null) {
+                    return false;
+                }
+            }
+        }
+        else {
+            for (int j = column; j < length*2 - 1; j++) {
+                if (board[row][j] != null) {
+                    return false;
+                }
+            }
+        }
+        return peon1.hasAnExitMainMethod(peon1.getRow(), peon1.getColumn()) && peon2.hasAnExitMainMethod(peon2.getRow(), peon2.getColumn());
     }
 
 }

@@ -726,7 +726,6 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         if(quoridor.getVsMachine()){
             quoridor.addObserver(gui);
         }
-        System.out.println(players + "numero de jugadores");
         if (players.equals("1 PLAYER")) {
             JPanel infoPlayerPanel = infoPlayerGame();
             infoPlayerPanel.setBorder(new EmptyBorder(0, 10, 0, 10)); // Agregar relleno horizontal
@@ -823,7 +822,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
             int [] peon = ubicaciones[1];
             try {
                 quoridor.machineTurn();
-            }catch (QuoridorException ex) {
+            }
+            catch (QuoridorException ex) {
                 if(ex.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER)){
                     boolean horizontal = quoridor.getOrientationDeletedTemporary();
                     int[] ubicacion = quoridor.getPositionDeletedTemporary();
@@ -1291,7 +1291,6 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                             ||type.equals("Allied")) {
                         Color color = quoridor.getFieldColor(i, j);
                         this.board[i][j] = createBarrier(color, BARRIER_WIDTH, SQUARE_SIZE );
-                        System.out.println(type + " por que no" + i + j + color);
                     }
                     else {
                         this.board[i][j] = createBarrier(Color.GRAY, BARRIER_WIDTH, SQUARE_SIZE);
@@ -1596,14 +1595,21 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         finishButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                casillasVisP1.clear();
-                casillasVisP2.clear();
-                if(!quoridor.getGameMode().equals("NORMAL")){
-                    tiempoDis.stop();
+                int option = JOptionPane.showConfirmDialog(null, "¿Quieres guardar la partida?", "Finalizar Partida",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                if (option == JOptionPane.YES_OPTION) {
+                    guardar.doClick();
+                } else if (option == JOptionPane.NO_OPTION) {
+                    casillasVisP1.clear();
+                    casillasVisP2.clear();
+                    if(!quoridor.getGameMode().equals("NORMAL")){
+                        tiempoDis.stop();
+                    }
+                    newGameButton.doClick();
+                    revalidate();
+                    repaint();
                 }
-                newGameButton.doClick();
-                revalidate();
-                repaint();
             }
         });
     }
@@ -1893,7 +1899,6 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     }
 
     public void posicionesEliminar(int row, int column, String direction){
-        System.out.println("se elimina en " + direction);
         if(direction.equals("s")){
             board[row+2][column].remove(P2);
             board[row+2][column].revalidate();
@@ -1961,7 +1966,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         posicionesEliminar(ubicaciones[1][0], ubicaciones[1][1], direction);
     }
     @Override
-    public void timesUp(String message) {
+    public void timesUp(String message, String gameMode) {
         JOptionPane.showMessageDialog(gui, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
     }
 

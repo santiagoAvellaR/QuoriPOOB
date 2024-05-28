@@ -24,6 +24,7 @@ public class Peon extends Field implements Serializable {
     private String[][] directionsMatrix;
     private ArrayList<String> shortestPath;
     private int minimumNumberMovementsToWin;
+    private int sumObjectiveRow;
 
     public Peon(int row, int column, Board board, Color color, int numberPlayer, String shape) {
         super(color);
@@ -219,7 +220,7 @@ public class Peon extends Field implements Serializable {
             validMovementsCalculated.add(directionString);
             return;
         }
-        if (row <= 2 && goesUp || column <= 0 || column >= board.getBoardSize()-1){return;}
+        if (row <= 2 && goesUp ){return;}
         if (row >= board.getBoardSize()-3 && !goesUp){return;}
         // verificar salto Doble
         if (board.hasBarrier(row + 3*direction, column)) {
@@ -237,12 +238,16 @@ public class Peon extends Field implements Serializable {
     private void validateVerticalDiagonals(int row, int column, ArrayList<String> validVerticalMovements, boolean goesUp){
         int direction = goesUp ? -1 : 1;
         String directionString = goesUp ? "nw" : "sw";
-        if (!board.hasBarrier(row + 2*direction, column - 1) && !validVerticalMovements.contains(directionString)){
-            validVerticalMovements.add(directionString);
+        if (!(column <= 0 )) {
+            if (!board.hasBarrier(row + 2 * direction, column - 1) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
         }
-        directionString = goesUp ? "ne" : "se";
-        if (!board.hasBarrier(row + 2*direction, column + 1) && !validVerticalMovements.contains(directionString)){
-            validVerticalMovements.add(directionString);
+        if (!(column >= board.getBoardSize()-1)){
+            directionString = goesUp ? "ne" : "se";
+            if (!board.hasBarrier(row + 2 * direction, column + 1) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
         }
     }
     public void validateHorizontal(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesLeft){
@@ -262,7 +267,7 @@ public class Peon extends Field implements Serializable {
             validMovementsCalculated.add(directionString);
             return;
         }
-        if (column <= 2 && goesLeft || row <= 0 || row >= board.getBoardSize()-1){return;}
+        if (column <= 2 && goesLeft){return;}
         if (column >= board.getBoardSize()-3 && !goesLeft){return;}
         // verificar salto Doble
         if (board.hasBarrier(row, column + 3*direction)) {
@@ -280,12 +285,16 @@ public class Peon extends Field implements Serializable {
     private void validateHorizontalDiagonals(int row, int column, ArrayList<String> validVerticalMovements, boolean goesLeft){
         int direction = goesLeft ? -1 : 1;
         String directionString = goesLeft ? "sw" : "se";
-        if (!board.hasBarrier(row+1, column + 2*direction) && !validVerticalMovements.contains(directionString)){
-            validVerticalMovements.add(directionString);
+        if ( !(row >= board.getBoardSize()-1)) {
+            if (!board.hasBarrier(row + 1, column + 2 * direction) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
         }
-        directionString = goesLeft ? "nw" : "ne";
-        if (!board.hasBarrier(row-1, column + 2*direction) && !validVerticalMovements.contains(directionString)){
-            validVerticalMovements.add(directionString);
+        if (!(row <= 0)){
+            directionString = goesLeft ? "nw" : "ne";
+            if (!board.hasBarrier(row - 1, column + 2 * direction) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
         }
     }
 
@@ -481,12 +490,16 @@ public class Peon extends Field implements Serializable {
         int min, row, column;
         column = 0;
         min = Integer.MAX_VALUE;
+        int sumAllRow = 0;
         row = playerNumber == 1 ? 0 : costsMatrix.length-1;
         Integer[] significantRow= costsMatrix[row];
         for (int i = 0; i < costsMatrix.length; i++){
             if (significantRow[i] < min){
                 min = significantRow[i];
                 column = i;
+            }
+            if (significantRow[i] != Integer.MAX_VALUE){
+                sumAllRow += significantRow[i];
             }
         }
         minimumNumberMovementsToWin = min;
@@ -502,10 +515,11 @@ public class Peon extends Field implements Serializable {
             cont+=1;
         }
         shortestPath = path;
-        System.out.println("peon numero " + playerNumber);
-        System.out.println("minimo numero de pasos: " + minimumNumberMovementsToWin + "camino: " + shortestPath.toString());
-        printMatrix(directionsMatrix);
-        printMatrix(costsMatrix);
+        sumObjectiveRow = sumAllRow;
+        //System.out.println("peon numero " + playerNumber);
+        //System.out.println("minimo numero de pasos: " + minimumNumberMovementsToWin + "camino: " + shortestPath.toString());
+        //printMatrix(directionsMatrix);
+        //printMatrix(costsMatrix);
     }
 
     public void actualizeStrategyInformation(){
@@ -516,6 +530,10 @@ public class Peon extends Field implements Serializable {
         costs[row/2][column/2] = 0;
         shortestPath(row, column, new String[board.getBoardSize()/2 + 1][board.getBoardSize()/2 + 1], costs, "");
         reconstructShortestPath();
+        System.out.println("minimo peon" + playerNumber + ": " + minimumNumberMovementsToWin);
+        System.out.println("suma total de: " + sumObjectiveRow);
+        printMatrix(costsMatrix);
+        printMatrix(directionsMatrix);
     }
 
     public int getMinimumNumberMovementsToWin(){
@@ -528,5 +546,12 @@ public class Peon extends Field implements Serializable {
 
     public String getContraryMovement(String movement){
         return oppositeMovements.get(movement);
+    }
+
+    public void printCostMatrix(){
+        printMatrix(costsMatrix);
+    }
+    public int getSumObjectiveRow(){
+        return sumObjectiveRow;
     }
 }

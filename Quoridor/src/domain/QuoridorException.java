@@ -37,8 +37,8 @@ public class QuoridorException extends Exception implements Serializable {
     public static final String PLAYER_PLAYS_TWICE = "Player plays twice";
     public static final String MAXIMUM_NUMBER_REWIND_EXCEEDED = ".  It's impossible to put in the board that amount of rewind squares";
     // machine
-    public static final String MACHINE_ADD_A_BARRIER = "Machine adds a barrier";
-    public static final String MACHINE_MOVE_PEON = "Machine move peon";
+    public static final String MACHINE_ADD_A_BARRIER = "Machine want to add a barrier";
+    public static final String MACHINE_MOVE_PEON = "Machine want to move the peon";
 
     public QuoridorException(String message){
         super(message);
