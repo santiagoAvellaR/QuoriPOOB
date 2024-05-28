@@ -8,6 +8,8 @@ public class Board implements Serializable{
     public final int size;
     private Field[][] board;
     private Temporary deletedTemporary;
+    private Peon peon1;
+    private Peon peon2;
 
     public Board(int size, Color player1Color, String shapePeon1, Color player2Color, String shapePeon2, int transporterSquares, int rewindSquares, int skipTurnSquares) {
         this.size = size;
@@ -15,8 +17,10 @@ public class Board implements Serializable{
         int midColumn = size % 2 == 0 ? size - 2 : size - 1;
         Peon peon1 = new Peon(getBoardSize() - 1, midColumn, this, player1Color, 1, shapePeon1);
         board[getBoardSize() - 1][midColumn] = peon1;
+        this.peon1 = peon1;
         Peon peon2 = new Peon(0, midColumn, this, player2Color, 2, shapePeon2);
         board[0][midColumn] = peon2;
+        this.peon2 = peon2;
         fillTheBoard(transporterSquares, rewindSquares, skipTurnSquares, peon1, peon2);
         System.out.println("tablero inicial");
         printBoard();
@@ -306,14 +310,14 @@ public class Board implements Serializable{
         if (row + (length*2)-1 >= getBoardSize() && !isHorizontal) {return false;}
         if (column + (length*2)-1 >= getBoardSize() && isHorizontal) {return false;}
         if (!isHorizontal){
-            for (int i = row; i < length*2 - 1; i++) {
+            for (int i = row; i < row + length*2 - 1; i++) {
                 if (board[i][column] != null) {
                     return false;
                 }
             }
         }
         else {
-            for (int j = column; j < length*2 - 1; j++) {
+            for (int j = column; j < column + length*2 - 1; j++) {
                 if (board[row][j] != null) {
                     return false;
                 }
@@ -326,20 +330,38 @@ public class Board implements Serializable{
         if (row + ((length*2)-2) >= getBoardSize() && !isHorizontal) {return false;}
         if (column + ((length*2)-2) >= getBoardSize() && isHorizontal) {return false;}
         if (!isHorizontal){
-            for (int i = row; i < length*2 - 1; i++) {
+            for (int i = row; i < row + length*2 - 1; i++) {
                 if (board[i][column] != null) {
                     return false;
                 }
             }
         }
         else {
-            for (int j = column; j < length*2 - 1; j++) {
+            for (int j = column; column + j < length*2 - 1; j++) {
                 if (board[row][j] != null) {
                     return false;
                 }
             }
         }
         return peon1.hasAnExitMainMethod(peon1.getRow(), peon1.getColumn()) && peon2.hasAnExitMainMethod(peon2.getRow(), peon2.getColumn());
+    }
+
+    public void deleteTemporarilyPeonFromBoard(int numberPeon){
+        if (numberPeon == 1){
+            board[peon1.getRow()][peon1.getColumn()] = null;
+        }
+        else if (numberPeon == 2){
+            board[peon2.getRow()][peon2.getColumn()] = null;
+        }
+    }
+
+    public void addPeonToBoard(int numberPeon){
+        if (numberPeon == 1){
+            board[peon1.getRow()][peon1.getColumn()] = peon1;
+        }
+        else if (numberPeon == 2){
+            board[peon2.getRow()][peon2.getColumn()] = peon2;
+        }
     }
 
 }

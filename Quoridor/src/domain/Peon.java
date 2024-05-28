@@ -328,14 +328,17 @@ public class Peon extends Field implements Serializable {
 
     // functions for validate that peon has an exit (way/path to win)
     public boolean hasAnExitMainMethod(int simulateRow, int simulateColumn){
+        board.deleteTemporarilyPeonFromBoard(playerNumber == 1 ? 2 : 1);
         Boolean[][] visited = new Boolean[getBoardSize()/2+1][getBoardSize()/2+1];
         for (Boolean[] booleans : visited) {
             Arrays.fill(booleans, false);
         }
         visited[simulateRow/2][simulateColumn/2] = true;
-        return hasAnExit(simulateRow, simulateColumn, visited, "");
+        boolean hasAnexit = hasAnExit(simulateRow, simulateColumn, visited, "");
+        board.addPeonToBoard(playerNumber == 1 ? 2 : 1);
+        return hasAnexit;
     }
-    public boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited, String lastMovement) {
+    private boolean hasAnExit(int simulateRow, int simulateColumn, Boolean[][] positionsVisited, String lastMovement) {
         if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize() - 1 && playerNumber == 2)) {return true;}
         if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")) {return false;}
         positionsVisited[simulateRow / 2][simulateColumn / 2] = true;
@@ -499,7 +502,7 @@ public class Peon extends Field implements Serializable {
     }
 
     // shortest path
-    public void shortestPath(int simulateRow, int simulateColumn, String[][] path, Integer[][] costs, String lastMovement){
+    private void shortestPath(int simulateRow, int simulateColumn, String[][] path, Integer[][] costs, String lastMovement){
         long startTime = System.currentTimeMillis();
         if ((simulateRow == 0 && playerNumber == 1) || (simulateRow == board.getBoardSize()-1 && playerNumber == 2)){return;}
         if (board.getTypeField(simulateRow, simulateColumn).equals("ReWind")){return;}
@@ -519,7 +522,7 @@ public class Peon extends Field implements Serializable {
         directionsMatrix = path;
         costsMatrix = costs;
     }
-    public void reconstructShortestPath(){
+    private void reconstructShortestPath(){
         int min, row, column;
         column = 0;
         min = Integer.MAX_VALUE;
@@ -565,8 +568,8 @@ public class Peon extends Field implements Serializable {
         reconstructShortestPath();
         System.out.println("minimo peon" + playerNumber + ": " + minimumNumberMovementsToWin);
         System.out.println("suma total de: " + sumObjectiveRow);
-        printMatrix(costsMatrix);
-        printMatrix(directionsMatrix);
+        //printMatrix(costsMatrix);
+        //printMatrix(directionsMatrix);
     }
 
     public int getMinimumNumberMovementsToWin(){

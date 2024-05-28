@@ -74,4 +74,8 @@ public class Machine extends Player implements Serializable {
         }
     }
 
+    public void strategyChooseAnotherBarrier(int row, int column){
+        strategy.addBarriersThatBlockPeon(row, column);
+    }
+
 }

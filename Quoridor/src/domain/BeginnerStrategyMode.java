@@ -86,4 +86,6 @@ public class BeginnerStrategyMode extends StrategyMode implements MachineStrateg
         return random.nextInt((limit / 2)) * 2 + 1;
     }
 
+    @Override
+    public void addBarriersThatBlockPeon(int row, int column){}
 }

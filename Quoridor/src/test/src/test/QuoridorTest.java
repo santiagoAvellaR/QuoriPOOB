@@ -675,7 +675,6 @@ class QuoridorTest {
                     "0", "0", false, "Player1", Color.BLUE, "CLASSIC",
                     "Player2", Color.red, "CLASSIC",
                     "NORMAL", 30,  "beginner");
-            quoridor.shortestPahtPeon(1);
             quoridor.peonActualizeStrategyInformation();
 
         }
@@ -691,7 +690,6 @@ class QuoridorTest {
                     "0", "0", false, "Player1", Color.BLUE, "CLASSIC",
                     "Player2", Color.red, "CLASSIC",
                     "NORMAL", 30,  "beginner");
-            quoridor.shortestPahtPeon(1);
             quoridor.addBarrier(Color.blue, 0,1,false,"n");
             quoridor.addBarrier(Color.red, 5, 6, true, "l");
             quoridor.addBarrier(Color.blue, 0, 7, false, "n");

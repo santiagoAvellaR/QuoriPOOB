@@ -223,9 +223,11 @@ public class Quoridor implements Serializable{
                         if (e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON1) || e1.getMessage().equals(QuoridorException.BARRIER_TRAP_PEON2) ||
                                 e1.getMessage().equals(QuoridorException.BARRIER_ALREADY_CREATED) || e1.getMessage().equals(QuoridorException.BARRIER_OVERLAP)){
                             System.out.println("atrapa al peon");
+                            machine.strategyChooseAnotherBarrier(machine.getRow(), machine.getColumn());
                             machineTurn();
                         }
                         else {
+                            Log.record(e1);
                             System.out.println("mientras añadía la barrera arrojo: " + e1.getMessage());
                         }
                     }
@@ -390,13 +392,7 @@ public class Quoridor implements Serializable{
         board.addRewindSquare(row, column);
     }
     public boolean peonsHasAnExit(){return player1.peonHasAnExit() && player2.peonHasAnExit();}
-    public void shortestPahtPeon(int numberPeon){
-        if (numberPeon == 1) {
-            player1.peonShortestPath();
-        } else {
-            player2.peonShortestPath();
-        }
-    }
+
     public void peonActualizeStrategyInformation(){
         player1.getPeon().actualizeStrategyInformation();
         player2.getPeon().actualizeStrategyInformation();

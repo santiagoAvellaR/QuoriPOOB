@@ -406,7 +406,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                             player2Color,
                             forP2,
                             (String) difficulties.getSelectedItem(),
-                            (seconds != null) ? seconds.getValue() : 0,
+                            (seconds != null && !difficulties.getSelectedItem().equals("NORMAL")) ? seconds.getValue() : 0,
                             (String)modalities.getSelectedItem());
                     turns = quoridor.getTurns();
                     player1Color = quoridor.getColorPlayer(0);
@@ -771,7 +771,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         if(!gameMode.equals("NORMAL")){
             timeTurno = new JLabel();
             turns = quoridor.getTurns();
-
+            System.out.println(quoridor.getGameMode());
             tiempoDis = createTimer(playerTurno);
             timeTurno.setFont(gameFont20);
             tiempoDis.start();
@@ -781,14 +781,11 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         gbcOptions.gridx = 2;
         gbcOptions.anchor = GridBagConstraints.NORTHEAST;
         options.add(finishButton, gbcOptions);
-
         gamePanel.add(options, BorderLayout.SOUTH);
     }
-
-
     private  Timer createTimer(Color player) {
         return new Timer(1000, new ActionListener() {
-            int time = quoridor.getTimePlayer(player);
+            int time = quoridor.getTimePlayer(playerTurno);
             boolean seguir = true;
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -808,14 +805,14 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                                 ((Timer) e.getSource()).stop();
                                 JOptionPane.showMessageDialog(gui, "Ningun jugador puede mover se acabo el juego");
                                 seguir = false;
-                                finishButton.doClick();
+                                newGameButton.doClick();
                             }
                             else {
                                 quoridor.sumTurn();
                                 quoridor.setDelta(2);
                             }
                         }
-                        else{
+                        else if(quoridor.getGameMode().equals("TIME TRIAL")){
                             quoridor.sumTurn();
                         }
                         ((Timer) e.getSource()).stop();
@@ -842,10 +839,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         playerTurno = (turns%2==0)?quoridor.getColorPlayer(0):quoridor.getColorPlayer(1);
         labelTurns.setText("Turno de: "  );
         panelTurns.setBackground(playerTurno);
-        if(timeTurno!= null){
-
+        if(timeTurno!= null && !quoridor.getGameMode().equals("NORMAL")){
             startTimer(playerTurno);
-
         }
         if(turns%2==1 && quoridor.getVsMachine()) {
             int[][] ubicaciones = quoridor.getPeonsPositions();
@@ -1637,6 +1632,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         tiempoDis.stop();
                     }
                     newGameButton.doClick();
+                    difficulties.setSelectedIndex(0);
                     revalidate();
                     repaint();
                 }
@@ -1772,6 +1768,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                         String nombreArchivo = nombreArchivoField.getText() + ".dat";
                         java.io.File archivo = new java.io.File(selectedFolder.getAbsolutePath() + java.io.File.separator + nombreArchivo);
                         quoridor.save(archivo);
+                        newGameButton.doClick();
                     }
                     catch (QuoridorException e) {
 

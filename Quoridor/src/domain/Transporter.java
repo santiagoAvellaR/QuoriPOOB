@@ -9,7 +9,7 @@ public class Transporter extends Square{
     }
 
     @Override
-    public String getType(){return hasPeon() ? "Transporter" + peon.getPlayerNumber() : "Transporter";}
+    public String getType(){return hasPeon() ? "TransporterPeon" + peon.getPlayerNumber() : "Transporter";}
 
     @Override
     public void applySpecialAction() {

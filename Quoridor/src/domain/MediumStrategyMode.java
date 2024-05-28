@@ -3,14 +3,23 @@ package src.domain;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class MediumStrategyMode extends StrategyMode implements MachineStrategy, Serializable {
+    private HashMap<int[], String> barriersTharBlockPeon = new HashMap<>();
+
+    @Override
+    public void addBarriersThatBlockPeon(int row, int column){
+        barriersTharBlockPeon.put(new int[]{row, column}, "block");
+    }
 
     @Override
     public void makeMove(Board board, Peon peon, Player otherPlayer, int normalBarriers, int temporaryBarriers, int longBarriers, int alliedBarriers) throws QuoridorException {
         peon.actualizeStrategyInformation();
         otherPlayer.getPeon().actualizeStrategyInformation();
         System.out.println(peon.getMinimumNumberMovementsToWin() + " <= " + otherPlayer.getPeon().getMinimumNumberMovementsToWin());
+        System.out.println("filas que bloquean: " + barriersTharBlockPeon.keySet());
         if (peon.getMinimumNumberMovementsToWin() <= otherPlayer.getPeon().getMinimumNumberMovementsToWin() || (normalBarriers <= 0 && temporaryBarriers <= 0
                 && alliedBarriers <= 0 && longBarriers <= 0)){
             System.out.println("maquina decide mover peon");
@@ -30,7 +39,9 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
             bestHorizontalBarrier(board, peon.getSumObjectiveRow(), otherPlayer.getPeon().getSumObjectiveRow(), peon.getMinimumNumberMovementsToWin(),
                     otherPlayer.getPeon().getMinimumNumberMovementsToWin(), availableBarriers, peon, otherPlayer);
             System.out.println("mandando respuesta, notificando...");
-            if (row != Integer.MAX_VALUE && column != Integer.MAX_VALUE && barrierType != ""){
+            int[] posiciones = new int[]{row, column};
+            if ((row != Integer.MAX_VALUE && column != Integer.MAX_VALUE && !barrierType.isEmpty()) || (barriersTharBlockPeon.containsKey(posiciones))){
+                System.out.println("encontro una barrera para poner, manda notificacion... ");
                 throw new QuoridorException(QuoridorException.MACHINE_ADD_A_BARRIER);
             }
             else {
@@ -59,6 +70,10 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
         if (availableBarriers.contains("t") && availableBarriers.contains("n")){
             availableBarriers.remove("t");
         }
+        if (availableBarriers.contains("a") && (availableBarriers.contains("n") || availableBarriers.contains("t"))){
+            availableBarriers.remove("n");
+            availableBarriers.remove("t");
+        }
         return availableBarriers;
     }
 
@@ -68,25 +83,25 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
         otherPlayer.getPeon().printCostMatrix();
         for (String barrier : availableBarriers) {
             int length = barrier.equals("l") ? 3 : 2;
-            System.out.println("entra al ciclo a recorrer la matriz");
-            for (int i = 0; i < board.getBoardSize() && i <= otherPlayer.getPeon().getRow()+2; i++) {
-                for (int j = 0; j < board.getBoardSize(); j++) {
-                    if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0)) {
-                        System.out.println("validando: " + barrier + " " + i + ", " + j);
+            // int i = 0; i < board.getBoardSize() && i < otherPlayer.getPeon().getRow() + 2; i++
+            for (int i = board.getBoardSize()-1; i >= 0; i--) {
+                // int j = 0; j < board.getBoardSize(); j++
+                for (int j = board.getBoardSize()-1; j >= 0; j--) {
+                    System.out.println("ciclo   i: " + i + " j: " + j);
+                    if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0) && !barriersTharBlockPeon.containsKey(new int[]{i, j})) {
                         boolean isHorizontalCal = (i % 2 != 0 && j % 2 == 0);
                         boolean isEmpty = board.getTypeField(i, j).equals("Empty");
                         boolean canBePlaced = board.barrierCanBePlace(i, j, length, isHorizontalCal, peon, otherPlayer.getPeon());
-                        System.out.println("esta vacia: " + isEmpty + " puede ponerse: " + canBePlaced);
                         if (isEmpty && canBePlaced) {
                             try {
-                                System.out.println("validando caso: " + i + ", " + j + " orientacion: " + isHorizontalCal);
+                                //System.out.println("validando caso: " + i + ", " + j + " orientacion: " + isHorizontalCal);
                                 board.addBarrier(Color.WHITE, i, j, length, isHorizontalCal, barrier);
                                 peon.actualizeStrategyInformation();
                                 otherPlayer.getPeon().actualizeStrategyInformation();
                                 //System.out.println("numero de pasos para ganar(maquina): " + peon.getMinimumNumberMovementsToWin());
                                 //System.out.println("numero de pasos para ganar(jugador): " + otherPlayer.getPeon().getMinimumNumberMovementsToWin());
                                 // ensayo (peon.getSumObjectiveRow() < sumMovementsME && otherPlayer.getPeon().getSumObjectiveRow() > sumMovementOP)
-                                if ((peon.getMinimumNumberMovementsToWin() <= meMNMTW && otherPlayer.getPeon().getMinimumNumberMovementsToWin() >= otherPMNMTW) && !(i > otherPlayer.getPeon().getRow()) ) {
+                                if ((peon.getMinimumNumberMovementsToWin() < meMNMTW || (peon.getMinimumNumberMovementsToWin() <= meMNMTW && otherPlayer.getPeon().getMinimumNumberMovementsToWin() > otherPMNMTW))) {
                                     row = i;
                                     column = j;
                                     barrierType = barrier;
@@ -100,6 +115,7 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
                                 board.deleteBarrier(i, j, length, isHorizontalCal, null);
                             } catch (QuoridorException e) {
                                 if (e.getMessage().equals(QuoridorException.BARRIER_ALREADY_CREATED) || e.getMessage().equals(QuoridorException.BARRIER_OVERLAP)) {
+                                    addBarriersThatBlockPeon(i, j);
                                     System.out.println("primer if: " + e.getMessage());
                                     continue;
                                 } else {
