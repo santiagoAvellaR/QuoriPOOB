@@ -215,7 +215,7 @@ public class Peon extends Field implements Serializable {
                 return;
             }
         }
-        if (!board.hasPeon(row + 2*direction, column)){
+        if (!board.hasPeon(row + 2*direction, column) || (board.hasPeon(row + 2*direction, column) && board.getFieldColor(row + 2*direction, column).equals(color))){
             directionString = goesUp ? "n" : "s";
             validMovementsCalculated.add(directionString);
             return;
@@ -262,7 +262,7 @@ public class Peon extends Field implements Serializable {
                 return;
             }
         }
-        if (!board.hasPeon(row, column + 2*direction)) {
+        if (!board.hasPeon(row, column + 2*direction) || (board.hasPeon(row, column + 2*direction) && board.getFieldColor(row, column + 2*direction).equals(color))) {
             directionString = goesLeft ? "w" : "e";
             validMovementsCalculated.add(directionString);
             return;
@@ -370,30 +370,47 @@ public class Peon extends Field implements Serializable {
 
     }
     private void validateVerticalExits(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesUp){
+        String directionString;
         if (row == 0 && goesUp) {return;}
         if (row == board.getBoardSize()-1 && !goesUp) {return;}
         int direction = goesUp ? -1 : 1;
-        // verificar salto Simple
         if (board.hasBarrier(row + direction, column)) {
             return;
         }
-        if (!board.hasPeon(row + 2*direction, column)){
-            String directionString = goesUp ? "n" : "s";
+        if (!board.hasPeon(row + 2*direction, column) || (board.hasPeon(row + 2*direction, column) && board.getFieldColor(row + 2*direction, column).equals(color))){
+            directionString = goesUp ? "n" : "s";
             validMovementsCalculated.add(directionString);
             return;
         }
-        if (row <= 2 && goesUp){return;}
+        if (row <= 2 && goesUp ){return;}
         if (row >= board.getBoardSize()-3 && !goesUp){return;}
-        // verificar salto Doble
         if (board.hasBarrier(row + 3*direction, column)) {
+            Barrier barrier = (Barrier) board.getField(row + 3*direction, column);
+            validateVerticalDiagonalsExits(row, column, validMovementsCalculated, goesUp);
             return;
         }
-        if (!board.hasPeon(row + 4*direction, column)) {
-            String directionCharacter = goesUp ? "jn" : "js";
-            validMovementsCalculated.add(directionCharacter);
+        if (!board.hasPeon(row + 4*direction, column) && !board.getFieldColor(row + 2*direction, column).equals(color)) {
+            directionString = goesUp ? "jn" : "js";
+            validMovementsCalculated.add(directionString);
+        }
+    }
+    private void validateVerticalDiagonalsExits(int row, int column, ArrayList<String> validVerticalMovements, boolean goesUp){
+        int direction = goesUp ? -1 : 1;
+        String directionString = goesUp ? "nw" : "sw";
+        if (!(column <= 0 )) {
+            if (!board.hasBarrier(row + 2 * direction, column - 1) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
+        }
+        if (!(column >= board.getBoardSize()-1)){
+            directionString = goesUp ? "ne" : "se";
+            if (!board.hasBarrier(row + 2 * direction, column + 1) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
         }
     }
     public void validateHorizontalExits(int row, int column, ArrayList<String> validMovementsCalculated, boolean goesLeft){
+        String directionString;
         if (column == 0 && goesLeft) {return;}
         if (column == board.getBoardSize()-1 && !goesLeft) {return;}
         int direction = goesLeft ? -1 : 1;
@@ -401,20 +418,36 @@ public class Peon extends Field implements Serializable {
         if (board.hasBarrier(row, column + direction)) {
             return;
         }
-        if (!board.hasPeon(row, column + 2*direction)) {
-            String directionString = goesLeft ? "w" : "e";
+        if (!board.hasPeon(row, column + 2*direction) || (board.hasPeon(row, column + 2*direction) && board.getFieldColor(row, column + 2*direction).equals(color))) {
+            directionString = goesLeft ? "w" : "e";
             validMovementsCalculated.add(directionString);
             return;
         }
         if (column <= 2 && goesLeft){return;}
-        if (column >= board.getBoardSize()-2 && !goesLeft){return;}
+        if (column >= board.getBoardSize()-3 && !goesLeft){return;}
         // verificar salto Doble
         if (board.hasBarrier(row, column + 3*direction)) {
+            validateHorizontalDiagonalsExits(row, column, validMovementsCalculated, goesLeft);
             return;
         }
-        if (board.hasPeon(row, column + 4*direction)) {
-            String directionCharacter = goesLeft ? "je" : "jw";
-            validMovementsCalculated.add(directionCharacter);
+        if (!board.hasPeon(row, column + 4*direction) && !board.getFieldColor(row, column + 2*direction).equals(color)) {
+            directionString = goesLeft ? "jw" : "je";
+            validMovementsCalculated.add(directionString);
+        }
+    }
+    private void validateHorizontalDiagonalsExits(int row, int column, ArrayList<String> validVerticalMovements, boolean goesLeft){
+        int direction = goesLeft ? -1 : 1;
+        String directionString = goesLeft ? "sw" : "se";
+        if ( !(row >= board.getBoardSize()-1)) {
+            if (!board.hasBarrier(row + 1, column + 2 * direction) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
+        }
+        if (!(row <= 0)){
+            directionString = goesLeft ? "nw" : "ne";
+            if (!board.hasBarrier(row - 1, column + 2 * direction) && !validVerticalMovements.contains(directionString)) {
+                validVerticalMovements.add(directionString);
+            }
         }
     }
     private int[] getTheNewPositionAccordingDirection(int row, int column, String direction){
@@ -507,7 +540,7 @@ public class Peon extends Field implements Serializable {
         row = row*2;
         ArrayList<String> path = new ArrayList<>();
         int cont = 0;
-        while ((row != this.row) || (column != this.column)){
+        while (((row != this.row) || (column != this.column)) && directionsMatrix[row/2][column/2] != null){
             path.addFirst(oppositeMovements.get(directionsMatrix[row/2][column/2]));
             int[] newPosition = getTheNewPositionAccordingDirection(row, column, directionsMatrix[row/2][column/2]);
             row = newPosition[0];

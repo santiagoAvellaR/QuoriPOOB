@@ -771,8 +771,8 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         if(!gameMode.equals("NORMAL")){
             timeTurno = new JLabel();
             turns = quoridor.getTurns();
-            int segundos = quoridor.getTimePlayer(playerTurno);
-            tiempoDis = createTimer(segundos, playerTurno);
+
+            tiempoDis = createTimer(playerTurno);
             timeTurno.setFont(gameFont20);
             tiempoDis.start();
             options.add(timeTurno, gbcOptions);
@@ -785,38 +785,68 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
         gamePanel.add(options, BorderLayout.SOUTH);
     }
 
-    private Timer createTimer(int tiempo, Color Player) {
+
+    private  Timer createTimer(Color player) {
         return new Timer(1000, new ActionListener() {
-            int time = tiempo;
+            int time = quoridor.getTimePlayer(player);
+            boolean seguir = true;
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(Player.equals(playerTurno)) {
+                if (player.equals(playerTurno)) {
                     if (time > 0) {
-
+                        if (quoridor.getGameMode().equals("TIMED"))
+                        {
+                            quoridor.setTimePlayer(playerTurno, time);
+                        }
                         timeTurno.setText("Tiempo Disponible " + time);
                         time--;
                     } else {
-                        timeTurno.setText("Se acabo el tiempo ");
+                        if (quoridor.getGameMode().equals("TIMED"))
+                        {
+                            if(quoridor.getTimePlayer(player1Color) == 1 && quoridor.getTimePlayer(player2Color) == 1 )
+                            {
+                                ((Timer) e.getSource()).stop();
+                                JOptionPane.showMessageDialog(gui, "Ningun jugador puede mover se acabo el juego");
+                                seguir = false;
+                                finishButton.doClick();
+                            }
+                            else {
+                                quoridor.sumTurn();
+                                quoridor.setDelta(2);
+                            }
+                        }
+                        else{
+                            quoridor.sumTurn();
+                        }
                         ((Timer) e.getSource()).stop();
+                        if(seguir) {
+                            actualizarTurnos();
+                        }
                     }
-                }
-                else{
+                } else {
                     ((Timer) e.getSource()).stop();
                 }
             }
         });
+    }
+    private  void startTimer(Color player) {
+        if (tiempoDis != null && tiempoDis.isRunning()) {
+            tiempoDis.stop();
+        }
+        tiempoDis = createTimer(player);
+        tiempoDis.start();
     }
 
     private void actualizarTurnos() {
         turns = quoridor.getTurns();
         playerTurno = (turns%2==0)?quoridor.getColorPlayer(0):quoridor.getColorPlayer(1);
         labelTurns.setText("Turno de: "  );
-        if(timeTurno!= null){
-            int segundos = quoridor.getTimePlayer(player1Color);
-            tiempoDis = createTimer(segundos, playerTurno);
-            tiempoDis.start();
-        }
         panelTurns.setBackground(playerTurno);
+        if(timeTurno!= null){
+
+            startTimer(playerTurno);
+
+        }
         if(turns%2==1 && quoridor.getVsMachine()) {
             int[][] ubicaciones = quoridor.getPeonsPositions();
             int [] peon = ubicaciones[1];
@@ -845,7 +875,7 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
                 peon = ubicaciones[1];
                 agregarPeon(peon[0], peon[1], P2);
                 actualizarCasillasVisitadas();
-                actualizarTurnos();
+                //actualizarTurnos();
             }
         }
         panelTurns.revalidate();
@@ -1967,7 +1997,18 @@ public class QuoridorGUI extends JFrame implements QuoridorObserver{
     }
     @Override
     public void timesUp(String message, String gameMode) {
-        JOptionPane.showMessageDialog(gui, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
+        if(quoridor.getGameMode().equals("TIME TRIAL")){
+
+            actualizarTurnos();
+            System.out.println("PITA");
+            System.out.println("TURNOOO" + (int)(quoridor.getTurns()));
+        }
+        else if(quoridor.getGameMode().equals("TIMED")){
+
+            System.out.println("ACTUALIZAE" + (int)(quoridor.getTurns()));
+        }
+
+        //JOptionPane.showMessageDialog(gui, message, "Fin del juego", JOptionPane.WARNING_MESSAGE);
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import javax.swing.Timer;
 
 public class Quoridor implements Serializable{
-    public Integer turns;
+    public int turns;
     public int delta;
     private Board board;
     private Player  player1;
@@ -48,7 +48,10 @@ public class Quoridor implements Serializable{
         validateStringNumberBarriers(normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers);
         validatePlayerData(sizeInt, playerOneColor, playerOneName, playerTwoColor, playerTwoName, normalBarriers, temporaryBarriers, largeBarriers, alliedBarriers, machineMode);
         // time
-        if (gameMode.equals("TIME TRIAL") || gameMode.equals("TIMED")){initializeTimes(gameTime);}
+        if(!gameMode.equals("NORMAL")){
+            timePlayer1 = gameTime;
+            timePlayer2 = gameTime;
+        }
         //initialize containers
         initializeHashMaps();
     }
@@ -109,59 +112,22 @@ public class Quoridor implements Serializable{
         lengthBarriersTypes.put("t", 2);
         lengthBarriersTypes.put("l", 3);
     }
-    private void initializeTimes(int totalGameTime) {
-        totalTime = totalGameTime;
-        this.timePlayer1 = totalGameTime;
-        this.timerPlayer1 = createTimer(timePlayer1, 1);
-
-        this.timePlayer2 = totalGameTime;
-        this.timerPlayer2 = createTimer(timePlayer2, 2);
-        timerPlayer1.restart();
-    }
-
-    private Timer createTimer(int playerTime, int playerNumber) {
-        return new Timer(1000, new ActionListener() {
-            int time = playerTime;
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (time > 0) {
-                    System.out.println("Tiempo restante para " + playerNumber + ": " + time + " segundos");
-                    time--;
-                } else {
-                    System.out.println("¡Tiempo agotado para " + playerNumber + "! El juego ha terminado.");
-                    ((Timer) e.getSource()).stop();
-                    String message = playerNumber == 1 ? QuoridorException.TIMES_UP_PLAYER_ONE : QuoridorException.TIMES_UP_PLAYER_TWO;
-                    delta = 2;
-                    notifyTimesUpObservers(message, gameMode);
-                }
-            }
-        });
-    }
-    private void maintainTime(Color playerColor){
-        int numberPlayer = playerColor.equals(player1.getColor()) ? 1 : 2;
-        if (gameMode.equals("TIME TRIAL")){
-            if (numberPlayer == 1){
-                timerPlayer1.stop();
-                timePlayer1 = totalTime;
-                timerPlayer2.restart();
-            }
-            else {
-                timerPlayer2.stop();
-                timePlayer2 = totalTime;
-                timerPlayer1.restart();
-            }
+    public void setTimePlayer(Color playerColor, int newTime){
+        if(playerColor.equals(player1.getColor())){
+            timePlayer1 = newTime;
+        }else{
+            timePlayer2 = newTime;
         }
-        else if (gameMode.equals("TIMED")) {
-            if (numberPlayer == 1){
-                timerPlayer1.stop();
-                timerPlayer2.restart();
-            }
-            else {
-                timerPlayer2.stop();
-                timerPlayer1.restart();
-            }
-        }
+
     }
+    public void sumTurn(){
+        turns+=1;
+    }
+    public void setDelta(int newDelta){
+        delta =newDelta;
+    }
+
+
     public int  getTimePlayer(Color playerColor){
         return playerColor.equals(player1.getColor()) ? timePlayer1 : timePlayer2;
     }
@@ -188,7 +154,6 @@ public class Quoridor implements Serializable{
         if (!selectedPlayer.equals(playerWhoIsSupposedToMove)){throw new QuoridorException(QuoridorException.PLAYER_NOT_TURN);}
         try {
             selectedPlayer.movePeon(direction);
-            maintainTime(playerColor);
             actualizeEachTurn(playerColor);
         } catch (QuoridorException e) {
             if (e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)){
@@ -240,10 +205,12 @@ public class Quoridor implements Serializable{
         if (vsMachine){
             Machine machine = (Machine) player2;
             try {
+                System.out.println("llama al metodo de juega contra la maquina");
                 machine.play();
             }
             catch (QuoridorException e) {
                 System.out.println("Excepcion arrojada: " + e.getMessage());
+                System.out.println("Juega y lanza la excepcion de: " + e.getMessage());
                 if (e.getMessage().equals(QuoridorException.MACHINE_ADD_A_BARRIER)){
                     System.out.println("entra en el catch de maquina quiere agregar una barrera");
                     try {
@@ -266,13 +233,19 @@ public class Quoridor implements Serializable{
                     System.out.println("moviendo peon en el tablero");
                     movePeon(machine.getColor(), machine.getDirection());
                     notifyMachineMovePeonObservers(QuoridorException.MACHINE_MOVE_PEON, machine.getPeon().getContraryMovement(machine.getDirection()));
-                } else if (e.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER)) {
+                } else if (e.getMessage().equals(QuoridorException.ERASE_TEMPORARY_BARRIER) || e.getMessage().equals(QuoridorException.PLAYER_ONE_WON) ||
+                e.getMessage().equals(QuoridorException.PLAYER_PLAYS_TWICE)) {
                     throw e;
+                } else if (e.getMessage().equals(QuoridorException.PLAYER_NOT_TURN)) {
+                    System.out.println("no es el turno de la maquina");
                 } else {
                     Log.record(e);
                     throw new QuoridorException(e.getMessage());
                 }
             }
+        }
+        else {
+            System.out.println("no es vs Maquina");
         }
     }
 
@@ -296,9 +269,6 @@ public class Quoridor implements Serializable{
         Color playerColorTurn = turns%2 == 0 ? player1.getColor() : player2.getColor();
         System.out.println("va a actualizar en cada turno");
         if (playerColorTurn.equals(playerColor)) {
-            if (gameMode.equals("TIMED") || gameMode.equals("TIME TRIAL")) {
-                maintainTime(playerColor);
-            }
             turns += delta;
             System.out.println();
             System.out.println("turno: " + turns);

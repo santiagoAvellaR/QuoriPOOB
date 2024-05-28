@@ -65,7 +65,13 @@ public class Machine extends Player implements Serializable {
     }
 
     public void play() throws QuoridorException {
-        strategy.makeMove(board, peon, otherPlayer, normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);
+        try{
+            strategy.makeMove(board, peon, otherPlayer, normalBarriers, temporaryBarriers, longBarriers, alliedBarriers);
+        }
+        catch(QuoridorException e){
+            System.out.println("error atrapado en maquina: " + e.getMessage());
+            throw e;
+        }
     }
 
 }

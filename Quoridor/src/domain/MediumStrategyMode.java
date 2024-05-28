@@ -19,6 +19,9 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
             throw new QuoridorException(QuoridorException.MACHINE_MOVE_PEON);
         }
         else{
+            row = Integer.MAX_VALUE;
+            column = Integer.MAX_VALUE;
+            barrierType = "";
             this.movementType = "addBarrier";
             System.out.println("maquina decide añadir barrera");
             String otherPlayerBestMovement = otherPlayer.getPeon().getBestPeonMovement();
@@ -27,7 +30,15 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
             bestHorizontalBarrier(board, peon.getSumObjectiveRow(), otherPlayer.getPeon().getSumObjectiveRow(), peon.getMinimumNumberMovementsToWin(),
                     otherPlayer.getPeon().getMinimumNumberMovementsToWin(), availableBarriers, peon, otherPlayer);
             System.out.println("mandando respuesta, notificando...");
-            throw new QuoridorException(QuoridorException.MACHINE_ADD_A_BARRIER);
+            if (row != Integer.MAX_VALUE && column != Integer.MAX_VALUE && barrierType != ""){
+                throw new QuoridorException(QuoridorException.MACHINE_ADD_A_BARRIER);
+            }
+            else {
+                System.out.println("maquina no encontró respuesta, decide mover peon");
+                this.movementType = "movePeon";
+                this.direction = peon.getBestPeonMovement();
+                throw new QuoridorException(QuoridorException.MACHINE_MOVE_PEON);
+            }
         }
     }
 
@@ -57,9 +68,11 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
         otherPlayer.getPeon().printCostMatrix();
         for (String barrier : availableBarriers) {
             int length = barrier.equals("l") ? 3 : 2;
-            for (int i = 0; i < board.getBoardSize(); i++) {
+            System.out.println("entra al ciclo a recorrer la matriz");
+            for (int i = 0; i < board.getBoardSize() && i <= otherPlayer.getPeon().getRow()+2; i++) {
                 for (int j = 0; j < board.getBoardSize(); j++) {
                     if ((i % 2 == 0 && j % 2 != 0) || (i % 2 != 0 && j % 2 == 0)) {
+                        System.out.println("validando: " + barrier + " " + i + ", " + j);
                         boolean isHorizontalCal = (i % 2 != 0 && j % 2 == 0);
                         boolean isEmpty = board.getTypeField(i, j).equals("Empty");
                         boolean canBePlaced = board.barrierCanBePlace(i, j, length, isHorizontalCal, peon, otherPlayer.getPeon());
@@ -100,7 +113,7 @@ public class MediumStrategyMode extends StrategyMode implements MachineStrategy,
                 }
             }
         }
-        System.out.println(row + ", " + column + " tipo: " + barrierType);
+        System.out.println("despues de hacer todo el ciclo, se decidio por:   " + row + ", " + column + " tipo: " + barrierType);
     }
 
 }
